@@ -41,10 +41,17 @@ void print_buf(char* buf, size_t buf_len) {
 int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
-  // open file for reading
+  // open mpf file for reading
   FILE* file = fopen(filePath, "r");
   if (file == NULL) {
       perror("An error occured, while trying to open a file");
+      return 1;
+  }
+
+  //open csv file for writing the data_tuples there
+  FILE* csv_file = fopen("data_tuples.csv", "w"); // or "a" to append
+  if (csv_file == NULL){
+      perror("Error while creating csv data_tuples file!");
       return 1;
   }
 
@@ -132,7 +139,8 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t ma
           (*cords)[i].laser = laser_on_off;
 
 
-          printf("(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
+          //printf("(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
+          fprintf(csv_file, "(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
 
           i += 1;
       }
@@ -140,6 +148,7 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t ma
 
   //close the mpf file
   fclose(file);
+  fclose(csv_file);
   return 0;
 }
 

@@ -4,42 +4,31 @@
 #include <math.h>
 
 int main() {
-    // filename und Zeichenpuffer definieren
-    char line[1000];
-    char filePath[] = "test.mpf";
+    char filePath[] = "ElGeo_5_V2_1.mpf";
+    size_t mpf_lines = 200;//266685;
 
-    // file zum Lesen öffnen
+
+    char line[1000]; //line buffer, to read a line with max 1000 chars
+
+    // open file for reading
     FILE *file = fopen(filePath, "r");
     if (file == NULL) {
         perror("An error occured, while trying to open a file");
         return 1;
-    }  
-
+    }
 
     int laser_on_off = 0;
     float machine_speed = 0.0;
 
-    size_t mpf_lines = 205000;
-    double* cords = malloc(mpf_lines * 4 * sizeof(double));
-
-    int i = 0;
-    for(int i = 0; i < mpf_lines; i++)
-    {
-        cords[i * 4] = 0;
-        cords[i * 4 + 1] = 0;
-        cords[i * 4 + 2] = 0;
-        cords[i * 4 + 3] = 0;
-    }
-
-
+    double* cords = calloc(mpf_lines * 4,sizeof(double));
     if (cords == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    
 
 
-    char format[] = " %*[^-0123456789]%lf"; 
+
+    char format[] = " %*[^-0123456789]%lf";
 
     double number = 0;
 
@@ -51,15 +40,14 @@ int main() {
     int y_has_changed = 0;
     int z_has_changed = 0;
 
-    //int i = 0;
 
     printf("Reading file with path: %s\n",filePath);
     //////////////////////////////////////////////////////////////////////////////////
     //--------------------------------Read-Loop-------------------------------------//
     //////////////////////////////////////////////////////////////////////////////////
-
+    int i = 0;
     while (fgets(line, sizeof(line), file) != NULL) {
-        
+
         x_has_changed = 0;
         y_has_changed = 0;
         z_has_changed = 0;
@@ -115,7 +103,7 @@ int main() {
 
         if (strstr(line, " Z") != NULL)
         {
-            
+
             //sscanf returns 1 when it successfully parses one item based on the format specifier provided.
             if (sscanf(strstr(line, " Z"), format, &number) == 1)
             {
@@ -123,17 +111,19 @@ int main() {
                 z_has_changed = 1;
             }
         }
-            
+
         if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1)
         {
-            //copy the last point
-            for (int j = 0; j < 4; j++) 
+
+            //(X10.0 in the NC means take the old point and change X to 10.0)
+            //therefore copy the last point
+            for (int j = 0; j < 4; j++)
             {
                 cords[i * 4 + j] = cords[(i-1) * 4 + j];
             }
 
 
-            //only change the parameters that have changed
+            //then only change the parameters that have changed
             if (x_has_changed == 1)
             {
                 cords[i * 4] = new_x;
@@ -149,6 +139,9 @@ int main() {
 
             cords[i * 4 + 3] = laser_on_off;
 
+
+            printf("(%f, %f, %f), laser=%d\n",cords[i*4],cords[i*4 + 1],cords[i*4 + 2],cords[i*4 + 3]);
+
             i += 1;
         }
 
@@ -163,11 +156,13 @@ int main() {
     unsigned int zero_counter = 0;
     unsigned int cords_length = 0;
     ///////////////////////////////////////////////////////
-    //----------Get the actual length of cords-----------//
+    //----------Get the length of cords array------------//
     ///////////////////////////////////////////////////////
 
+    //we iterate through the the cords array
+    //and break when we read at least 5 entries which contain (0,0,0,0)
     unsigned int j;
-    for(j = 0; j < mpf_lines; j++) 
+    for(j = 0; j < mpf_lines; j++)
     {
 
         if (cords[j * 4] == 0 && cords[j * 4 + 1] == 0 && cords[j * 4 + 2] == 0 && cords[j * 4 + 3] == 0)
@@ -176,7 +171,7 @@ int main() {
         }
         else
         {
-            zero_counter = 0; 
+            zero_counter = 0;
         }
 
         if (zero_counter > 4)
@@ -210,7 +205,7 @@ int main() {
     double y1 = 0;
     double z1 = 0;
 
-    
+
 
     //last vector (Vector from P-1 to P0)
     double lvx = 0;
@@ -256,18 +251,18 @@ int main() {
     }
 
     // Write the header row of the csv
-    fprintf(csvFile, "Time in seconds, Laser On/Off, Angle Between Last and Current Vector, P-1, P0, P1, last vector(P-1 to P0), length last vector, current vector(P0 to P1), length current vector, dot_product, (length_of_last * length_of_curr), angle between last and current vector \n"); 
+    fprintf(csvFile, "Time in seconds, Laser On/Off, Angle Between Last and Current Vector, P-1, P0, P1, last vector(P-1 to P0), length last vector, current vector(P0 to P1), length current vector, dot_product, (length_of_last * length_of_curr), angle between last and current vector \n");
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     for(int i = 0; i < cords_length - 1; i ++)
     {
-       if (i > 0) 
+       if (i > 0)
        {
             //point-1
             xn1 = cords[(i-1) * 4];
             yn1 = cords[(i-1) * 4 + 1];
             zn1 = cords[(i-1) * 4 + 2];
-       } //xn1, yn1, zn1 = 0; for i = 0 
+       } //xn1, yn1, zn1 = 0; for i = 0
 
 
         //point0
@@ -297,7 +292,7 @@ int main() {
 
         //last_vector * current_vector
         dot_product = lvx * vx + lvy * vy + lvz * vz;
-      
+
         //the angle between the last and current vector
         angle_last_curr = acos(dot_product / (length_of_curr_vector * length_of_last_vector))* (180 / M_PI); //convert the radiant result to degrees
 
@@ -311,7 +306,7 @@ int main() {
         }
 
         laser_on_off = cords[i * 4 + 3];
-        
+
 
         // printf("%d.: lv(%f, %f, %f), v(%f, %f, %f)\n",i, lvx, lvy, lvz, vx, vy, vz);
 
@@ -320,8 +315,8 @@ int main() {
 
         while((round(x0 * precision) / precision) != (round(x1 * precision) / precision) || (round(y0 * precision) / precision) != (round(y1 * precision) / precision) || (round(z0 * precision) / precision) != (round(z1 * precision) / precision))
         {
-            
-            
+
+
 
             //Go 1/1000 step on the vector to point1
             //TODO uncomment "/ precision"
@@ -332,7 +327,7 @@ int main() {
             // printf("vector(%f,%f,%f))\n",vx/1000,vy/1000,vz/1000);
             // printf("p0(%f,%f,%f),\np1(%f,%f,%f)\n",x0,y0,z0, x1,y1,z1);
 
-            
+
             //time counts the overall passed time.
             time += length_of_curr_vector / machine_speed * 60; //in seconds (t = s/v)
 
@@ -354,7 +349,7 @@ int main() {
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     fclose(csvFile);
     free(cords);
 

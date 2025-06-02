@@ -1,0 +1,10 @@
+laser_on_off doesn't seem to correctly scan G01 and G00.
+Laser is always marked as off
+
+For Refactoring:
+Fist Function:
+Write to a point cloud file, while reading the data
+
+Second Function:
+Read from the point cloud file and do the machine simulation,
+write the simulated results to a new mpf file

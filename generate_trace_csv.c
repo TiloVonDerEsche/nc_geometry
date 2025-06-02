@@ -23,12 +23,12 @@ typedef struct {
 } data_tuple;
 
 
-//does this function copy by value or by reference?
 void copy_data_tuple(size_t i, data_tuple** arr) {
-  arr[i]->P.x = arr[i-1]->P.x;
-  arr[i]->P.y = arr[i-1]->P.y;
-  arr[i]->P.z = arr[i-1]->P.z;
-  arr[i]->laser = arr[i-1]->laser;
+    if (i <= 0) { return; } // Avoid seg fault when i = 0
+    (*arr)[i].P.x = (*arr)[i-1].P.x;
+    (*arr)[i].P.y = (*arr)[i-1].P.y;
+    (*arr)[i].P.z = (*arr)[i-1].P.z;
+    (*arr)[i].laser = (*arr)[i-1].laser;
 }
 
 
@@ -38,7 +38,7 @@ void print_buf(char* buf, size_t buf_len) {
   }
 }
 
-int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_tuple** cords) {
+int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   // open file for reading
@@ -56,13 +56,15 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_t
 
   double number = 0;
 
-  double new_x = 0;
-  double new_y = 0;
-  double new_z = 0;
+  (*cords)[0].P.x = 0;
+  (*cords)[0].P.y = 0;
+  (*cords)[0].P.z = 0;
 
-  int x_has_changed = 0;
-  int y_has_changed = 0;
-  int z_has_changed = 0;
+  vec3D new_P = {0,0,0};
+
+  uint8_t x_has_changed = 0;
+  uint8_t y_has_changed = 0;
+  uint8_t z_has_changed = 0;
 
 
   printf("Reading file with path: %s\n",filePath);
@@ -73,9 +75,8 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_t
   //////////////////////////////////////////////////////////////////////////////
   int i = 0;
   //continue as long as the line contains something
-  while (fgets(line, max_line_len, file) != NULL) {
-
-      print_buf(line,max_line_len);
+  while ((fgets(line, max_line_len, file) != NULL) && i < mpf_lines) {
+      //print_buf(line,max_line_len);
 
       x_has_changed = 0;
       y_has_changed = 0;
@@ -99,21 +100,21 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_t
 
       if (strstr(line, " X") != NULL){
           if (sscanf(strstr(line, " X"), format, &number)){
-              new_x = number;
+              new_P.x = number;
               x_has_changed = 1;
           }
       }
 
       if (strstr(line, " Y") != NULL){
           if (sscanf(strstr(line, " Y"), format, &number)){
-              new_y = number;
+              new_P.y = number;
               y_has_changed = 1;
           }
       }
 
       if (strstr(line, " Z") != NULL) {
           if (sscanf(strstr(line, " Z"), format, &number)){
-              new_z = number;
+              new_P.z = number;
               z_has_changed = 1;
           }
       }
@@ -121,30 +122,17 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_t
       if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
 
           //(X10.0 in the NC means take the old point and change X to 10.0)
-          //Does this work for copying, or does it copy the reference?
-          //cords[i] = cords[i-1];
-
-          //alternative
           copy_data_tuple(i,cords);
 
           //then only change the parameters that have changed
-          if (x_has_changed == 1)
-          {
-              cords[i]->P.x = new_x;
-          }
-          if (y_has_changed == 1)
-          {
-              cords[i]->P.y = new_y;
-          }
-          if (z_has_changed == 1)
-          {
-              cords[i]->P.z = new_z;
-          }
+          if (x_has_changed) (*cords)[i].P.x = new_P.x;
+          if (y_has_changed) (*cords)[i].P.y = new_P.y;
+          if (z_has_changed) (*cords)[i].P.z = new_P.z;
 
-          cords[i]->laser = laser_on_off;
+          (*cords)[i].laser = laser_on_off;
 
 
-          printf("(%f, %f, %f), laser=%d\n",cords[i]->P.x,cords[i]->P.y,cords[i]->P.z, cords[i]->laser);
+          printf("(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
 
           i += 1;
       }
@@ -156,15 +144,17 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t max_line_len, data_t
 }
 
 int main() {
-    size_t cmd_lines = 250000;
+    size_t mpf_lines = 2500;
+    size_t max_line_len = 1000;
+    char* file_name = "ElGeo_5_V2_1.mpf";
 
-    data_tuple* cords = calloc(cmd_lines,sizeof(data_tuple));
+    data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
     if (cords == NULL) {
       fprintf(stderr, "Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
 
-    read_mpf_and_create_point_cloud("ElGeo_5_V2_1.mpf", 1000, &cords);
+    read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords);
 
 
 

@@ -1,8 +1,6 @@
 Maybe implement "Eilmodus". So switch between two different speeds
 depending on the Eilmodus boolean value.
 
-Bring Moritz to use gcc and let him compile the code in the meeting on wednesday!
-
 Precision of 1000 yields a ridiculous amount of csv lines.
 For 10 mpf_lines -> 300.000 lines of csv -> 70.4 MB
 For 2500 mpf_lines -> ???.???.??? lines of csv -> 27.5 GB
@@ -29,3 +27,8 @@ to display all of the lines)
 
 Ends at Point (7.253,33.29,2.519),
 while in the NC code endpoint (69, 249, 459) is defined.
+
+
+If the cylinders should be subdivided for higher geometry precision.
+Then we should subdivide them into spheres instead of cubes.
+Because spherical collision is easier to program, and in our case more realistic.

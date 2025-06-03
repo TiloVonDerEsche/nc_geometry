@@ -38,15 +38,19 @@ void print_buf(char* buf, size_t buf_len) {
   }
 }
 
-float dot_product(vec3D A, vec3D B) {
-  return (A.x * B.x) + (A.y * B.y) + (A.z * B.z);
+float dot_product(vec3D s, vec3D t) {
+  return (s.x * t.x) + (s.y * t.y) + (s.z * t.z);
 }
 
-float vec_len(vec3D A) {
-  return sqrt(dot_product(A,A));
+float vec_len(vec3D v) {
+  return sqrt(dot_product(v,v));
 }
 
-int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords) {
+float angle_btw_vecs(vec3D v1, vec3D v2) {
+  return acos(dot_product(v1,v2) / (vec_len(v1) * vec_len(v2)))* (180 / M_PI);
+}
+
+float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   // open mpf file for reading
@@ -157,19 +161,22 @@ int read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t ma
   //close the mpf file
   fclose(file);
   fclose(csv_file);
-  return 0;
+  return machine_speed;
 }
 
 
-int simulate_machine(size_t mpf_lines, data_tuple** cords) {
+int simulate_machine(float machine_speed, size_t precision, size_t mpf_lines, data_tuple** cords) {
 
   ///////////////////////////////////////////////////////
   //----------Get the length of cords array------------//
   ///////////////////////////////////////////////////////
+  puts("Counting amount of tuples in cords array...");
+
   //we iterate through the the cords array
   //and break when we read at least 5 entries which contain (0,0,0,0)
-  unsigned int j;
-  for(j = 0; j < mpf_lines; j++)
+  size_t zero_counter = 0;
+  size_t i;
+  for(i = 0; i < mpf_lines; i++)
   {
 
       if ((*cords)[i].P.x == 0 && (*cords)[i].P.y == 0 && (*cords)[i].P.z == 0 && (*cords)[i].laser == 0)
@@ -188,7 +195,7 @@ int simulate_machine(size_t mpf_lines, data_tuple** cords) {
 
       // printf("P%d(%f, %f, %f)\n",j, cords[j * 4], cords[j * 4 + 1], cords[j * 4 + 2]);
   }
-  cords_length = j - 4;
+  size_t cords_length = i - 4;
   ///////////////////////////////////////////////////////
 
   //printf("%d",cords_length);
@@ -196,59 +203,29 @@ int simulate_machine(size_t mpf_lines, data_tuple** cords) {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //----------Simulate the machine and note the position at every timestep of 0.002 seconds and write to the csv------------//
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  puts("Simulating the machine...");
 
-  //Point -1
-  // double xn1 = 0;
-  // double yn1 = 0;
-  // double zn1 = 0;
-  vec3D A = {0,0,0};
+  vec3D A = {0,0,0}; //previous point
+  vec3D B = {0,0,0}; //current point
+  vec3D C = {0,0,0}; //next point
 
-  //Point 0
-  // double x0 = 0;
-  // double y0 = 0;
-  // double z0 = 0;
-  vec3D B = {0,0,0};
+  vec3D AB = {0,0,0}; //vec A to B
+  vec3D BC = {0,0,0}; //vec B to C
 
-  //Point 1
-  // double x1 = 0;
-  // double y1 = 0;
-  // double z1 = 0;
-  vec3D C = {0,0,0};
+  float AB_len = 1;
+  float BC_len = 1;
 
+  float dot_product = 0;
+  float angle_AB_BC = 0;
 
-  //last vector (Vector from P-1 to P0)
-  // double lvx = 0;
-  // double lvy = 0;
-  // double lvz = 0;
-  vec3D AB = {0,0,0};
-
-  //current vector (Vector from P0 to P1)
-  // double vx = 0;
-  // double vy = 0;
-  // double vz = 0;
-  vec3D BC = {0,0,0};
-
-  double AB_len = 1;
-
-  double BC_len = 1;
-
-  //dot_product between last and current vector is used to determine their respective angle
-  double dot_product = 0;
-
-  double angle_AB_BC = 0;
-
-
-  double time = 0;
-  double temp_time = 0;
-
-  //for some reason does the precision dictate the number of lines in the csv
-  double precision = 100000;
+  float time = 0;
+  float temp_time = 0;
 
   //determine when the machine slows down
-  double angle_threshold = 75.0;
+  float angle_threshold = 75.0;
 
   //~boolean variable, that is 1 when the angle_last_curr exceeds the angle_threshold and otherwise 0
-  unsigned int critical_area = 0;
+  uint8_t critical_area = 0;
 
 
   //Prepare the output csv
@@ -262,100 +239,117 @@ int simulate_machine(size_t mpf_lines, data_tuple** cords) {
   }
 
   // Write the header row of the csv
-  fprintf(csvFile, "Time in seconds, Laser On/Off, Angle Between Last and Current Vector, P-1, P0, P1, last vector(P-1 to P0), length last vector, current vector(P0 to P1), length current vector, dot_product, (length_of_last * length_of_curr), angle between last and current vector \n");
+  fprintf(csvFile, "Time in seconds,"
+                    "Laser On/Off,"
+                    "angle_AB_BC,"
+                    "A,"
+                    "B,"
+                    "C,"
+                    "AB,"
+                    "AB_len,"
+                    "BC,"
+                    "BC_len,"
+                    "dotp,"
+                    "(AB_len * BC_len),"
+                    "\n");
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   for(int i = 0; i < cords_length - 1; i ++)
   {
-     if (i > 0)
-     {
-          //point-1
-          A.x = cords[(i-1)];
-          A.y = cords[(i-1) * 4 + 1];
-          A.z = cords[(i-1) * 4 + 2];
-     } //xn1, yn1, zn1 = 0; for i = 0
+    //set A,B,C to the next triple of points in cords
+     if (i > 0) {
+          A.x = (*cords)[(i-1)].P.x;
+          A.y = (*cords)[(i-1)].P.y;
+          A.z = (*cords)[(i-1)].P.z;
+     }
+
+      B.x = (*cords)[i].P.x;
+      B.y = (*cords)[i].P.y;
+      B.z = (*cords)[i].P.z;
+
+      C.x = (*cords)[i+1].P.x;
+      C.y = (*cords)[i+1].P.y;
+      C.z = (*cords)[i+1].P.z;
 
 
-      //point0
-      B.x = cords[i];
-      B.y = cords[i];
-      B.z = cords[i];
+      //redefine vectors AB, BC
+      AB.x = B.x - A.x;
+      AB.y = B.y - A.y;
+      AB.z = B.z - A.z;
 
-      //point1
-      C.x = cords[(i+1)];
-      C.y = cords[(i+1)];
-      C.z = cords[(i+1)];
-
-
-      //last vector from point-1 to point0
-      AB = B.x - A.x;
-      AB = B.y - A.y;
-      AB = B.z - A.z;
-
-      //current vector from point0 to point1
       BC.x = C.x - B.x;
       BC.y = C.y - B.y;
       BC.z = C.z - B.z;
 
-      AB_len = vec_len(AB);
-      BC_len = vec_len(BC);
 
-      //last_vector * current_vector
-      dot_product = dot_product(AB,BC);
+      angle_AB_BC = angle_btw_vecs(AB,BC);
 
-      //the angle between the last and current vector
-      angle_AB_BC = acos(dot_product / (AB_len * BC_len))* (180 / M_PI); //convert the radiant result to degrees
+      if (angle_AB_BC > angle_threshold) {critical_area = 1;}
+        else {critical_area = 0;}
 
-      if (angle_AB_BC > angle_threshold)
+      uint8_t laser_on_off = (*cords)[i].laser;
+
+
+      //printf("Going from (%f,%f,%f) to (%f,%f,%f)\n",B.x,B.y,B.z,C.x,C.y,C.z);
+      //While Point C isn't reached go towards it.
+      while((round(B.x) != round(C.x)) ||
+            (round(B.y) != round(C.y)) ||
+            (round(B.z) != round(C.z)))
       {
-          critical_area = 1;
-      }
-      else
-      {
-          critical_area = 0;
-      }
+          //printf("B(%f,%f,%f), C(%f,%f,%f)\n",round(B.x),round(B.y),round(B.z), round(C.x),round(C.y),round(C.z));
 
-      laser_on_off = (*cords)[i].laser;
-
-
-      // printf("%d.: lv(%f, %f, %f), v(%f, %f, %f)\n",i, lvx, lvy, lvz, vx, vy, vz);
-
-      //While point_1 isn't reached go towards it.
-      //TODO round the cords
-
-      while((round(x0 * precision) / precision) != (round(x1 * precision) / precision) || (round(y0 * precision) / precision) != (round(y1 * precision) / precision) || (round(z0 * precision) / precision) != (round(z1 * precision) / precision))
-      {
-
-
-
-          //Go 1/1000 step on the vector to point1
-          //TODO uncomment "/ precision"
-          x0 += vx; //precision;
-          y0 += vy; //precision;
-          z0 += vz; //precision;
-
-          // printf("vector(%f,%f,%f))\n",vx/1000,vy/1000,vz/1000);
-          // printf("p0(%f,%f,%f),\np1(%f,%f,%f)\n",x0,y0,z0, x1,y1,z1);
-
+          //Go 1/precision step on the vector BC to C
+          //should I change precision proportionally depending on the
+          //ratio of the component compared to the vec length?
+          if(round(B.x) != round(C.x)) {B.x += BC.x / precision;}
+          if(round(B.y) != round(C.y)) {B.y += BC.y / precision;}
+          if(round(B.z) != round(C.z)) {B.z += BC.z / precision;}
 
           //time counts the overall passed time.
-          time += length_of_curr_vector / machine_speed * 60; //in seconds (t = s/v)
+          time += (BC_len / machine_speed) * 60; //in seconds (t = s/v)
 
           //temp_time counts to 0.002 and then gets reset to 0, so that an entry is being made every 0.002 seconds.
-          temp_time += length_of_curr_vector / machine_speed * 60;
+          temp_time += (BC_len / machine_speed) * 60;
 
           if (temp_time > 0.002)
           {
               // printf("%f",temp_time);
               //write a row to the csv
-              fprintf(csvFile, "time= %f, %d, P-1(%f,%f,%f), P0(%f,%f,%f), P1(%f,%f,%f), lv(%f,%f,%f), %f, v(%f,%f,%f), %f, dotP= %f, lenP= %f, angle= %f, critical?=%d\n",time,laser_on_off,xn1,yn1,zn1,x0,y0,z0,x1,y1,z1,lvx,lvy,lvz,length_of_last_vector,vx,vy,vz,length_of_curr_vector, dot_product, (length_of_curr_vector*length_of_last_vector),angle_last_curr,critical_area);
+              fprintf(csvFile, "%f," //time
+                                "laser?=%d,"//laser
+
+                                "A(%f,%f,%f)," //A
+                                "B(%f,%f,%f),"
+                                "C(%f,%f,%f),"
+
+                                "AB(%f,%f,%f),"
+                                "%f,"
+
+                                "BC(%f,%f,%f),"
+                                "%f,"
+
+                                // "dotP= %f,"
+                                // "lenP= %f,"
+                                "angle= %f,"
+                                "critical?=%d\n",
+
+                                time,
+                                laser_on_off,
+                                A.x,A.y,A.z,
+                                B.x,B.y,B.z,
+                                C.x,C.y,C.z,
+                                AB.x,AB.y,AB.z,
+                                AB_len,
+                                BC.x,BC.y,BC.z,
+                                BC_len,
+                                // dot_product,
+                                // (length_of_curr_vector*length_of_last_vector),
+                                angle_AB_BC,
+                                critical_area);
 
               //reset temp_time so it can count to 0.002 again
               temp_time = 0;
           }
-
-
-          //printf("%s\n",(round(x0 * precision) / precision) != (round(x1 * precision) / precision) && (round(y0 * precision) / precision) != (round(y1 * precision) / precision) && (round(z0 * precision) / precision) != (round(z1 * precision) / precision) ? "true" : "false");
       }
   }
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +358,8 @@ int simulate_machine(size_t mpf_lines, data_tuple** cords) {
 }
 
 int main() {
-    size_t mpf_lines = 2500;
+    size_t mpf_lines = 250000;
+    size_t precision = 10; //1000 yields ridiculous amount of csv lines
     size_t max_line_len = 1000;
     char* file_name = "ElGeo_5_V2_1.mpf";
 
@@ -374,13 +369,12 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords);
+    float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords);
+    simulate_machine(machine_speed,precision,mpf_lines,&cords);
 
 
 
 
     free(cords);
-
-
     return 0;
 }

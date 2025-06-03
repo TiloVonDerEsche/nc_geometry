@@ -365,7 +365,13 @@ int main() {
 
     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
     if (cords == NULL) {
-      fprintf(stderr, "Memory allocation failed\n");
+      fprintf(stderr, "Memory allocation of cords failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    cylinder* cyls = calloc(mpf_lines,sizeof(cylinder));
+    if (cyls == NULL) {
+      fprintf(stderr, "Memory allocation of cylinder list failed\n");
         exit(EXIT_FAILURE);
     }
 

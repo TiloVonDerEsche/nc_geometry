@@ -50,7 +50,25 @@ float angle_btw_vecs(vec3D v1, vec3D v2) {
   return acos(dot_product(v1,v2) / (vec_len(v1) * vec_len(v2)))* (180 / M_PI);
 }
 
-float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords) {
+void write_cyls_to_csv(float radius, size_t cyls_len, cylinder** cyls) {
+  FILE* file = fopen("cylinders.csv", "w");
+  if (file == NULL) {
+      perror("An error occured, while trying to open a file");
+      return;
+  }
+
+  fprintf(file,"Cylinder_id,A,B,radius\n");
+
+  for (size_t i = 0; i < cyls_len; i++) {
+    fprintf(file,"%d,(%f,%f,%f), (%f,%f,%f), %f\n",
+           i,
+           (*cyls)[i].A.x, (*cyls)[i].A.y, (*cyls)[i].A.z,
+           (*cyls)[i].B.x, (*cyls)[i].B.y, (*cyls)[i].B.z,
+           radius);
+  }
+}
+
+float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, cylinder** cyls, size_t* cyls_len) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   // open mpf file for reading
@@ -92,6 +110,8 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
+  uint8_t fetch_next_point = 0;
+  size_t cyl_i = 0;
   int i = 0;
   //continue as long as the line contains something
   while ((fgets(line, max_line_len, file) != NULL) && i < mpf_lines) {
@@ -105,8 +125,21 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
       if (strstr(line, "G00") != NULL) {laser_on_off = 0;}
       else if (strstr(line, "G01") != NULL) {laser_on_off = 1;}
 
-      if(strstr(line, "LASER_ON") != NULL) {puts("LASER ON!!");}
-      else if(strstr(line, "LASER_OFF") != NULL) {puts("LASER OFF!!");}
+      if(strstr(line, "LASER_ON") != NULL) {
+        //get next point
+        fetch_next_point = 1;
+      }
+      else if(strstr(line, "LASER_OFF") != NULL) {
+        //get current point
+        if (i > 1) {
+          (*cyls)[cyl_i].B.x = (*cords)[i-1].P.x;
+          (*cyls)[cyl_i].B.y = (*cords)[i-1].P.y;
+          (*cyls)[cyl_i].B.z = (*cords)[i-1].P.z;
+        }
+
+        //increment cylinder index
+        cyl_i++;
+      }
 
       //read the set machine speed
       if (strstr(line, "VIT_TIR=") != NULL) {
@@ -153,6 +186,14 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
 
           (*cords)[i].laser = laser_on_off;
 
+          if (fetch_next_point) { //get start of track
+            (*cyls)[cyl_i].A.x = (*cords)[i].P.x;
+            (*cyls)[cyl_i].A.y = (*cords)[i].P.y;
+            (*cyls)[cyl_i].A.z = (*cords)[i].P.z;
+
+            fetch_next_point = 0;
+          }
+
 
           //printf("(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
           fprintf(csv_file, "(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
@@ -160,6 +201,9 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
           i += 1;
       }
   }
+
+  //save the length of cyls arr in cyls_len
+  (*cyls_len) = cyl_i;
 
   //close the mpf file
   fclose(file);
@@ -365,7 +409,7 @@ int main() {
     size_t mpf_lines = 2500;
     size_t precision = 10; //1000 yields ridiculous amount of csv lines
     size_t max_line_len = 1000;
-    char* file_name = "data\\ElGeo_5_V2_1.mpf";
+    char* file_name = "ElGeo_5_V2_1.mpf";
 
     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
     if (cords == NULL) {
@@ -379,8 +423,14 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords);
-    simulate_machine(machine_speed,precision,mpf_lines,&cords);
+    //size_t* cyls_len = calloc(1,sizeof(size_t));
+    size_t cyls_len = -1;
+    float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &cyls, &cyls_len);
+
+    printf("%d",cyls_len);
+
+    write_cyls_to_csv(0.3,cyls_len,&cyls);
+    //simulate_machine(machine_speed,precision,mpf_lines,&cords);
 
 
 

@@ -1,0 +1,36 @@
+Maybe implement "Eilmodus". So switch between two different speeds
+depending on the Eilmodus boolean value.
+
+Precision of 1000 yields a ridiculous amount of csv lines.
+For 10 mpf_lines -> 300.000 lines of csv -> 70.4 MB
+For 2500 mpf_lines -> ???.???.??? lines of csv -> 27.5 GB
+
+
+Precision 10:
+2500 mpf lines -> 13376 csv lines -> 2.94 MB
+25000 mpf lines -> 130949 csv lines -> 29.023MB -> 4482.7 seconds
+250000 mpf lines -> more than 1048576 csv lines -> 257.163 MB ->  36402 seconds
+
+
+Generated CSV vs ElGeo_5_V2_1.csv
+Generated CSV has more than 1048576 lines (Excel gives up after that)
+36402 seconds
+Point ElGeo Endpoint (7.661810,33.299599,2.160000) found in line 258462
+in generated csv, at 8841.063 seconds
+
+ElGeo_5_V2_1.csv has 1017006 lines
+(the next lines are empty, implying that https://dfncloud.fh-kiel.de can handle
+to display all of the lines)
+2033.982 seconds
+
+
+
+Ends at Point (7.253,33.29,2.519),
+while in the NC code endpoint (69, 249, 459) is defined.
+
+
+If the cylinders should be subdivided for higher geometry precision.
+Then we should subdivide them into spheres instead of cubes.
+Because spherical collision is easier to program, and in our case more realistic.
+
+Track_id =^ cyl_i //cylinder index

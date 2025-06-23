@@ -12,3 +12,31 @@ fills out the neighborhood matricies
 
 Lastly create a visualization program, maybe with SDL3, that marks the overlapping
 areas of the cylinders red.
+
+#
+
+Sequentielle collision
+
+Paarweise extraction der tracks, und
+
+Was passiert beim Schichtwechsel
+Paarweises Vergleichen vielleicht ungenügend
+
+Reicht paarweises Vergleichen ohne Schichtwechsel
+
+Special Case bei Schichtwechsel
+
+Nach dem ersten Schichtwechsel sind die unterem Felder der Matrix alle True
+
+Bei jeder Z Änderung -> Schichtwechsel
+
+
+2D Matrix aus der 3D Matrix extrahieren und 5 Felder in CSV schreiben.
+
+trackID, A, B, h
+
+
+Abstand nicht zwischen A und A bilden,
+sondern
+zwischen z.B: Punkt A von t1 und einem projezierten Punkt A' auf t2, wobei es
+eine Gerade von A zu A' gibt die im Lot zu t1 steht.

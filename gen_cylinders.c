@@ -164,35 +164,35 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
 }
 
 
-int main() {
-    size_t mpf_lines = 2500;
-    size_t precision = 10; //1000 yields ridiculous amount of csv lines
-    size_t max_line_len = 1000;
-    char* file_name = "ElGeo_5_V2_1.mpf";
-
-    data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
-    if (cords == NULL) {
-      fprintf(stderr, "Memory allocation of cords failed\n");
-        exit(EXIT_FAILURE);
-    }
-
-    cylinder* cyls = calloc(mpf_lines,sizeof(cylinder));
-    if (cyls == NULL) {
-      fprintf(stderr, "Memory allocation of cylinder list failed\n");
-        exit(EXIT_FAILURE);
-    }
-
-    //size_t* cyls_len = calloc(1,sizeof(size_t));
-    size_t cyls_len = -1;
-    float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &cyls, &cyls_len);
-
-    printf("%d",cyls_len);
-
-    write_cyls_to_csv(0.3,cyls_len,&cyls);
-
-
-
-
-    free(cords);
-    return 0;
-}
+// int main() {
+//     size_t mpf_lines = 2500;
+//     size_t precision = 10; //1000 yields ridiculous amount of csv lines
+//     size_t max_line_len = 1000;
+//     char* file_name = "ElGeo_5_V2_1.mpf";
+//
+//     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
+//     if (cords == NULL) {
+//       fprintf(stderr, "Memory allocation of cords failed\n");
+//         exit(EXIT_FAILURE);
+//     }
+//
+//     cylinder* cyls = calloc(mpf_lines,sizeof(cylinder));
+//     if (cyls == NULL) {
+//       fprintf(stderr, "Memory allocation of cylinder list failed\n");
+//         exit(EXIT_FAILURE);
+//     }
+//
+//     //size_t* cyls_len = calloc(1,sizeof(size_t));
+//     size_t cyls_len = -1;
+//     float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &cyls, &cyls_len);
+//
+//     printf("%d",cyls_len);
+//
+//     write_cyls_to_csv(0.3,cyls_len,&cyls);
+//
+//
+//
+//
+//     free(cords);
+//     return 0;
+// }

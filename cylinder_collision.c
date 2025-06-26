@@ -10,50 +10,29 @@ void track_collision(track** track_list, size_t track_list_len) {
   size_t track_list_len = 10;
 
   track t1; track t2;
-  vec3D tv;
+  float distance_t1_t2;
 
   for (size_t i = 0; i < track_list_len; i++) {
-    for (size_t j = 0; j < track_list_len; j++) {
-      if (i != j) {
+        //pairwise track extraction
         t1 = (*track_list)[i];
-        t2 = (*track_list)[j];
+        t2 = (*track_list)[i+1];
 
-        //get the vector between t1 and t2
-        //if all tracks are parallel
-        //we can just compare the vector lens between all track starting points
-        //-> btw t.A's
+        //assuming that the tracks are parallel -> point line distance
+        distance_t1_t2 = distance_point_to_line(t1.A,t2.A,connecting_vec(t2.A,t2.B));
 
+        if ((t1.hradius + t2.hradius) >= distance_t1_t2) {
+          //Maybe we should get the Lotfußpunkt and compare t1.A with the Lotfußpunkt
+          //on t2
 
-        tv = connecting_vec(t1.A,t2.A); //vector btw t1.A & t2.A
-
-        //if the sum of both of the horizontal radii is greater than the
-        //vec_len btw their starting points than squere's around
-        // the A points would be colliding
-        if ((t1.hradius + t2.hradius) >= vec_len(tv)) {
-
-
-          //we orient the directions based on two common directions
-          //1. back of the machine
-          //2. vector pointing to the sky
-          //, in the compass example
-          //1. vector north
-          //2. vector earth's core
-
-          //when the tracks are parralel we can assume that all the vectors tv
-          //are in the same plane, which is parallel to the back plane
-
-
-          //naive approach, only works for one layer of tracks
-          //t1 should be left to t2
-          if (i < j) {
-            t1.M.right = 1;
+          //TODO add margin around 0 to accommodate for floating point errors
+          if (tv.x > 0) {
             t2.M.left = 1;
           }
-          //t1 should be right of t2
-          else { // (i > j)
-            t1.M.left = 1;
+
+          else {
             t2.M.right = 1;
           }
+
 
 
           //how do we determine the side the tracks are colliding on?

@@ -52,6 +52,14 @@ float dot_product(vec3D s, vec3D t) {
   return (s.x * t.x) + (s.y * t.y) + (s.z * t.z);
 }
 
+vec3D cross_product(vec3D a, vec3D b) {
+  return (vec3D) {
+    a.y*b.z - a.z*b.y,
+    a.z*b.x - a.x*b.z,
+    a.x*b.y - a.y*b.x
+  };
+}
+
 float vec_len(vec3D v) {
   return sqrt(dot_product(v,v));
 }
@@ -62,4 +70,16 @@ float angle_btw_vecs(vec3D v1, vec3D v2) {
 
 vec3D connecting_vec(vec3D v1, vec3D v2) {
   return (vec3D) {v2.x - v1.x, v2.y - v1.y, v2.z - v1.z};
+}
+
+vec3D vec_minus(vec3D v1, vec3D v2) {
+  return (vec3D) {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+}
+
+vec3D vec_plus(vec3D v1, vec3D v2) {
+  return (vec3D) {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
+}
+
+float distance_point_to_line(vec3D P, vec3D SP,vec3D dir_vec) {
+  return vec_len(cross_product(vec_minus(P,SP), dir_vec)) / vec_len(dir_vec);
 }

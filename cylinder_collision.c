@@ -12,27 +12,30 @@ void track_collision(track** track_list, size_t track_list_len) {
   track t1; track t2;
   float distance_t1_t2;
 
+  vec3D tv;
+
   for (size_t i = 0; i < track_list_len; i++) {
         //pairwise track extraction
         t1 = (*track_list)[i];
         t2 = (*track_list)[i+1];
 
+
+
         //assuming that the tracks are parallel -> point line distance
         distance_t1_t2 = distance_point_to_line(t1.A,t2.A,connecting_vec(t2.A,t2.B));
 
+        vec3D tv = connecting_vec(t1.A,t2.A);
         if ((t1.hradius + t2.hradius) >= distance_t1_t2) {
           //Maybe we should get the Lotfußpunkt and compare t1.A with the Lotfußpunkt
           //on t2
 
-          //TODO add margin around 0 to accommodate for floating point errors
           if (tv.x > 0) {
             t2.M.left = 1;
           }
 
-          else {
+          else if (tv.x < 0) {
             t2.M.right = 1;
           }
-
 
 
           //how do we determine the side the tracks are colliding on?
@@ -50,7 +53,7 @@ void track_collision(track** track_list, size_t track_list_len) {
           // x < 0 & y > 0 -> top_left
           // x == 0  & y > 0 -> top
 
-          printf("tv(%f %f %f)",tv.x,tv.y,tv.z);
+          //printf("tv(%f %f %f)",tv.x,tv.y,tv.z);
 
         }
       }

@@ -40,3 +40,7 @@ Abstand nicht zwischen A und A bilden,
 sondern
 zwischen z.B: Punkt A von t1 und einem projezierten Punkt A' auf t2, wobei es
 eine Gerade von A zu A' gibt die im Lot zu t1 steht.
+
+
+
+Init tracks! Or does calloc init everything to 0 correctly?

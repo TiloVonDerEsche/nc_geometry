@@ -1,26 +1,32 @@
-#include "helper_funcs.h"
 
 
-
-void write_cyls_to_csv(float radius, size_t cyls_len, cylinder** cyls) {
-  FILE* file = fopen("cylinders.csv", "w");
-  if (file == NULL) {
-      perror("An error occured, while trying to open a file");
-      return;
-  }
-
-  fprintf(file,"Cylinder_id,A,B,radius\n");
-
-  for (size_t i = 0; i < cyls_len; i++) {
-    fprintf(file,"%d,(%f,%f,%f), (%f,%f,%f), %f\n",
-           i,
-           (*cyls)[i].A.x, (*cyls)[i].A.y, (*cyls)[i].A.z,
-           (*cyls)[i].B.x, (*cyls)[i].B.y, (*cyls)[i].B.z,
-           radius);
+void init_track_list(float hradius, float vradius, size_t track_list_len, track** tl) {
+  for (size_t i = 0; i < track_list_len; i++) {
+    (*tl)[i].hradius = hradius;
+    (*tl)[i].vradius = vradius;
   }
 }
 
-float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, cylinder** cyls, size_t* cyls_len) {
+void write_tracks_to_csv(size_t track_list_len, track** tl) {
+  FILE* file = fopen("track_list.csv", "w");
+  if (file == NULL) {
+      perror("An error occured, while trying to create / open and write to track_list.csv file!");
+      return;
+  }
+
+  fprintf(file,"Track_id, A, B, hradius, vradius, left, right, bottom\n");
+
+  for (size_t i = 0; i < track_list_len; i++) {
+    fprintf(file,"%lld,(%f,%f,%f), (%f,%f,%f), %f, %f, (%u,%u,%u)\n",
+           i,
+           (*tl)[i].A.x, (*tl)[i].A.y, (*tl)[i].A.z,
+           (*tl)[i].B.x, (*tl)[i].B.y, (*tl)[i].B.z,
+           (*tl)[i].hradius,(*tl)[i].vradius,
+           (*tl)[i].M.left,(*tl)[i].M.right,(*tl)[i].M.bottom);
+  }
+}
+
+float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, track** tl, size_t* tl_len) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   // open mpf file for reading
@@ -63,7 +69,7 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
   uint8_t fetch_next_point = 0;
-  size_t cyl_i = 0;
+  size_t ti = 0; //track id
   int i = 0;
   //continue as long as the line contains something
   while ((fgets(line, max_line_len, file) != NULL) && i < mpf_lines) {
@@ -84,13 +90,13 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
       else if(strstr(line, "LASER_OFF") != NULL) {
         //get current point
         if (i > 1) {
-          (*cyls)[cyl_i].B.x = (*cords)[i-1].P.x;
-          (*cyls)[cyl_i].B.y = (*cords)[i-1].P.y;
-          (*cyls)[cyl_i].B.z = (*cords)[i-1].P.z;
+          (*tl)[ti].B.x = (*cords)[i-1].P.x;
+          (*tl)[ti].B.y = (*cords)[i-1].P.y;
+          (*tl)[ti].B.z = (*cords)[i-1].P.z;
         }
 
         //increment cylinder index
-        cyl_i++;
+        ti++;
       }
 
       //read the set machine speed
@@ -139,9 +145,9 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
           (*cords)[i].laser = laser_on_off;
 
           if (fetch_next_point) { //get start of track
-            (*cyls)[cyl_i].A.x = (*cords)[i].P.x;
-            (*cyls)[cyl_i].A.y = (*cords)[i].P.y;
-            (*cyls)[cyl_i].A.z = (*cords)[i].P.z;
+            (*tl)[ti].A.x = (*cords)[i].P.x;
+            (*tl)[ti].A.y = (*cords)[i].P.y;
+            (*tl)[ti].A.z = (*cords)[i].P.z;
 
             fetch_next_point = 0;
           }
@@ -154,45 +160,11 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
       }
   }
 
-  //save the length of cyls arr in cyls_len
-  (*cyls_len) = cyl_i;
+  //save the length of tl (track_list) arr in tl_len
+  (*tl_len) = ti;
 
   //close the mpf file
   fclose(file);
   fclose(csv_file);
   return machine_speed;
 }
-
-
-// int main() {
-//     size_t mpf_lines = 2500;
-//     size_t precision = 10; //1000 yields ridiculous amount of csv lines
-//     size_t max_line_len = 1000;
-//     char* file_name = "ElGeo_5_V2_1.mpf";
-//
-//     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
-//     if (cords == NULL) {
-//       fprintf(stderr, "Memory allocation of cords failed\n");
-//         exit(EXIT_FAILURE);
-//     }
-//
-//     cylinder* cyls = calloc(mpf_lines,sizeof(cylinder));
-//     if (cyls == NULL) {
-//       fprintf(stderr, "Memory allocation of cylinder list failed\n");
-//         exit(EXIT_FAILURE);
-//     }
-//
-//     //size_t* cyls_len = calloc(1,sizeof(size_t));
-//     size_t cyls_len = -1;
-//     float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &cyls, &cyls_len);
-//
-//     printf("%d",cyls_len);
-//
-//     write_cyls_to_csv(0.3,cyls_len,&cyls);
-//
-//
-//
-//
-//     free(cords);
-//     return 0;
-// }

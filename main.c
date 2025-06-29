@@ -2,9 +2,10 @@
 #include "gen_cylinders.c"
 #include "cylinder_collision.c"
 
+
 int main() {
     size_t mpf_lines = 2500;
-    size_t precision = 10; //1000 yields ridiculous amount of csv lines
+    //size_t precision = 10; //1000 yields ridiculous amount of csv lines
     size_t max_line_len = 1000;
     char* file_name = "ElGeo_5_V2_1.mpf";
 
@@ -21,16 +22,18 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    //size_t* cyls_len = calloc(1,sizeof(size_t));
+
     size_t track_list_len = -1;
-    float machine_speed = read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &track_list, &track_list_len);
+    //float machine_speed =
+    read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &track_list, &track_list_len);
 
-    printf("%d",track_list_len);
+    printf("%lld",track_list_len);
 
-    write_cyls_to_csv(0.3,track_list_len,&track_list);
+    init_track_list(666, 651, track_list_len, &track_list);
 
+    track_collision(track_list_len, &track_list);
 
-
+    write_tracks_to_csv(track_list_len,&track_list);
 
     free(cords);
     free(track_list);

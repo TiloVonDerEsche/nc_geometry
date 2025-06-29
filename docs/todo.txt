@@ -15,9 +15,7 @@ areas of the cylinders red.
 
 #
 
-Sequentielle collision
 
-Paarweise extraction der tracks, und
 
 Was passiert beim Schichtwechsel
 Paarweises Vergleichen vielleicht ungenügend
@@ -32,15 +30,3 @@ Bei jeder Z Änderung -> Schichtwechsel
 
 
 2D Matrix aus der 3D Matrix extrahieren und 5 Felder in CSV schreiben.
-
-trackID, A, B, h
-
-
-Abstand nicht zwischen A und A bilden,
-sondern
-zwischen z.B: Punkt A von t1 und einem projezierten Punkt A' auf t2, wobei es
-eine Gerade von A zu A' gibt die im Lot zu t1 steht.
-
-
-
-Init tracks! Or does calloc init everything to 0 correctly?

@@ -30,3 +30,11 @@ Bei jeder Z Änderung -> Schichtwechsel
 
 
 2D Matrix aus der 3D Matrix extrahieren und 5 Felder in CSV schreiben.
+
+Wichtige Parameter aus main.c in eine Konfigurationsdatei, sodass man diese ändern kann,
+ohne das Programm neu kompilieren zu müssen. Wichtige Parameter:
+mpf_lines=2500
+file_name="ElGeo_5_V2_1.mpf"
+
+Halbwichtige:
+size_t max_line_len = 1000

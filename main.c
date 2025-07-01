@@ -29,7 +29,7 @@ int main() {
 
     printf("%lld",track_list_len);
 
-    //Set horizontal and vertical radius 
+    //Set horizontal and vertical radius
     init_track_list(0.3, 0.3, track_list_len, &track_list);
 
     track_collision(track_list_len, &track_list);

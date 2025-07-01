@@ -80,6 +80,7 @@ vec3D vec_plus(vec3D v1, vec3D v2) {
   return (vec3D) {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
 }
 
+//https://studyflix.de/mathematik/abstand-punkt-gerade-2006
 float distance_point_to_line(vec3D P, vec3D SP,vec3D dir_vec) {
   return vec_len(cross_product(vec_minus(P,SP), dir_vec)) / vec_len(dir_vec);
 }

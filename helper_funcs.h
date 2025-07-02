@@ -19,6 +19,7 @@ typedef struct {
 } coll_ma;
 //collision_matrix
 
+
 typedef struct {
   vec3D A;
   vec3D B;

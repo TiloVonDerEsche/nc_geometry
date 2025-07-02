@@ -22,3 +22,8 @@ ElGeo_5_V2_1.csv has 1017006 lines
 (the next lines are empty, implying that https://dfncloud.fh-kiel.de can handle
 to display all of the lines)
 2033.982 seconds
+
+
+
+
+Do we need data_tuples.csv ? 

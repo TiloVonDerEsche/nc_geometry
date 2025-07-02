@@ -8,16 +8,16 @@ void init_track_list(float hradius, float vradius, size_t track_list_len, track*
 }
 
 void write_tracks_to_csv(size_t track_list_len, track** tl) {
-  FILE* file = fopen("track_list.csv", "w");
+  FILE* file = fopen(".\\data\\track_list.csv", "w");
   if (file == NULL) {
       perror("An error occured, while trying to create / open and write to track_list.csv file!");
       return;
   }
 
-  fprintf(file,"Track_id, A, B, hradius, vradius, left, right, bottom\n");
+  fprintf(file,"Track_id, A.x, A.y, A.z, B.x, B.y, B.z, hradius, vradius, left, right, bottom\n");
 
   for (size_t i = 0; i < track_list_len; i++) {
-    fprintf(file,"%lld,(%f,%f,%f), (%f,%f,%f), %f, %f, (%u,%u,%u)\n",
+    fprintf(file,"%lld, %f,%f,%f, %f,%f,%f, %f, %f, %u,%u,%u\n",
            i,
            (*tl)[i].A.x, (*tl)[i].A.y, (*tl)[i].A.z,
            (*tl)[i].B.x, (*tl)[i].B.y, (*tl)[i].B.z,
@@ -37,7 +37,7 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
   }
 
   //open csv file for writing the data_tuples there
-  FILE* csv_file = fopen("data_tuples.csv", "w"); // or "a" to append
+  FILE* csv_file = fopen(".\\data\\data_tuples.csv", "w"); // or "a" to append
   if (csv_file == NULL){
       perror("Error while creating csv data_tuples file!");
       return 1;

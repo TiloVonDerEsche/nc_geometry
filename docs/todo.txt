@@ -31,10 +31,75 @@ Bei jeder Z Änderung -> Schichtwechsel
 
 2D Matrix aus der 3D Matrix extrahieren und 5 Felder in CSV schreiben.
 
+
+
+Change from left right bottom to  x, y, z -> normalized direction vector, which has length 1
+x = 0.66
+y = 0.66
+
+change coll_ma struct format
+
+implement z collision
+analyze x,y area collision
+
+(t1->vradius + t2->vradius) <= distance_t1_t2
+
+-> z = -1
+
+Add direction of track drawing
+vec3D tvec = connecting_vec(t1->A,t1->B);
+tvec / vec_len(tvec);
+
+-> note for t1 (x,y,z)
+
+config.txt
 Wichtige Parameter aus main.c in eine Konfigurationsdatei, sodass man diese ändern kann,
 ohne das Programm neu kompilieren zu müssen. Wichtige Parameter:
-mpf_lines=2500
-file_name="ElGeo_5_V2_1.mpf"
+
+"""
+mpf_lines=2500    //special Wert für ganze file z.B.: mpf_lines=-1 =^ lese ganze File
+file_path="./data/ElGeo_5_V2_1.mpf"
+
+frag_count = 1 / batch_count = 1   (zerteile csv in frag_count viele Teile)
+"""
+
+
+
+
 
 Halbwichtige:
 size_t max_line_len = 1000
+
+
+
+Was passiert wenn t1.A = t1.B (Fall Kreisumrandung)
+
+LayerID Spalte hinzufügen (LayerID wird bei Schichtwechsel inkrementiert)
+
+
+Dokumentation
+config.txt
+
+Laser Leistung aus dem NC code lesen
+PUIS_LASER 300
+
+Als extra Spalte in track_list.csv jeweils pro Track hineinschreiben
+
+
+Normierter Richtungsvektor innerhalb des Tracks (Verfahrrichtung pro Track)
+(float angle_btw_vecs(connecteing_vec(t1->A,t1->B), connecteing_vec(t2->A,t2->B)))
+
+Mappe diesen normierten Richtungsvektor in Grad (Radianten)
+angl_btw_vec (x_Achse, jetziger Track)
+
+
+
+Python Datei welches
+gcc main.c -o main.exe
+
+optional Path in config.txt reinschreiben.
+
+.\main.exe
+
+Lese die output csv
+und z.B. printe diese Zeilenweise

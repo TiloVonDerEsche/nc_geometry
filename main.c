@@ -1,13 +1,13 @@
 #include "helper_funcs.h"
-#include "gen_cylinders.c"
-#include "cylinder_collision.c"
+#include "extract_points.c"
+#include "track_collision.c"
 
 
 int main() {
     size_t mpf_lines = 2500;
     //size_t precision = 10; //1000 yields ridiculous amount of csv lines
     size_t max_line_len = 1000;
-    char* file_name = "ElGeo_5_V2_1.mpf";
+    char* file_name = ".\\data\\ElGeo_5_V2_1.mpf";
 
     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
     if (cords == NULL) {

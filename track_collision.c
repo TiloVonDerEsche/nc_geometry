@@ -23,22 +23,24 @@ void track_collision(size_t track_list_len, track** track_list) {
         //assuming that the tracks are parallel -> point line distance
         distance_t1_t2 = distance_point_to_line(t1->A,t2->A,connecting_vec(t2->A,t2->B));
 
+
+
         tv = connecting_vec(t1->A,t2->A);
         if ((t1->hradius + t2->hradius) >= distance_t1_t2) {
           //Maybe we should get the Lotfußpunkt and compare t1.A with the Lotfußpunkt
           //on t2
 
           if (tv.y > 0) {
-            puts("LEFT");
+            //puts("LEFT");
             t2->M.left = 1;
           }
 
           else if (tv.y < 0) {
-            puts("RIGHT");
+            //puts("RIGHT");
             t2->M.right = 1;
           }
           else {
-            puts("INSIDE!");
+            //puts("INSIDE!");
             t2->M.left = -1;
             t2->M.right = -1;
           }

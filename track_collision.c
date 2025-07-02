@@ -32,18 +32,17 @@ void track_collision(size_t track_list_len, track** track_list) {
 
           if (tv.y > 0) {
             //puts("LEFT");
-            t2->M.left = 1;
+            t2->coll_vec.x = -1;
           }
 
           else if (tv.y < 0) {
             //puts("RIGHT");
-            t2->M.right = 1;
+            t2->coll_vec.x = 1;
           }
-          else {
-            //puts("INSIDE!");
-            t2->M.left = -1;
-            t2->M.right = -1;
-          }
+          // else {
+          //   //puts("INSIDE!");
+          //   t2->coll_vec.x = 42;
+          // }
 
 
           //how do we determine the side the tracks are colliding on?

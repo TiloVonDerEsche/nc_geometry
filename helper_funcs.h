@@ -10,22 +10,13 @@ float y;
 float z;
 } vec3D;
 
-typedef struct {
-  uint8_t left;
-  uint8_t bot_left;
-  uint8_t bottom;
-  uint8_t bot_right;
-  uint8_t right;
-} coll_ma;
-//collision_matrix
-
 
 typedef struct {
   vec3D A;
   vec3D B;
   float hradius;
   float vradius;
-  coll_ma M;
+  vec3D coll_vec;
 } track;
 
 typedef struct {

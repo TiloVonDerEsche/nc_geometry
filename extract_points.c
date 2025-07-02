@@ -14,15 +14,15 @@ void write_tracks_to_csv(size_t track_list_len, track** tl) {
       return;
   }
 
-  fprintf(file,"Track_id, A.x, A.y, A.z, B.x, B.y, B.z, hradius, vradius, left, right, bottom\n");
+  fprintf(file,"Track_id, A.x, A.y, A.z, B.x, B.y, B.z, hradius, vradius, coll_vec.x, coll_vec.y, coll_vec.z\n");
 
   for (size_t i = 0; i < track_list_len; i++) {
-    fprintf(file,"%lld, %f,%f,%f, %f,%f,%f, %f, %f, %u,%u,%u\n",
+    fprintf(file,"%lld, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f\n",
            i,
            (*tl)[i].A.x, (*tl)[i].A.y, (*tl)[i].A.z,
            (*tl)[i].B.x, (*tl)[i].B.y, (*tl)[i].B.z,
            (*tl)[i].hradius,(*tl)[i].vradius,
-           (*tl)[i].M.left,(*tl)[i].M.right,(*tl)[i].M.bottom);
+           (*tl)[i].coll_vec.x,(*tl)[i].coll_vec.y,(*tl)[i].coll_vec.z);
   }
 }
 

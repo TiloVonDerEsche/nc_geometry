@@ -1,5 +1,15 @@
+change coll_ma struct format
 
+Change from left right bottom to  x, y, z -> normalized direction vector, which has length 1
+x = 0.66
+y = 0.66
 
+implement z collision
+analyze x,y area collision
+
+(t1->vradius + t2->vradius) <= distance_t1_t2
+
+-> M.z = -1
 
 Special Case bei Schichtwechsel?
 Bei jeder Z Änderung Schichtwechsel?
@@ -9,20 +19,6 @@ Bei jeder Z Änderung Schichtwechsel?
 LayerID Spalte hinzufügen (LayerID wird bei Schichtwechsel inkrementiert)
 Wenn LayerID > 0 -> bottom collision
 
-
-
-Change from left right bottom to  x, y, z -> normalized direction vector, which has length 1
-x = 0.66
-y = 0.66
-
-change coll_ma struct format
-
-implement z collision
-analyze x,y area collision
-
-(t1->vradius + t2->vradius) <= distance_t1_t2
-
--> z = -1
 
 Add direction of track drawing
 vec3D tvec = connecting_vec(t1->A,t1->B);
@@ -34,24 +30,14 @@ config.txt
 Wichtige Parameter aus main.c in eine Konfigurationsdatei, sodass man diese ändern kann,
 ohne das Programm neu kompilieren zu müssen. Wichtige Parameter:
 
-"""
+
 mpf_lines=2500    //special Wert für ganze file z.B.: mpf_lines=-1 =^ lese ganze File
 file_path="./data/ElGeo_5_V2_1.mpf"
 
-frag_count = 1 / batch_count = 1   (zerteile csv in frag_count viele Teile)
-"""
-
-
-
-
-
-Halbwichtige:
-size_t max_line_len = 1000
 
 
 
 Was passiert wenn t1.A = t1.B (Fall Kreisumrandung)
-
 
 
 Dokumentation
@@ -84,3 +70,7 @@ und z.B. printe diese Zeilenweise
 
 Lastly create a visualization program, maybe with SDL3, that marks the overlapping
 areas of the cylinders red.
+
+
+In config.txt?:
+frag_count = 1 / batch_count = 1   (zerteile csv in frag_count viele Teile)

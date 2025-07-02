@@ -1,35 +1,13 @@
-Make a cylinder list
-
-create a variant interpreter, that just gets the point after laser_on (G00)
-and the point before laser_off (G01).
-Those to points A and B, will define the cylinder.
-
-For now just create every cylinder with a overgiven cylinder_radius variable
-
-
-Write a second function that goes through the whole cylinder list, and
-fills out the neighborhood matricies
-
-Lastly create a visualization program, maybe with SDL3, that marks the overlapping
-areas of the cylinders red.
-
-#
 
 
 
-Was passiert beim Schichtwechsel
-Paarweises Vergleichen vielleicht ungenügend
+Special Case bei Schichtwechsel?
+Bei jeder Z Änderung Schichtwechsel?
+3D Tracks Windschief anstatt parallel, bei Schichtwechsel
+-> Vorab Check sind Tracks parallel, Windschief, oder identisch
 
-Reicht paarweises Vergleichen ohne Schichtwechsel
-
-Special Case bei Schichtwechsel
-
-Nach dem ersten Schichtwechsel sind die unterem Felder der Matrix alle True
-
-Bei jeder Z Änderung -> Schichtwechsel
-
-
-2D Matrix aus der 3D Matrix extrahieren und 5 Felder in CSV schreiben.
+LayerID Spalte hinzufügen (LayerID wird bei Schichtwechsel inkrementiert)
+Wenn LayerID > 0 -> bottom collision
 
 
 
@@ -74,7 +52,6 @@ size_t max_line_len = 1000
 
 Was passiert wenn t1.A = t1.B (Fall Kreisumrandung)
 
-LayerID Spalte hinzufügen (LayerID wird bei Schichtwechsel inkrementiert)
 
 
 Dokumentation
@@ -103,3 +80,7 @@ optional Path in config.txt reinschreiben.
 
 Lese die output csv
 und z.B. printe diese Zeilenweise
+
+
+Lastly create a visualization program, maybe with SDL3, that marks the overlapping
+areas of the cylinders red.

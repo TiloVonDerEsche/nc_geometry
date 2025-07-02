@@ -26,4 +26,7 @@ to display all of the lines)
 
 
 
-Do we need data_tuples.csv ? 
+Do we need data_tuples.csv ?
+Not really but we need the cords array for the historic 3D points.
+Writing to data_tuples.csv is only one fprintf line more.
+(Could be commented out, if inference time goes above 1 second)

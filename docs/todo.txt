@@ -1,8 +1,10 @@
-change coll_ma struct format
-
 Change from left right bottom to  x, y, z -> normalized direction vector, which has length 1
 x = 0.66
 y = 0.66
+
+get direction vector between vectors and return it normalized as coll_vec
+Do we need to have t1.A's Lotfußpunkt, so that we take the shortest distance,
+and not skew the resulting coll_vec
 
 implement z collision
 analyze x,y area collision
@@ -13,6 +15,7 @@ analyze x,y area collision
 
 Special Case bei Schichtwechsel?
 Bei jeder Z Änderung Schichtwechsel?
+
 3D Tracks Windschief anstatt parallel, bei Schichtwechsel
 -> Vorab Check sind Tracks parallel, Windschief, oder identisch
 

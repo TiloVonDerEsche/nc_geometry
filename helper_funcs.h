@@ -76,3 +76,30 @@ vec3D vec_plus(vec3D v1, vec3D v2) {
 float distance_point_to_line(vec3D P, vec3D SP,vec3D dir_vec) {
   return vec_len(cross_product(vec_minus(P,SP), dir_vec)) / vec_len(dir_vec);
 }
+
+
+//foot of the perpendicular method
+float distance_point_to_line_and_foot_point(vec3D P, vec3D OG, vec3D u, vec3D* foot_point) {
+  //step 1 helper plane
+  // g: x_vec = OG + lamda * u
+  // H: u dotp [x,y,z] = u.x * x + u.y * y + u.z * z = r
+
+  //insert P into H to get the value of r
+  //and with that our helper plane H
+
+  //step 2 calc instersection point btw plane and g (our Lotfußpunkt)
+  //we insert g into H:
+  //u.x * (OG.x + lambda * u.x) + u.y * (OG.y + lambda * u.y) + u.z * (OG.z + lambda * u.z) = r
+
+  //Solve for lambda
+
+  //insert lambda value into g to get Lotfußpunkt s (foot of a dropped perpendicular)
+
+  //step 3 calc distance between Lotfußpunkt s and P
+  // SP = p - s
+  // &foot_point = s //return s as foot point var
+  //
+  // return vec_len(SP)
+  return 0;
+
+}

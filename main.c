@@ -4,11 +4,17 @@
 
 
 int main() {
+    //---------------Parameters set by user---------------//
     size_t mpf_lines = 2500;
     //size_t precision = 10; //1000 yields ridiculous amount of csv lines
     size_t max_line_len = 1000;
     char* file_name = ".\\data\\ElGeo_5_V2_1.mpf";
     char* output_csv_name = ".\\data\\track_list.csv";
+
+    //radii of welding track
+    float horizonal_radius = 0.3;
+    float vertical_radius = 0.3;
+    //----------------------------------------------------//
 
     data_tuple* cords = calloc(mpf_lines,sizeof(data_tuple));
     if (cords == NULL) {
@@ -25,13 +31,18 @@ int main() {
 
 
     size_t track_list_len = -1;
-    //float machine_speed =
-    read_mpf_and_create_point_cloud(file_name, mpf_lines, max_line_len, &cords, &track_list, &track_list_len);
+    float laser_power = -1;
+    float machine_speed = -1;
 
-    printf("track_list_len=%lld\n",track_list_len);
+    read_mpf(file_name, mpf_lines, max_line_len, &cords, &track_list, &track_list_len, &laser_power, &machine_speed);
+
+    printf("track_list_len=%lld\
+            \rlaser_power=%f\
+            \rmachine_speed=%f\n\r",
+            track_list_len,laser_power,machine_speed);
 
     //Set horizontal and vertical radius
-    init_track_list(0.3, 0.3, track_list_len, &track_list);
+    init_track_list(horizonal_radius, vertical_radius, track_list_len, &track_list);
 
     track_collision(track_list_len, &track_list);
 

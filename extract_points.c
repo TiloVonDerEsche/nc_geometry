@@ -27,7 +27,7 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   }
 }
 
-float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, track** tl, size_t* tl_len) {
+void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, track** tl, size_t* tl_len, float* laser_power, float* machine_speed) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   // open mpf file for reading
@@ -45,8 +45,6 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
   }
 
   uint8_t laser_on_off = 0;
-  float machine_speed = 0.0;
-
 
   char format[] = " %*[^-0123456789]%lf";
 
@@ -100,14 +98,23 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
         ti++;
       }
 
+      //read laser power
+      if (strstr(line, "PUIS_LASER ") != NULL) {
+          if (sscanf(strstr(line, "PUIS_LASER "), format, &number)) {
+              *laser_power = number;
+          }
+      }
+
       //read the set machine speed
       if (strstr(line, "VIT_TIR=") != NULL) {
           //sscanf returns 1 when it successfully parses one item
           //based on the format specifier provided.
           if (sscanf(strstr(line, "VIT_TIR="), format, &number)) {
-              machine_speed = number;
+              *machine_speed = number;
           }
       }
+
+
 
       //ignore comments
       if (strstr(line, ";") != NULL){continue;}
@@ -167,5 +174,4 @@ float read_mpf_and_create_point_cloud(char filePath[], size_t mpf_lines, size_t 
   //close the mpf file
   fclose(file);
   fclose(csv_file);
-  return machine_speed;
 }

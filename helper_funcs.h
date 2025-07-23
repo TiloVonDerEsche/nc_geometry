@@ -10,6 +10,11 @@ float y;
 float z;
 } vec3D;
 
+typedef struct {
+    vec3D normal;
+    vec3D P;
+} plane;
+
 
 typedef struct {
   vec3D A;
@@ -68,8 +73,19 @@ vec3D vec_minus(vec3D v1, vec3D v2) {
   return (vec3D) {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
 }
 
-vec3D vec_plus(vec3D v1, vec3D v2) {
+vec3D vec_add(vec3D v1, vec3D v2) {
   return (vec3D) {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
+}
+
+vec3D vec_add_scaled(vec3D s, double scalar, vec3D t) {
+  return (vec3D) {s.x + scalar * t.x, s.y + scalar * t.y, s.z + scalar * t.z};
+}
+
+vec3D norm_vec(vec3D v) {
+  double v_len = vec_len(v);
+  if (v_len == 0) {printf("Error: Trying to norm zero vec!\n");
+    return (vec3D) {0,0,0};}
+  return (vec3D) {v.x / v_len, v.y / v_len, v.z / v_len};
 }
 
 //https://studyflix.de/mathematik/abstand-punkt-gerade-2006
@@ -77,29 +93,31 @@ float distance_point_to_line(vec3D P, vec3D SP,vec3D dir_vec) {
   return vec_len(cross_product(vec_minus(P,SP), dir_vec)) / vec_len(dir_vec);
 }
 
+// Function to compute distance and foot point
+// P: A point on Line 1
+// v: Direction vector of Line 1
+// Q: A point representing the second parallel line
+// FQ: Connecting vec btw foot_point and Q, gets returned
+vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
+    // Compute t = [(Q - P) . v] / (v . v)
+    vec3D PQ = vec_minus(Q, P);
+    double v_dot_v = dot_product(v, v);
 
-//foot of the perpendicular method
-float distance_point_to_line_and_foot_point(vec3D P, vec3D OG, vec3D u, vec3D* foot_point) {
-  //step 1 helper plane
-  // g: x_vec = OG + lamda * u
-  // H: u dotp [x,y,z] = u.x * x + u.y * y + u.z * z = r
+    if (v_dot_v == 0) {
+        printf("Error: Direction vector cannot be zero.\n");
+        *distance = 0;
+        foot_point->x = foot_point->y = foot_point->z = 0;
+        return (vec3D) {0,0,0};
+    }
 
-  //insert P into H to get the value of r
-  //and with that our helper plane H
+    double t = dot_product(PQ, v) / v_dot_v;
 
-  //step 2 calc instersection point btw plane and g (our Lotfußpunkt)
-  //we insert g into H:
-  //u.x * (OG.x + lambda * u.x) + u.y * (OG.y + lambda * u.y) + u.z * (OG.z + lambda * u.z) = r
+    // Foot point F = P + t * v
+    *foot_point = vec_add_scaled(P, t, v);
 
-  //Solve for lambda
+    // Distance = ||Q - F||
+    vec3D FQ = vec_minus(Q, *foot_point);
+    *distance = vec_len(FQ);
 
-  //insert lambda value into g to get Lotfußpunkt s (foot of a dropped perpendicular)
-
-  //step 3 calc distance between Lotfußpunkt s and P
-  // SP = p - s
-  // &foot_point = s //return s as foot point var
-  //
-  // return vec_len(SP)
-  return 0;
-
+    return FQ;
 }

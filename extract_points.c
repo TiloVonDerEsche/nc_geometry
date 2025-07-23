@@ -7,8 +7,9 @@ void init_track_list(float hradius, float vradius, size_t track_list_len, track*
   }
 }
 
-void write_tracks_to_csv(size_t track_list_len, track** tl) {
-  FILE* file = fopen(".\\data\\track_list.csv", "w");
+void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
+  printf("Writing to csv with path: %s\n",csv_path);
+  FILE* file = fopen(csv_path, "w");
   if (file == NULL) {
       perror("An error occured, while trying to create / open and write to track_list.csv file!");
       return;

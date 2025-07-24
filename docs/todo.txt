@@ -11,26 +11,9 @@ Bei jeder Z Änderung Schichtwechsel?
 3D Tracks Windschief anstatt parallel, bei Schichtwechsel
 -> Vorab Check sind Tracks parallel, Windschief, oder identisch
 
-LayerID Spalte hinzufügen (LayerID wird bei Schichtwechsel inkrementiert)
-Wenn LayerID > 0 -> bottom collision
 
 
-Add direction of track drawing
-vec3D tvec = connecting_vec(t1->A,t1->B);
-tvec / vec_len(tvec);
-
--> note for t1 (x,y,z)
-
-config.txt
-Wichtige Parameter aus main.c in eine Konfigurationsdatei, sodass man diese ändern kann,
-ohne das Programm neu kompilieren zu müssen. Wichtige Parameter:
-
-
-mpf_lines=2500    //special Wert für ganze file z.B.: mpf_lines=-1 =^ lese ganze File
-file_path="./data/ElGeo_5_V2_1.mpf"
-
-
-
+config.txt? Instead of settings params in main.c
 
 Was passiert wenn t1.A = t1.B (Fall Kreisumrandung)
 
@@ -38,21 +21,17 @@ Was passiert wenn t1.A = t1.B (Fall Kreisumrandung)
 Dokumentation
 config.txt
 
-Laser Leistung aus dem NC code lesen
-PUIS_LASER 300
+Verfahrrichtung pro Track hinzufügen
+Normierter Richtungsvektor innerhalb des Tracks
+Richtungsvektor vec3D rv vec_minus(t1->B,t1->A)
+norm_vec(rv)
 
-Als extra Spalte in track_list.csv jeweils pro Track hineinschreiben
 
-
-Normierter Richtungsvektor innerhalb des Tracks (Verfahrrichtung pro Track)
-(float angle_btw_vecs(connecting_vec(t1->A,t1->B), connecteing_vec(t2->A,t2->B)))
-
-Mappe diesen normierten Richtungsvektor in Grad (Radianten)
-angl_btw_vec (x_Achse, jetziger Track)
+(Mappe diesen normierten Richtungsvektor in Grad (Radianten)
+angl_btw_vec (x_Achse, jetziger Track))
 
 Lastly create a visualization program, maybe with SDL3, that marks the overlapping
 areas of the cylinders red.
-
 
 In config.txt?:
 frag_count = 1 / batch_count = 1   (zerteile csv in frag_count viele Teile)

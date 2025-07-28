@@ -136,7 +136,7 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
 }
 
 
-// Function to trim whitespace and quotes from a string
+// Function to trim leading and trailing whitespaces and quotes from a string
 char* trim(char* str) {
     char* end;
     // Remove leading whitespace and quotes
@@ -149,7 +149,20 @@ char* trim(char* str) {
     return str;
 }
 
-// Function to parse the config file
+void parse_line(char* line, char** key, char** value) {
+    //using '=' as delimiter
+    char* eq_pos = strchr(line, '=');
+    if (eq_pos == NULL) {
+        *key = NULL;
+        *value = NULL;
+        return;
+    }
+    *eq_pos = '\0';  // Split the string at '='
+    *key = trim(line);
+    //inc the char pointer to give trim the str which starts after '='
+    *value = trim(eq_pos + 1);
+}
+
 int read_config(const char* filename, Config* config) {
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -159,24 +172,21 @@ int read_config(const char* filename, Config* config) {
 
     char line[512];
     while (fgets(line, sizeof(line), file)) {
-        // Skip empty lines or comments
         char* trimmed = trim(line);
+
+        //ignore comments and empty lines
         if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
             continue;
         }
-
-        // Split line into key and value
-        char* key = strtok(trimmed, "=");
+        char* key = strtok(trimmed, "= ");  // Include space in delimiter to handle spaces around '='
         char* value = strtok(NULL, ";");
         if (!key || !value) {
             fprintf(stderr, "Error: Invalid line format: %s\n", line);
             continue;
         }
-
         key = trim(key);
         value = trim(value);
 
-        // Assign values to config struct
         if (strcmp(key, "mpf_lines") == 0) {
             config->mpf_lines = (size_t)atoi(value);
         } else if (strcmp(key, "precision") == 0) {

@@ -5,5 +5,5 @@ file_name =".\\data\\ElGeo_5_V2_1.mpf";
 output_csv_name = ".\\data\\track_list.csv";
 
 //radii of welding track
-horizontal_radius= 0.378;
-vertical_radius=0.3965;
+horizontal_radius= 0.398412;
+vertical_radius=0.314554;

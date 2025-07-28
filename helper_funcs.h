@@ -178,14 +178,13 @@ int read_config(const char* filename, Config* config) {
         if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
             continue;
         }
-        char* key = strtok(trimmed, "= ");  // Include space in delimiter to handle spaces around '='
-        char* value = strtok(NULL, ";");
+        char* key;
+        char* value;
+        parse_line(trimmed, &key, &value);
         if (!key || !value) {
             fprintf(stderr, "Error: Invalid line format: %s\n", line);
             continue;
         }
-        key = trim(key);
-        value = trim(value);
 
         if (strcmp(key, "mpf_lines") == 0) {
             config->mpf_lines = (size_t)atoi(value);

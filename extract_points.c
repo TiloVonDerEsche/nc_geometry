@@ -30,18 +30,21 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
 void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple** cords, track** tl, size_t* tl_len, float* laser_power, float* machine_speed) {
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
+  printf("Opening file: %s in read mode...\n",filePath);
   // open mpf file for reading
+  //does work with manual string ".\\data\\ElGeo_5_V2_1.mpf"
+  //str seems to be read wrong from config.txt
   FILE* file = fopen(filePath, "r");
   if (file == NULL) {
       perror("An error occured, while trying to open a file");
-      return 1;
+      return;
   }
 
   //open csv file for writing the data_tuples there
   FILE* csv_file = fopen(".\\data\\data_tuples.csv", "w"); // or "a" to append
   if (csv_file == NULL){
       perror("Error while creating csv data_tuples file!");
-      return 1;
+      return;
   }
 
   uint8_t laser_on_off = 0;

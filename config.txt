@@ -1,0 +1,9 @@
+mpf_lines = 2500;
+precision = 10; //1000 yields ridiculous amount of csv lines
+max_line_len = 1000;
+file_name = ".\\data\\ElGeo_5_V2_1.mpf";
+output_csv_name = ".\\data\\track_list.csv";
+
+//radii of welding track
+horizonal_radius = 0.3;
+vertical_radius = 0.3;

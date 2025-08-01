@@ -1,7 +1,3 @@
-
-
-//https://dfncloud.fh-kiel.de/s/prg56gjALs53QST
-
 //assigns the coll_vec inside of the track structs
 void track_collision(size_t track_list_len, track** track_list) {
   if (track_list_len < 2) {puts("LESS THAN TWO TRACKS IN TRACK LIST!");return;}
@@ -29,27 +25,6 @@ void track_collision(size_t track_list_len, track** track_list) {
         if ((t1->hradius + t2->hradius) >= distance_t1_t2) {
 
           t2->coll_vec = FQ_normed;
-
-          // if (tv.y > 0) {
-          //   //puts("LEFT");
-          //   t2->coll_vec.x = -1;
-          // }
-          //
-          // else if (tv.y < 0) {
-          //   //puts("RIGHT");
-          //   t2->coll_vec.x = 1;
-          // }
-
-          //getting the direction of tv
-          // x, y > 0 -> top_right
-          // x > 0 & y == 0 -> right
-          // x > 0 & y < 0 -> bot_right
-          // x == 0 & y < 0 -> bottom
-          // x < 0 & y < 0 -> bot_left
-          // x < 0 & y == 0 -> left
-          // x < 0 & y > 0 -> top_left
-          // x == 0  & y > 0 -> top
-
         }
   }
 }

@@ -117,7 +117,7 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
     double v_dot_v = dot_product(v, v);
 
     if (v_dot_v == 0) {
-        printf("Error: Direction vector cannot be zero vec.\n");
+        //printf("Error: Direction vector cannot be zero vec.\n");
         *distance = 0;
         foot_point->x = foot_point->y = foot_point->z = 0;
         return (vec3D) {0,0,0};

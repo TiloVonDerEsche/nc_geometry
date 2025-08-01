@@ -18,7 +18,8 @@ int main() {
     printf("file_name=%s\n", config.file_name);
     printf("output_csv_name=%s\n", config.output_csv_name);
     printf("horizontal_radius=%.2f\n", config.horizontal_radius);
-    printf("vertical_radius=%.2f\n", config.vertical_radius);
+    printf("vertical_radius=%.2f\n\n", config.vertical_radius);
+
 
 
     data_tuple* cords = calloc(config.mpf_lines,sizeof(data_tuple));
@@ -46,9 +47,9 @@ int main() {
       &cords, &track_list, &track_list_len, &laser_power, &machine_speed
     );
 
-    printf("track_list_len=%lld\
-            \rlaser_power=%f\
-            \rmachine_speed=%f\n\r",
+    printf("\ntrack_list_len=%lld\n\
+            \rlaser_power=%f\n\
+            \rmachine_speed=%f\n\n\r",
             track_list_len,laser_power,machine_speed);
 
     //Set horizontal and vertical radius

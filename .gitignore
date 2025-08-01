@@ -1,7 +1,9 @@
 *.csv
 *.mpf
 *.exe
+*.zip
 
+img/
 data/
 backup/
 docs/cloud_link.txt

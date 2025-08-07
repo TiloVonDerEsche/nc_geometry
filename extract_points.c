@@ -87,20 +87,21 @@ void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple
       if(strstr(line, "LASER_ON") != NULL) {
         laser_on_off = 1;
         //get point where head is currently (Point before LASER_ON)
-        (*tl)[ti].A.x = (*cords)[i].P.x;
-        (*tl)[ti].A.y = (*cords)[i].P.y;
-        (*tl)[ti].A.z = (*cords)[i].P.z;
+        (*tl)[ti].A.x = (*cords)[i-1].P.x;
+        (*tl)[ti].A.y = (*cords)[i-1].P.y;
+        (*tl)[ti].A.z = (*cords)[i-1].P.z;
       }
       else if(strstr(line, "LASER_OFF") != NULL) {
         laser_on_off = 0;
         //get current point
         if (i > 1) {
-          (*tl)[ti].B.x = (*cords)[i-1].P.x; //why do we get i-1?
+          //i-1 because there is no point at i
+          (*tl)[ti].B.x = (*cords)[i-1].P.x;
           (*tl)[ti].B.y = (*cords)[i-1].P.y;
           (*tl)[ti].B.z = (*cords)[i-1].P.z;
         }
 
-        //increment cylinder index
+        //increment track index
         ti++;
       }
 

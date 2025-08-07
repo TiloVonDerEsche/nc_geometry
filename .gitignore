@@ -2,8 +2,11 @@
 *.mpf
 *.exe
 *.zip
+*.dll
 
 img/
 data/
 backup/
 docs/cloud_link.txt
+track_visualization/freeglut_test
+track_visualization/pyplot

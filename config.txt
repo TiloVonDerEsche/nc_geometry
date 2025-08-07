@@ -1,4 +1,4 @@
-mpf_lines = 10000;
+mpf_lines = 100000000; //convert x lines of the NC code into tracks (-1 for all lines)
 precision = 10; //1000 yields ridiculous amount of csv lines
 max_line_len = 1000;
 file_name = ".\\data\\ElGeo_5_V2_1.mpf";

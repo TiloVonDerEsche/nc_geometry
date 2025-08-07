@@ -70,7 +70,6 @@ void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
-  uint8_t fetch_next_point = 0;
   size_t ti = 0; //track id
   int i = 0;
   //continue as long as the line contains something
@@ -82,17 +81,21 @@ void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple
       z_has_changed = 0;
 
       //read the on/off state of the laser
-      if (strstr(line, "G00") != NULL) {laser_on_off = 0;}
-      else if (strstr(line, "G01") != NULL) {laser_on_off = 1;}
+      //if (strstr(line, "G00") != NULL) {laser_on_off = 0;} //Eilmodus?
+      //else if (strstr(line, "G01") != NULL) {laser_on_off = 1;} //Arbeitsmodus?
 
       if(strstr(line, "LASER_ON") != NULL) {
-        //get next point
-        fetch_next_point = 1;
+        laser_on_off = 1;
+        //get point where head is currently (Point before LASER_ON)
+        (*tl)[ti].A.x = (*cords)[i].P.x;
+        (*tl)[ti].A.y = (*cords)[i].P.y;
+        (*tl)[ti].A.z = (*cords)[i].P.z;
       }
       else if(strstr(line, "LASER_OFF") != NULL) {
+        laser_on_off = 0;
         //get current point
         if (i > 1) {
-          (*tl)[ti].B.x = (*cords)[i-1].P.x;
+          (*tl)[ti].B.x = (*cords)[i-1].P.x; //why do we get i-1?
           (*tl)[ti].B.y = (*cords)[i-1].P.y;
           (*tl)[ti].B.z = (*cords)[i-1].P.z;
         }
@@ -145,7 +148,8 @@ void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple
 
       if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
 
-          //(X10.0 in the NC means take the old point and change X to 10.0)
+          //"X10.0" in the NC means copy values of the old point and
+          //change X to 10.0
           copy_data_tuple(i,cords);
 
           //then only change the parameters that have changed
@@ -154,15 +158,6 @@ void read_mpf(char filePath[], size_t mpf_lines, size_t max_line_len, data_tuple
           if (z_has_changed) (*cords)[i].P.z = new_P.z;
 
           (*cords)[i].laser = laser_on_off;
-
-          if (fetch_next_point) { //get start of track
-            (*tl)[ti].A.x = (*cords)[i].P.x;
-            (*tl)[ti].A.y = (*cords)[i].P.y;
-            (*tl)[ti].A.z = (*cords)[i].P.z;
-
-            fetch_next_point = 0;
-          }
-
 
           //printf("(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);
           fprintf(csv_file, "(%f, %f, %f), laser=%d\n", (*cords)[i].P.x, (*cords)[i].P.y, (*cords)[i].P.z, (*cords)[i].laser);

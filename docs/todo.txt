@@ -35,3 +35,21 @@ areas of the cylinders red.
 
 In config.txt?:
 frag_count = 1 / batch_count = 1   (zerteile csv in frag_count viele Teile)
+
+Erkennung von Geometrie Abweichung
+Umrandung
+gekrümmte Tracks
+Subset von Punktwolke, Punkte zwischen A und B notieren
+Kollision mit den Special Shapes nicht nur paarweise
+
+Bedingung keine Paralellität
+Subschritt-Vektoren
+Richtung eines Subschritts als Gleichheit mit jedem nächsten Subschritt vergleichen
+
+
+
+Doku:
+gcc Installieren und c Programme kompilen
+
+Visualisierung von
+Punktwolke

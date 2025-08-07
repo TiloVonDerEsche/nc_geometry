@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include <GL/glu.h>  // Added for GLU functions
+#include <GL/glu.h>
 
 // Structure to hold track data
 typedef struct {
@@ -55,51 +54,65 @@ void readCSV(const char* filename) {
     fclose(file);
 }
 
-// Draw an elliptical cylinder from point A to B
+// Draw an elliptical cylinder from point A to B with correct orientation
 void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
     const int segments = 32;
-    float length = sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay) + (bz - az) * (bz - az));
+
+    // Compute direction vector and length
+    float dx = bx - ax;
+    float dy = by - ay;
+    float dz = bz - az;
+    float length = sqrt(dx * dx + dy * dy + dz * dz);
     if (length == 0) return;
+    dx /= length;
+    dy /= length;
+    dz /= length;
 
-    float dx = (bx - ax) / length;
-    float dy = (by - ay) / length;
-    float dz = (bz - az) / length;
-
-    float up[3] = {0, 0, 1};
-    float axis[3];
-    float dot = dz;
-    float angle = acos(dot) * 180.0f / M_PI;
-
-    if (fabs(dot) < 0.999f) {
-        axis[0] = dy;
-        axis[1] = -dx;
-        axis[2] = 0;
-        float axisLen = sqrt(axis[0] * axis[0] + axis[1] * axis[1]);
-        if (axisLen > 0) {
-            axis[0] /= axisLen;
-            axis[1] /= axisLen;
-        }
-    } else {
-        axis[0] = 1; axis[1] = 0; axis[2] = 0;
-        if (dot < 0) angle = 180.0f;
+    // Define up vector (global y-axis)
+    float up[3] = {0.0f, 1.0f, 0.0f};
+    // Check if direction is nearly parallel to y-axis
+    if (fabs(fabs(dy) - 1.0f) < 0.001f) {
+        up[0] = 0.0f; up[1] = 0.0f; up[2] = 1.0f; // Use z-axis as up
     }
 
+    // Compute local y-axis: v = up - (up • w) * w
+    float dot_up_w = up[0] * dx + up[1] * dy + up[2] * dz;
+    float v[3];
+    v[0] = up[0] - dot_up_w * dx;
+    v[1] = up[1] - dot_up_w * dy;
+    v[2] = up[2] - dot_up_w * dz;
+    float v_len = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    if (v_len > 0) {
+        v[0] /= v_len;
+        v[1] /= v_len;
+        v[2] /= v_len;
+    } else {
+        v[0] = 1.0f; v[1] = 0.0f; v[2] = 0.0f; // Fallback
+    }
+
+    // Compute local x-axis: u = w × v
+    float u[3];
+    u[0] = dy * v[2] - dz * v[1];
+    u[1] = dz * v[0] - dx * v[2];
+    u[2] = dx * v[1] - dy * v[0];
+
+    // Construct rotation matrix (column-major for OpenGL)
+    GLfloat rotationMatrix[16] = {
+        u[0], u[1], u[2], 0.0f,
+        v[0], v[1], v[2], 0.0f,
+        dx, dy, dz, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    // Apply transformations
     glPushMatrix();
     glTranslatef(ax, ay, az);
-    if (fabs(dot) < 0.999f) {
-        glRotatef(angle, axis[0], axis[1], axis[2]);
-    } else if (dot < 0) {
-        glRotatef(180.0f, 1, 0, 0);
-    }
-
+    glMultMatrixf(rotationMatrix);
     glScalef(hradius, vradius, length);
-
-    // Draw cylinder with normals for lighting
     GLUquadric* quad = gluNewQuadric();
-    gluQuadricNormals(quad, GLU_SMOOTH);  // Enable smooth normals
+    gluQuadricNormals(quad, GLU_SMOOTH);
     gluCylinder(quad, 1.0, 1.0, 1.0, segments, 1);
     gluDeleteQuadric(quad);
-
     glPopMatrix();
 }
 

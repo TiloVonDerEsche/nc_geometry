@@ -1,7 +1,4 @@
-# Project Instructions
-
-## To use the project
-
+# Guide to using the project
 1. **Create a folder** named `data`.
 2. Move the NC code (`.mpf`) file into the `data` folder.
 

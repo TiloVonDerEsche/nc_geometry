@@ -15,7 +15,11 @@ Set the desired values in config.txt:
      
 
 Then start the generate_track_list.exe file.
-
-
 Afterwards a data_tuples.csv and track_list.csv should appear in the data folder.
+
+Make sure that 3d_track_visualizer.exe is in the same directory as generate_track_list.exe.
+Both should have the data folder, with the csv's and the mpf in their directory.
+
+Then starting 3d_track_visualizer.exe should result in a window with a 3D visalization of the tracks.
+You can traverse that 3D space with WASD and the left mouse button.
 

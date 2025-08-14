@@ -16,7 +16,7 @@ ${MXE_PATH}/usr/bin/${TARGET}-gcc t_vis_color.c -o 3d_track_visualizer.exe \
 
 # Check for errors
 if [ $? -eq 0 ]; then
-  echo "Compilation successful! Executable: t_vis_color.exe"
+  echo "Compilation successful! Executable: 3d_track_visualizer.exe"
 else
   echo "Compilation failed."
 fi

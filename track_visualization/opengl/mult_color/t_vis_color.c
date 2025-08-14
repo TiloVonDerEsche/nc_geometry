@@ -209,7 +209,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 int main(int argc, char** argv) {
     // Read CSV
-    readCSV("./../../../data/track_list.csv");
+    readCSV("./data/track_list.csv");
 
     // Compute min and max z for color mapping
     min_z = tracks[0].az;

@@ -9,7 +9,6 @@ Set the desired values in config.txt:
     mpf_file specifies the path of the .mpf file
     data_tuples_csv specifies the path of the data_tuples.csv out file
     track_list_csv specifies the path of the track_list.csv out file
-
     horizontal_radius specifies the horizontal_radius of a track
     vertical_radius specifies the vertical_radius of a track
      

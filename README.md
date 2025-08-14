@@ -20,4 +20,4 @@
    Both should have the `data` folder, with the CSVs and the `.mpf` file in their directory.
 
 6. Start `3d_track_visualizer.exe` — this should open a window with a 3D visualization of the tracks.  
-   You can move around in 3D space using **WASD** keys and the **left mouse button**.
+   You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.

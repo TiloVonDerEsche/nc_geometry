@@ -1,4 +1,4 @@
-To use the project:
+#To use the project:
 Create a folder named "data".
 Move the nc code (.mpf) file into the data folder
 

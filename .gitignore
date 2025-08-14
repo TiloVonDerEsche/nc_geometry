@@ -1,8 +1,10 @@
+*.exe
+*.bin
+*.dll
 *.csv
 *.mpf
-*.exe
 *.zip
-*.dll
+
 
 img/
 data/

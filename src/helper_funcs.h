@@ -10,8 +10,9 @@ typedef struct {
     size_t precision;
     size_t max_line_len;
 
-    char file_name[256];
-    char output_csv_name[256];
+    char mpf_file[256];
+    char data_tuples_csv[256];
+    char track_list_csv[256];    
 
     float horizontal_radius;
     float vertical_radius;
@@ -188,21 +189,32 @@ int read_config(const char* filename, Config* config) {
 
         if (strcmp(key, "mpf_lines") == 0) {
             config->mpf_lines = (size_t)atoi(value);
-        } else if (strcmp(key, "precision") == 0) {
+        }
+        else if (strcmp(key, "precision") == 0) {
             config->precision = (size_t)atoi(value);
-        } else if (strcmp(key, "max_line_len") == 0) {
+        }
+        else if (strcmp(key, "max_line_len") == 0) {
             config->max_line_len = (size_t)atoi(value);
-        } else if (strcmp(key, "file_name") == 0) {
-            strncpy(config->file_name, value, sizeof(config->file_name) - 1);
-            config->file_name[sizeof(config->file_name) - 1] = '\0';
-        } else if (strcmp(key, "output_csv_name") == 0) {
-            strncpy(config->output_csv_name, value, sizeof(config->output_csv_name) - 1);
-            config->output_csv_name[sizeof(config->output_csv_name) - 1] = '\0';
-        } else if (strcmp(key, "horizontal_radius") == 0) {
+        }
+        else if (strcmp(key, "mpf_file") == 0) {
+            strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
+            config->mpf_file[sizeof(config->mpf_file) - 1] = '\0';
+        }
+        else if (strcmp(key, "data_tuples_csv") == 0) {
+            strncpy(config->data_tuples_csv, value, sizeof(config->data_tuples_csv) - 1);
+            config->data_tuples_csv[sizeof(config->data_tuples_csv) - 1] = '\0';
+        }
+        else if (strcmp(key, "track_list_csv") == 0) {
+            strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);
+            config->track_list_csv[sizeof(config->track_list_csv) - 1] = '\0';
+        }
+        else if (strcmp(key, "horizontal_radius") == 0) {
             config->horizontal_radius = atof(value);
-        } else if (strcmp(key, "vertical_radius") == 0) {
+        }
+        else if (strcmp(key, "vertical_radius") == 0) {
             config->vertical_radius = atof(value);
-        } else {
+        }
+        else {
             fprintf(stderr, "Warning: Unknown key: %s\n", key);
         }
     }

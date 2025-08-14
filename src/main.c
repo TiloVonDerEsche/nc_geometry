@@ -1,6 +1,6 @@
 #include "helper_funcs.h"
-#include "extract_points.c"
-#include "track_collision.c"
+#include "file_funcs.h"
+#include "track_collision.h"
 
 int main() {
     // Initialize config struct with default values
@@ -11,12 +11,14 @@ int main() {
       return 1;
     }
 
-    // Print the values to verify
+    // Print the config.txt values to verify
     printf("mpf_lines=%zu\n", config.mpf_lines);
     printf("precision=%zu\n", config.precision);
     printf("max_line_len=%zu\n", config.max_line_len);
-    printf("file_name=%s\n", config.file_name);
-    printf("output_csv_name=%s\n", config.output_csv_name);
+    printf("mpf_file=%s\n", config.mpf_file);
+    printf("data_tuples_csv=%s\n", config.data_tuples_csv);
+    printf("track_list_csv=%s\n", config.track_list_csv);
+
     printf("horizontal_radius=%.2f\n", config.horizontal_radius);
     printf("vertical_radius=%.2f\n\n", config.vertical_radius);
 
@@ -41,10 +43,11 @@ int main() {
     float machine_speed = -1;
 
     read_mpf(
-      config.file_name,
+      config.mpf_file,
       config.mpf_lines,
       config.max_line_len,
-      &cords, &track_list, &track_list_len, &laser_power, &machine_speed
+      &cords, &track_list, &track_list_len, &laser_power, &machine_speed,
+      &config
     );
 
     printf("\ntrack_list_len=%lld\n\
@@ -61,7 +64,7 @@ int main() {
     track_collision(track_list_len, &track_list);
 
     write_tracks_to_csv(
-      config.output_csv_name,
+      config.track_list_csv,
       track_list_len,&track_list);
 
     free(cords);

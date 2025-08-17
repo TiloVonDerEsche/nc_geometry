@@ -7,5 +7,5 @@ track_list_csv = "./data/track_list.csv";
 
 
 //radii of welding track
-horizontal_radius= 0.498412;
-vertical_radius=0.314554;
+horizontal_radius= 0.49;
+vertical_radius=0.31;

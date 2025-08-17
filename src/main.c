@@ -10,16 +10,17 @@ int main() {
     if (read_config("config.txt", &config) != 0) {
       return 1;
     }
-
+    puts("\nRead values from config.txt:");
     // Print the config.txt values to verify
     printf("mpf_lines=%zu\n", config.mpf_lines);
     printf("precision=%zu\n", config.precision);
     printf("max_line_len=%zu\n", config.max_line_len);
-    printf("mpf_file=%s\n", config.mpf_file);
+
+    printf("\nmpf_file=%s\n", config.mpf_file);
     printf("data_tuples_csv=%s\n", config.data_tuples_csv);
     printf("track_list_csv=%s\n", config.track_list_csv);
 
-    printf("horizontal_radius=%.2f\n", config.horizontal_radius);
+    printf("\nhorizontal_radius=%.2f\n", config.horizontal_radius);
     printf("vertical_radius=%.2f\n\n", config.vertical_radius);
 
 
@@ -50,10 +51,12 @@ int main() {
       &config
     );
 
-    printf("\ntrack_list_len=%lld\n\
-            \rlaser_power=%f\n\
-            \rmachine_speed=%f\n\n\r",
-            track_list_len,laser_power,machine_speed);
+    printf("\nRead values from %s:\n",config.mpf_file);
+    printf("machine_speed=%f\n\
+            \rlaser_power=%f\n\n\r",
+            machine_speed,laser_power);
+
+
 
     //Set horizontal and vertical radius
     init_track_list(
@@ -61,8 +64,10 @@ int main() {
       config.vertical_radius,
       track_list_len, &track_list);
 
+    printf("Using track_list with %lld tracks for collision...\n",track_list_len);
     track_collision(track_list_len, &track_list);
 
+    printf("\nSaving track_list in %s...\n",config.track_list_csv);
     write_tracks_to_csv(
       config.track_list_csv,
       track_list_len,&track_list);

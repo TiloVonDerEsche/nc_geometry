@@ -6,27 +6,27 @@
 #include <ctype.h>
 
 typedef struct {
-    size_t mpf_lines;
-    size_t precision;
-    size_t max_line_len;
+  size_t mpf_lines;
+  size_t precision;
+  size_t max_line_len;
 
-    char mpf_file[256];
-    char data_tuples_csv[256];
-    char track_list_csv[256];    
+  char mpf_file[256];
+  char data_tuples_csv[256];
+  char track_list_csv[256];
 
-    float horizontal_radius;
-    float vertical_radius;
+  float horizontal_radius;
+  float vertical_radius;
 } Config;
 
 typedef struct {
-float x;
-float y;
-float z;
+  float x;
+  float y;
+  float z;
 } vec3D;
 
 typedef struct {
-    vec3D normal;
-    vec3D P;
+  vec3D normal;
+  vec3D P;
 } plane;
 
 
@@ -40,16 +40,16 @@ typedef struct {
 
 typedef struct {
   vec3D P;
-  uint8_t laser; //boolean -> laser on or off?
+  uint8_t laser; //bool -> laser on/off
 } data_tuple;
 
 
 void copy_data_tuple(size_t i, data_tuple** arr) {
-    if (i <= 0) { return; } // Avoid seg fault when i = 0
-    (*arr)[i].P.x = (*arr)[i-1].P.x;
-    (*arr)[i].P.y = (*arr)[i-1].P.y;
-    (*arr)[i].P.z = (*arr)[i-1].P.z;
-    (*arr)[i].laser = (*arr)[i-1].laser;
+  if (i <= 0) { return; } // Avoid seg fault when i = 0
+  (*arr)[i].P.x = (*arr)[i-1].P.x;
+  (*arr)[i].P.y = (*arr)[i-1].P.y;
+  (*arr)[i].P.z = (*arr)[i-1].P.z;
+  (*arr)[i].laser = (*arr)[i-1].laser;
 }
 
 
@@ -113,27 +113,27 @@ float distance_point_to_line(vec3D P, vec3D SP,vec3D dir_vec) {
 // Q: A point representing the second parallel line
 // FQ: Connecting vec btw foot_point and Q, gets returned
 vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
-    // Compute t = [(Q - P) . v] / (v . v)
-    vec3D PQ = vec_minus(Q, P);
-    double v_dot_v = dot_product(v, v);
+  // Compute t = [(Q - P) . v] / (v . v)
+  vec3D PQ = vec_minus(Q, P);
+  double v_dot_v = dot_product(v, v);
 
-    if (v_dot_v == 0) {
-        //printf("Error: Direction vector cannot be zero vec.\n");
-        *distance = 0;
-        foot_point->x = foot_point->y = foot_point->z = 0;
-        return (vec3D) {0,0,0};
-    }
+  if (v_dot_v == 0) {
+      //printf("Error: Direction vector cannot be zero vec.\n");
+      *distance = 0;
+      foot_point->x = foot_point->y = foot_point->z = 0;
+      return (vec3D) {0,0,0};
+  }
 
-    double t = dot_product(PQ, v) / v_dot_v;
+  double t = dot_product(PQ, v) / v_dot_v;
 
-    // Foot point F = P + t * v
-    *foot_point = vec_add_scaled(P, t, v);
+  // Foot point F = P + t * v
+  *foot_point = vec_add_scaled(P, t, v);
 
-    // Distance = ||Q - F||
-    vec3D FQ = vec_minus(Q, *foot_point);
-    *distance = vec_len(FQ);
+  // Distance = ||Q - F||
+  vec3D FQ = vec_minus(Q, *foot_point);
+  *distance = vec_len(FQ);
 
-    return FQ;
+  return FQ;
 }
 
 
@@ -162,63 +162,4 @@ void parse_line(char* line, char** key, char** value) {
     *key = trim(line);
     //inc the char pointer to give trim the str which starts after '='
     *value = trim(eq_pos + 1);
-}
-
-int read_config(const char* filename, Config* config) {
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        fprintf(stderr, "Error: Could not open config file %s\n", filename);
-        return 1;
-    }
-
-    char line[512];
-    while (fgets(line, sizeof(line), file)) {
-        char* trimmed = trim(line);
-
-        //ignore comments and empty lines
-        if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
-            continue;
-        }
-        char* key;
-        char* value;
-        parse_line(trimmed, &key, &value);
-        if (!key || !value) {
-            fprintf(stderr, "Error: Invalid line format: %s\n", line);
-            continue;
-        }
-
-        if (strcmp(key, "mpf_lines") == 0) {
-            config->mpf_lines = (size_t)atoi(value);
-        }
-        else if (strcmp(key, "precision") == 0) {
-            config->precision = (size_t)atoi(value);
-        }
-        else if (strcmp(key, "max_line_len") == 0) {
-            config->max_line_len = (size_t)atoi(value);
-        }
-        else if (strcmp(key, "mpf_file") == 0) {
-            strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
-            config->mpf_file[sizeof(config->mpf_file) - 1] = '\0';
-        }
-        else if (strcmp(key, "data_tuples_csv") == 0) {
-            strncpy(config->data_tuples_csv, value, sizeof(config->data_tuples_csv) - 1);
-            config->data_tuples_csv[sizeof(config->data_tuples_csv) - 1] = '\0';
-        }
-        else if (strcmp(key, "track_list_csv") == 0) {
-            strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);
-            config->track_list_csv[sizeof(config->track_list_csv) - 1] = '\0';
-        }
-        else if (strcmp(key, "horizontal_radius") == 0) {
-            config->horizontal_radius = atof(value);
-        }
-        else if (strcmp(key, "vertical_radius") == 0) {
-            config->vertical_radius = atof(value);
-        }
-        else {
-            fprintf(stderr, "Warning: Unknown key: %s\n", key);
-        }
-    }
-
-    fclose(file);
-    return 0;
 }

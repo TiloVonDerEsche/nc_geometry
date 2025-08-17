@@ -1,2 +1,2 @@
 #!/bin/bash
-gcc main.c -o ./../generate_track_list.bin -lm
+gcc ./src/main.c -o ./generate_track_list.bin -lm

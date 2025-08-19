@@ -31,16 +31,24 @@ typedef struct {
 
 
 typedef struct {
+  //set by read_mpf
   vec3D A;
   vec3D B;
+  float laser_power;
+  float machine_speed;
+  //set by track_collision
+  vec3D coll_vec;
+  //set by set_track_radius
   float hradius;
   float vradius;
-  vec3D coll_vec;
 } track;
 
 typedef struct {
+  //set by read_mpf
   vec3D P;
   uint8_t laser; //bool -> laser on/off
+  float laser_power;
+  float machine_speed;
 } data_tuple;
 
 

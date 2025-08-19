@@ -25,9 +25,9 @@ int main() {
 
 
 
-    data_tuple* cords = calloc(config.mpf_lines,sizeof(data_tuple));
-    if (cords == NULL) {
-      fprintf(stderr, "Memory allocation of cords failed\n");
+    data_tuple* tuple_list = calloc(config.mpf_lines,sizeof(data_tuple));
+    if (tuple_list == NULL) {
+      fprintf(stderr, "Memory allocation of tuple_list failed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -40,26 +40,15 @@ int main() {
 
 
     size_t track_list_len = -1;
-    float laser_power = -1;
-    float machine_speed = -1;
-
     read_mpf(
       config.mpf_file,
       config.mpf_lines,
       config.max_line_len,
-      &cords, &track_list, &track_list_len, &laser_power, &machine_speed,
-      &config
+      &tuple_list, &track_list, &track_list_len, &config
     );
 
-    printf("\nRead values from %s:\n",config.mpf_file);
-    printf("machine_speed=%f\n\
-            \rlaser_power=%f\n\n\r",
-            machine_speed,laser_power);
 
-
-
-    //Set horizontal and vertical radius
-    init_track_list(
+    set_track_radius(
       config.horizontal_radius,
       config.vertical_radius,
       track_list_len, &track_list);
@@ -72,7 +61,7 @@ int main() {
       config.track_list_csv,
       track_list_len,&track_list);
 
-    free(cords);
+    free(tuple_list);
     free(track_list);
     return 0;
 }

@@ -5,11 +5,17 @@
 int main() {
     // Initialize config struct with default values
     Config config = {0};
+    uint8_t read_all = 0; //read whole mpf file=yes / no
 
     // Read the config file
     if (read_config("config.txt", &config) != 0) {
       return 1;
     }
+
+    if (config.mpf_lines == -1) {
+      read_all = 1;
+    }
+
     puts("\nRead values from config.txt:");
     // Print the config.txt values to verify
     printf("mpf_lines=%zu\n", config.mpf_lines);
@@ -41,9 +47,7 @@ int main() {
 
     size_t track_list_len = -1;
     read_mpf(
-      config.mpf_file,
-      config.mpf_lines,
-      config.max_line_len,
+      config.mpf_file, config.mpf_lines, config.max_line_len, read_all,
       &tuple_list, &track_list, &track_list_len, &config
     );
 
@@ -53,7 +57,7 @@ int main() {
       config.vertical_radius,
       track_list_len, &track_list);
 
-    printf("Using track_list with %lld tracks for collision...\n",track_list_len);
+    printf("Using track_list with %lu tracks for collision...\n",track_list_len);
     track_collision(track_list_len, &track_list);
 
     printf("\nSaving track_list in %s...\n",config.track_list_csv);

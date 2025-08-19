@@ -18,7 +18,7 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   fprintf(file,"Track_id, A.x, A.y, A.z, B.x, B.y, B.z, laser_power, machine_speed, coll_vec.x, coll_vec.y, coll_vec.z, hradius, vradius\n");
 
   for (size_t i = 0; i < track_list_len; i++) {
-    fprintf(file,"%lld, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f\n",
+    fprintf(file,"%lu, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f\n",
            i,
            (*tl)[i].A.x, (*tl)[i].A.y, (*tl)[i].A.z,
            (*tl)[i].B.x, (*tl)[i].B.y, (*tl)[i].B.z,
@@ -28,7 +28,11 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   }
 }
 
-void read_mpf(char mpf_path[], size_t mpf_lines, size_t max_line_len, data_tuple** tuple_list, track** tl, size_t* tl_len, Config* config) {
+void read_mpf (
+  char mpf_path[], size_t mpf_lines, size_t max_line_len, uint8_t read_all,
+  data_tuple** tuple_list, track** tl, size_t* tl_len,
+  Config* config){
+
   char line[max_line_len]; //line buffer, to read a line with max 1000 chars
 
   printf("Opening: %s in read mode...\n",mpf_path);
@@ -75,7 +79,7 @@ void read_mpf(char mpf_path[], size_t mpf_lines, size_t max_line_len, data_tuple
   size_t ti = 0; //track id
   int i = 0;
   //continue as long as the line contains something
-  while ((fgets(line, max_line_len, file) != NULL) && i < mpf_lines) {
+  while ((fgets(line, max_line_len, file) != NULL) && (i < mpf_lines || read_all)) {
       //print_buf(line,max_line_len);
 
       x_has_changed = 0;

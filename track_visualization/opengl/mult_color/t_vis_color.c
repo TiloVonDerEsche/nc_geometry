@@ -9,6 +9,9 @@
 #include <GL/freeglut.h>
 #include <GL/glu.h>
 
+//parse_line and trim
+#include "helper_funcs.h"
+
 // Structure to hold track data
 typedef struct {
     float ax, ay, az; // Start point
@@ -27,8 +30,11 @@ Track* tracks = NULL;
 int numTracks = 0;
 float min_z, max_z;  // Global variables for z-range color mapping
 
+Config config = {0};
+
 // Read CSV file
-void readCSV(const char* filename) {
+void read_csv(const char* filename) {
+    printf("Opening %s...\n",filename);
     FILE* file = fopen(filename, "r");
     if (!file) {
         printf("Failed to open %s\n", filename);
@@ -57,6 +63,43 @@ void readCSV(const char* filename) {
         i++;
     }
     fclose(file);
+}
+
+
+
+int read_config(const char* filename, Config* config) {
+    printf("Opening %s...\n",filename);
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Could not open config file %s\n", filename);
+        return 1;
+    }
+
+    char line[512];
+    while (fgets(line, sizeof(line), file)) {
+        char* trimmed = trim(line);
+
+        //ignore comments and empty lines
+        if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
+            continue;
+        }
+        char* key;
+        char* value;
+        parse_line(trimmed, &key, &value);
+        if (!key || !value) {
+            fprintf(stderr, "Error: Invalid line format: %s\n", line);
+            continue;
+        }
+
+
+        if (strcmp(key, "tracks_to_plot") == 0) {
+            strncpy(config->tracks_to_plot, value, sizeof(config->tracks_to_plot) - 1);
+            config->tracks_to_plot[sizeof(config->tracks_to_plot) - 1] = '\0';
+        }
+    }
+
+    fclose(file);
+    return 0;
 }
 
 // Draw an elliptical cylinder from point A to B with correct orientation
@@ -209,8 +252,8 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 int main(int argc, char** argv) {
-    // Read CSV
-    readCSV("./data/track_list.csv");
+    read_config("config.txt",&config);
+    read_csv(config.tracks_to_plot);
 
     // Compute min and max z for color mapping
     min_z = tracks[0].az;
@@ -239,10 +282,10 @@ int main(int argc, char** argv) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Enable lighting
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);  // glColor3f affects ambient and diffuse
+    // glEnable(GL_LIGHTING);
+    // glEnable(GL_LIGHT0);
+    // glEnable(GL_COLOR_MATERIAL);
+    // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);  // glColor3f affects ambient and diffuse
 
     // Set global ambient light
     GLfloat ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};

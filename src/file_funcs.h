@@ -221,7 +221,7 @@ int read_config(const char* filename, Config* config) {
             config->mpf_lines = (size_t)atoi(value);
         }
         else if (strcmp(key, "precision") == 0) {
-            config->precision = (size_t)atoi(value);fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,filename);
+            config->precision = (size_t)atoi(value);
         }
         else if (strcmp(key, "max_line_len") == 0) {
             config->max_line_len = (size_t)atoi(value);
@@ -243,6 +243,9 @@ int read_config(const char* filename, Config* config) {
         }
         else if (strcmp(key, "vertical_radius") == 0) {
             config->vertical_radius = atof(value);
+        }
+        else if (strcmp(key, "tracks_to_plot") == 0) {
+          //Do nothing; Used by t_vis_color.c
         }
         else {
             fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,filename);

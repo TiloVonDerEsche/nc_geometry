@@ -48,11 +48,12 @@ void readCSV(const char* filename) {
     int i = 0;
     while (fgets(line, sizeof(line), file) && i < numTracks) {
         float dummy;
-        sscanf(line, "%*d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f",
                &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
                &tracks[i].bx, &tracks[i].by, &tracks[i].bz,
-               &tracks[i].hradius, &tracks[i].vradius,
-               &dummy, &dummy, &dummy);
+               &dummy, &dummy, //laser_power, machine_speed
+               &dummy, &dummy, &dummy, //track_coll_vec
+               &tracks[i].hradius, &tracks[i].vradius);
         i++;
     }
     fclose(file);

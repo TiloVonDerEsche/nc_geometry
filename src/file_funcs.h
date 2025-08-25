@@ -1,5 +1,3 @@
-#include "./read_mpf_refactor.c"
-
 void set_track_radius(float hradius, float vradius, size_t track_list_len, track** tl) {
   for (size_t i = 0; i < track_list_len; i++) {
     (*tl)[i].hradius = hradius;
@@ -68,10 +66,12 @@ void read_mpf (
   //use last 3 bits as bool which dimension changed (X,Y,Z)
   uint8_t dim_changed = 0b00000000; //0b00000111
 
+
+  const size_t keywords_len = 8;
   const char* keywords[] = {
     "/LASER_ON",
     "/LASER_OFF",
-    "PUIS_LASER",
+    "PUIS_LASER ",
     "VIT_TIR=",
     "X",
     "Y",
@@ -79,7 +79,7 @@ void read_mpf (
     "G"
   };
 
-  printf("Reading: %s...\n",mpf_path);
+  printf("Reading %ld lines from %s...\n",mpf_lines,mpf_path);
 
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
@@ -94,10 +94,11 @@ void read_mpf (
   char c = '\0';
   size_t bi = 0;
   size_t vi = 0;
-
+  uint8_t read_number = 0;
   //fgets prints the new line in line_buf, and keeps a line index count
   //read mpf linewise
   while ((fgets(line_buf, max_line_len, file) != NULL) && (i < mpf_lines || read_all)) {
+
       //line_buf and line are currently always equal
       printf("line_buf=%s",line_buf);
 
@@ -107,30 +108,39 @@ void read_mpf (
       for (size_t li=0; li < max_line_len; li++){
         c = line_buf[li];
 
-        printf("Checking %s as keyword...",buf);
-        if (is_in_list(trim(buf), keywords, 7)) {
-          puts("KEYWORD FOUND!");
-        }
-
-
-        if (is_part_of_num(c)) {
+        if (read_number && is_part_of_num(c)) {
             //check if current buf is matching to a keyword
-
             //parse value
             read_value[vi] = c;
             vi++;
 
-            //printf("read_value=%sEND\n",read_value);
+            //printf("read_value=%sE\n",read_value);
         }
         else {
+
+          //save value
+          if (read_value[0] != 0) {
+            printf("read_value=%s\n",read_value);
+          }
+          if (c != ' ') {
+          read_number = 0;
+          memset(read_value, 0, max_line_len);
+          vi = 0;
+          }
+
+
+          //inc buf
           buf[bi] = c;
           bi++;
-
-          //clear buffer
-          read_value[0] = '\0';
-          vi = 0;
         }
         printf("%c\n",c);
+
+        //printf("Checking %s as keyword...",buf);
+        if (is_in_list(buf, keywords, keywords_len)) {
+          puts("KEYWORD FOUND!");
+          read_number = 1;
+        }
+
 
         if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
             //buf[0] = '\0';
@@ -140,6 +150,8 @@ void read_mpf (
         }
 
       }
+
+      i++;
 
 
 

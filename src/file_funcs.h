@@ -1,4 +1,4 @@
-
+#include "./read_mpf_refactor.c"
 
 void set_track_radius(float hradius, float vradius, size_t track_list_len, track** tl) {
   for (size_t i = 0; i < track_list_len; i++) {
@@ -33,7 +33,7 @@ void read_mpf (
   data_tuple** tuple_list, track** tl, size_t* tl_len,
   Config* config){
 
-  char line[max_line_len]; //line buffer, to read a line with max 1000 chars
+
 
   printf("Opening: %s in read mode...\n",mpf_path);
   FILE* file = fopen(mpf_path, "r");
@@ -52,133 +52,119 @@ void read_mpf (
   fprintf(csv_file, "P.x,P.y,P.z, laser_on_off, laser_power, machine_speed\n");
 
   uint8_t laser_on_off = 0;
-  float puis_laser = 0;
-  float vit_tir = 0;
+  float puis_laser = 0; //laser_power
+  float vit_tir = 0; //machine_speed
 
   char format[] = " %*[^-0123456789]%lf";
 
   double read_val = 0;
-
+  //init first point, because the successor needs its predeceding point to copy
   (*tuple_list)[0].P.x = 0;
   (*tuple_list)[0].P.y = 0;
   (*tuple_list)[0].P.z = 0;
 
   vec3D new_P = {0,0,0};
 
-  uint8_t x_has_changed = 0;
-  uint8_t y_has_changed = 0;
-  uint8_t z_has_changed = 0;
+  //use last 3 bits as bool which dimension changed (X,Y,Z)
+  uint8_t dim_changed = 0b00000000; //0b00000111
 
+  const char* keywords[] = {
+    "/LASER_ON",
+    "/LASER_OFF",
+    "PUIS_LASER",
+    "VIT_TIR=",
+    "X",
+    "Y",
+    "Z",
+    "G"
+  };
 
   printf("Reading: %s...\n",mpf_path);
-
 
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
   size_t ti = 0; //track id
-  int i = 0;
+  size_t i = 0; //data_tuple id (for tuple_list)
+  //size_t li = 0;
   //continue as long as the line contains something
-  while ((fgets(line, max_line_len, file) != NULL) && (i < mpf_lines || read_all)) {
-      //print_buf(line,max_line_len);
+  char line_buf[max_line_len];
+  char buf[max_line_len];
+  char read_value[max_line_len];
+  char c = '\0';
+  size_t bi = 0;
+  size_t vi = 0;
 
-      x_has_changed = 0;
-      y_has_changed = 0;
-      z_has_changed = 0;
+  //fgets prints the new line in line_buf, and keeps a line index count
+  //read mpf linewise
+  while ((fgets(line_buf, max_line_len, file) != NULL) && (i < mpf_lines || read_all)) {
+      //line_buf and line are currently always equal
+      printf("line_buf=%s",line_buf);
 
-      //read the on/off state of the laser
-      //if (strstr(line, "G00") != NULL) {laser_on_off = 0;} //Eilmodus?
-      //else if (strstr(line, "G01") != NULL) {laser_on_off = 1;} //Arbeitsmodus?
+      bi = 0;
+      vi = 0;
+      //read line charwise
+      for (size_t li=0; li < max_line_len; li++){
+        c = line_buf[li];
 
-      if(strstr(line, "LASER_ON") != NULL) {
-        laser_on_off = 1;
-        //get point where head is currently (Point before LASER_ON)
-        (*tl)[ti].A.x = (*tuple_list)[i-1].P.x;
-        (*tl)[ti].A.y = (*tuple_list)[i-1].P.y;
-        (*tl)[ti].A.z = (*tuple_list)[i-1].P.z;
-        (*tl)[ti].laser_power = puis_laser;
-        (*tl)[ti].machine_speed = vit_tir;
-      }
-      //should we set laser_power & machine_speed at the start or end of track?
-      //they should not change during a track
-      else if(strstr(line, "LASER_OFF") != NULL) {
-        laser_on_off = 0;
-        //get current point
-        if (i > 1) {
-          //i-1 because there is no point at i
-          (*tl)[ti].B.x = (*tuple_list)[i-1].P.x;
-          (*tl)[ti].B.y = (*tuple_list)[i-1].P.y;
-          (*tl)[ti].B.z = (*tuple_list)[i-1].P.z;
+        printf("Checking %s as keyword...",buf);
+        if (is_in_list(trim(buf), keywords, 7)) {
+          puts("KEYWORD FOUND!");
         }
 
-        //increment track index
-        ti++;
+
+        if (is_part_of_num(c)) {
+            //check if current buf is matching to a keyword
+
+            //parse value
+            read_value[vi] = c;
+            vi++;
+
+            //printf("read_value=%sEND\n",read_value);
+        }
+        else {
+          buf[bi] = c;
+          bi++;
+
+          //clear buffer
+          read_value[0] = '\0';
+          vi = 0;
+        }
+        printf("%c\n",c);
+
+        if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
+            //buf[0] = '\0';
+            memset(buf, 0, max_line_len);
+            bi = 0;
+            if (c == '\0' || c == ';') {break;}
+        }
+
       }
 
-      //read laser power
-      if (strstr(line, "PUIS_LASER ") != NULL) {
-          if (sscanf(strstr(line, "PUIS_LASER "), format, &read_val)) {
-              puis_laser = read_val;
-          }
-      }
-
-      //read the set machine speed
-      if (strstr(line, "VIT_TIR=") != NULL) {
-          //sscanf returns 1 when it successfully parses one item
-          //based on the format specifier provided.
-          if (sscanf(strstr(line, "VIT_TIR="), format, &read_val)) {
-              vit_tir = read_val;
-          }
-      }
 
 
-
-      //ignore comments
-      if (strstr(line, ";") != NULL){continue;}
-
-      if (strstr(line, " X") != NULL){
-          if (sscanf(strstr(line, " X"), format, &read_val)){
-              new_P.x = read_val;
-              x_has_changed = 1;
-          }
-      }
-
-      if (strstr(line, " Y") != NULL){
-          if (sscanf(strstr(line, " Y"), format, &read_val)){
-              new_P.y = read_val;
-              y_has_changed = 1;
-          }
-      }
-
-      if (strstr(line, " Z") != NULL) {
-          if (sscanf(strstr(line, " Z"), format, &read_val)){
-              new_P.z = read_val;
-              z_has_changed = 1;
-          }
-      }
-
-      if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
-
-          //"X10.0" in the NC means copy values of the old point and
-          //change X to 10.0
-          copy_data_tuple(i,tuple_list);
-
-          //then only change the parameters that have changed
-          if (x_has_changed) (*tuple_list)[i].P.x = new_P.x;
-          if (y_has_changed) (*tuple_list)[i].P.y = new_P.y;
-          if (z_has_changed) (*tuple_list)[i].P.z = new_P.z;
-
-          (*tuple_list)[i].laser = laser_on_off;
-          (*tuple_list)[i].laser_power = puis_laser;
-          (*tuple_list)[i].machine_speed = vit_tir;
-
-          fprintf(csv_file, "(%f, %f, %f), %s, %f, %f\n",
-          (*tuple_list)[i].P.x, (*tuple_list)[i].P.y, (*tuple_list)[i].P.z,
-          (*tuple_list)[i].laser ? "on" : "off", (*tuple_list)[i].laser_power,
-          (*tuple_list)[i].machine_speed);
-
-          i += 1;
-      }
+      // if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
+      //
+      //     //"X10.0" in the NC means copy values of the old point and
+      //     //change X to 10.0
+      //     copy_data_tuple(i,tuple_list);
+      //
+      //     //then only change the parameters that have changed
+      //     if (x_has_changed) (*tuple_list)[i].P.x = new_P.x;
+      //     if (y_has_changed) (*tuple_list)[i].P.y = new_P.y;
+      //     if (z_has_changed) (*tuple_list)[i].P.z = new_P.z;
+      //line
+      //     (*tuple_list)[i].laser = laser_on_off;
+      //     (*tuple_list)[i].laser_power = puis_laser;
+      //     (*tuple_list)[i].machine_speed = vit_tir;
+      //
+      //     fprintf(csv_file, "(%f, %f, %f), %s, %f, %f\n",
+      //     (*tuple_list)[i].P.x, (*tuple_list)[i].P.y, (*tuple_list)[i].P.z,
+      //     (*tuple_list)[i].laser ? "on" : "off", (*tuple_list)[i].laser_power,
+      //     (*tuple_list)[i].machine_speed);
+      //
+      //     i += 1;
+      // }
   }
 
   //save the length of tl (track_list) arr in tl_len

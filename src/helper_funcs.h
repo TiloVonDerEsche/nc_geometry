@@ -171,3 +171,28 @@ void parse_line(char* line, char** key, char** value) {
     //inc the char pointer to give trim the str which starts after '='
     *value = trim(eq_pos + 1);
 }
+
+
+uint8_t is_part_of_num(char c) {
+    if (c >= '0' && c <= '9') {
+        return 1;
+    }
+
+    // Check for specific characters: '-', '.', '/', 'e', '^'
+    if (c == '+' || c == '-' || c == '.' || c == 'e' || c == '^') {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+uint8_t is_in_list(const char* str, const char** list, size_t list_size) {
+    for (size_t i = 0; i < list_size; i++) {
+        if (strcmp(str, list[i]) == 0) {
+            return 1;
+        }
+    }
+
+    return 0;
+}

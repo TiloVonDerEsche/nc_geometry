@@ -61,10 +61,9 @@ void read_mpf (
   (*dtuple_list)[0].P.y = 0;
   (*dtuple_list)[0].P.z = 0;
 
-  vec3D new_P = {0,0,0};
+  //vec3D new_P = {0,0,0};
 
-  //use last 3 bits as bool which dimension changed (X,Y,Z)
-  uint8_t dim_changed = 0b00000000; //0b00000111
+  uint8_t dim_changed = 0b000; //bool x y z
 
 
   const size_t keywords_len = 8;
@@ -122,8 +121,17 @@ void read_mpf (
           //save value
           if (read_value[0] != 0) {
             printf("read_value=%s\n",read_value);
-            set_key_value(keypos,read_value,
-                          di, ti, dtuple_list, tl);
+
+            if (keypos >= 0) {
+              set_key_value(keypos,read_value,
+                            di, ti, dtuple_list, tl,
+                            &dim_changed);
+              if (dim_changed > 0) {
+                printf("dim_changed=%u\n",dim_changed);
+                dim_changed = 0;
+              }
+
+            }
           }
           if (c != ' ') {
           read_number = 0;

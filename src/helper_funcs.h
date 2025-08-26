@@ -237,8 +237,13 @@ int is_in_list(const char* str, const char** list, size_t list_size) {
 
 //ugly static mapping
 //smarter solution required
-void set_key_value(int keypos, const char* read_value, int tui, int tri, data_tuple** tuple_list, track** track_list) {
+void set_key_value(
+  int keypos, const char* read_value,
+  int tui, int tri, data_tuple** tuple_list, track** track_list,
+  uint8_t* dim_changed) {
+
     float fval = 0.0;
+    //uint8_t dim_changed = 0b000; //bool x y z
 
     switch (keypos) {
         case 0: //LASER_ON
@@ -259,17 +264,21 @@ void set_key_value(int keypos, const char* read_value, int tui, int tri, data_tu
             break;
         case 4: //3D Point from mpf file
             (*tuple_list)[tui].P.x = str_to_float(read_value);
+            (*dim_changed) = 4;
             break;
         case 5:
             (*tuple_list)[tui].P.y = str_to_float(read_value);
+            (*dim_changed) = 2;
             break;
         case 6:
             (*tuple_list)[tui].P.z = str_to_float(read_value);
+            (*dim_changed) = 1;
             break;
         case 7: //G (Operating Mode)
             (*tuple_list)[tui].G = str_to_uint8(read_value);
             break;
         default:
+            fprintf(stderr,"Invalid keypos=%d",keypos);
             break;
     }
 }

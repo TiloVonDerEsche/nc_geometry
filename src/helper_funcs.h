@@ -5,6 +5,8 @@
 #include <math.h>
 #include <ctype.h>
 
+#include <errno.h>
+
 typedef struct {
   size_t mpf_lines;
   size_t precision;
@@ -45,6 +47,7 @@ typedef struct {
 
 typedef struct {
   //set by read_mpf
+  uint8_t G;
   vec3D P;
   uint8_t laser; //bool -> laser on/off
   float laser_power;
@@ -172,6 +175,41 @@ void parse_line(char* line, char** key, char** value) {
     *value = trim(eq_pos + 1);
 }
 
+float str_to_float(const char* str) {
+  char* endptr;  // To handle potential parsing errors
+
+  float value = strtof(str, &endptr);
+
+  if (str == endptr) {
+      // No conversion occurred (invalid input)
+      printf("Invalid float string.\n");
+  } else {
+      printf("Converted float: %f\n", value);
+  }
+
+  return value;
+}
+
+uint8_t str_to_uint8(const char* str) {
+  char* endptr;             // To handle parsing errors
+  errno = 0;                // Reset errno before call
+
+  unsigned long value = strtoul(str, &endptr, 10);  // Base 10 for decimal
+
+  if (str == endptr) {
+      // No conversion occurred (invalid input)
+      printf("Invalid uint8_t string.\n");
+  } else if (errno == ERANGE || value > UINT8_MAX) {
+      // Out of range for uint8_t (0-255)
+      printf("Value out of uint8_t range.\n");
+  } else {
+      uint8_t result = (uint8_t)value;
+      printf("Converted uint8_t: %u\n", result);
+  }
+
+  return 0;
+}
+
 
 uint8_t is_part_of_num(char c) {
     if (c >= '0' && c <= '9') {
@@ -187,12 +225,51 @@ uint8_t is_part_of_num(char c) {
 }
 
 
-uint8_t is_in_list(const char* str, const char** list, size_t list_size) {
-    for (size_t i = 0; i < list_size; i++) {
+int is_in_list(const char* str, const char** list, size_t list_size) {
+    for (int i = 0; i < list_size; i++) {
         if (strcmp(str, list[i]) == 0) {
-            return 1;
+            return i;
         }
     }
 
-    return 0;
+    return -1;
+}
+
+//ugly static mapping
+//smarter solution required
+void set_key_value(int keypos, const char* read_value, int tui, int tri, data_tuple** tuple_list, track** track_list) {
+    float fval = 0.0;
+
+    switch (keypos) {
+        case 0: //LASER_ON
+            (*tuple_list)[tui].laser = 1;
+            break;
+        case 1: //LASER_OFF
+            (*tuple_list)[tui].laser = 0;
+            break;
+        case 2: //PUIS_LASER
+            fval = str_to_float(read_value);
+            (*tuple_list)[tui].laser_power = fval;
+            (*track_list)[tri].laser_power = fval;
+            break;
+        case 3: //VIT_TIR
+            fval = str_to_float(read_value);
+            (*tuple_list)[tui].machine_speed = fval;
+            (*track_list)[tri].machine_speed = fval;
+            break;
+        case 4: //3D Point from mpf file
+            (*tuple_list)[tui].P.x = str_to_float(read_value);
+            break;
+        case 5:
+            (*tuple_list)[tui].P.y = str_to_float(read_value);
+            break;
+        case 6:
+            (*tuple_list)[tui].P.z = str_to_float(read_value);
+            break;
+        case 7: //G (Operating Mode)
+            (*tuple_list)[tui].G = str_to_uint8(read_value);
+            break;
+        default:
+            break;
+    }
 }

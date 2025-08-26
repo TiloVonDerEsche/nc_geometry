@@ -28,7 +28,7 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
 
 void read_mpf (
   char mpf_path[], size_t mpf_lines, size_t max_line_len, uint8_t read_all,
-  data_tuple** tuple_list, track** tl, size_t* tl_len,
+  data_tuple** dtuple_list, track** tl, size_t* tl_len,
   Config* config){
 
 
@@ -57,9 +57,9 @@ void read_mpf (
 
   double read_val = 0;
   //init first point, because the successor needs its predeceding point to copy
-  (*tuple_list)[0].P.x = 0;
-  (*tuple_list)[0].P.y = 0;
-  (*tuple_list)[0].P.z = 0;
+  (*dtuple_list)[0].P.x = 0;
+  (*dtuple_list)[0].P.y = 0;
+  (*dtuple_list)[0].P.z = 0;
 
   vec3D new_P = {0,0,0};
 
@@ -85,7 +85,7 @@ void read_mpf (
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
   size_t ti = 0; //track id
-  size_t i = 0; //data_tuple id (for tuple_list)
+  size_t di = 0; //data_tuple id (for dtuple_list)
   //size_t li = 0;
   //continue as long as the line contains something
   char line_buf[max_line_len];
@@ -95,9 +95,10 @@ void read_mpf (
   size_t bi = 0;
   size_t vi = 0;
   uint8_t read_number = 0;
+  int keypos = -1;
   //fgets prints the new line in line_buf, and keeps a line index count
   //read mpf linewise
-  while ((fgets(line_buf, max_line_len, file) != NULL) && (i < mpf_lines || read_all)) {
+  while ((fgets(line_buf, max_line_len, file) != NULL) && (di < mpf_lines || read_all)) {
 
       //line_buf and line are currently always equal
       printf("line_buf=%s",line_buf);
@@ -121,6 +122,8 @@ void read_mpf (
           //save value
           if (read_value[0] != 0) {
             printf("read_value=%s\n",read_value);
+            set_key_value(keypos,read_value,
+                          di, ti, dtuple_list, tl);
           }
           if (c != ' ') {
           read_number = 0;
@@ -136,8 +139,9 @@ void read_mpf (
         printf("%c\n",c);
 
         //printf("Checking %s as keyword...",buf);
-        if (is_in_list(buf, keywords, keywords_len)) {
-          puts("KEYWORD FOUND!");
+        keypos = is_in_list(buf, keywords, keywords_len);
+        if (keypos != -1) {
+          printf("KEYWORD %d FOUND!",keypos);
           read_number = 1;
         }
 
@@ -151,31 +155,34 @@ void read_mpf (
 
       }
 
-      i++;
-
-
 
       // if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
+
+
+
       //
       //     //"X10.0" in the NC means copy values of the old point and
       //     //change X to 10.0
-      //     copy_data_tuple(i,tuple_list);
+      //     copy_data_tuple(i,dtuple_list);
       //
       //     //then only change the parameters that have changed
-      //     if (x_has_changed) (*tuple_list)[i].P.x = new_P.x;
-      //     if (y_has_changed) (*tuple_list)[i].P.y = new_P.y;
-      //     if (z_has_changed) (*tuple_list)[i].P.z = new_P.z;
+      //     if (x_has_changed) (*dtuple_list)[i].P.x = new_P.x;
+      //     if (y_has_changed) (*dtuple_list)[i].P.y = new_P.y;
+      //     if (z_has_changed) (*dtuple_list)[i].P.z = new_P.z;
       //line
-      //     (*tuple_list)[i].laser = laser_on_off;
-      //     (*tuple_list)[i].laser_power = puis_laser;
-      //     (*tuple_list)[i].machine_speed = vit_tir;
+              //should be set in set_key_value
+      //     (*dtuple_list)[i].laser = laser_on_off;
+      //     (*dtuple_list)[i].laser_power = puis_laser;
+      //     (*dtuple_list)[i].machine_speed = vit_tir;
       //
       //     fprintf(csv_file, "(%f, %f, %f), %s, %f, %f\n",
-      //     (*tuple_list)[i].P.x, (*tuple_list)[i].P.y, (*tuple_list)[i].P.z,
-      //     (*tuple_list)[i].laser ? "on" : "off", (*tuple_list)[i].laser_power,
+      //     (*dtuple_list)[i].P.x, (*dtuple_list)[i].P.y, (*dtuple_list)[i].P.z,
+      //     (*dtuple_list)[i].laser ? "on" : "off", (*dtuple_list)[i].laser_power,
       //     (*tuple_list)[i].machine_speed);
       //
-      //     i += 1;
+      //data tuple index should only be incremented after a new point has been saved
+      //and not after setting the laser_power f.e.
+      di++;
       // }
   }
 

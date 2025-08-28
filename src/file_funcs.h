@@ -83,6 +83,25 @@ void read_mpf (
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
+
+  //str_float hashmap for variables
+  puts("Initializing str_float_map...");
+  strfloat_t *h = strfloat_init();  // Create empty map
+  int absent;
+  khint_t k; //portable unsigned int iterator, like size_t?
+  khint_t k2;
+
+  char* key;
+  char* value;
+
+  char* trimmed;
+  //-------
+
+
+
+
+
+
   size_t ti = 0; //track id
   size_t di = 0; //data_tuple id (for dtuple_list)
   //size_t li = 0;
@@ -102,65 +121,99 @@ void read_mpf (
       //line_buf and line are currently always equal
       printf("line_buf=%s",line_buf);
 
-      bi = 0;
-      vi = 0;
-      //read line charwise
-      for (size_t li=0; li < max_line_len; li++){
-        c = line_buf[li];
 
-        if (read_number && is_part_of_num(c)) {
-            //check if current buf is matching to a keyword
-            //parse value
-            read_value[vi] = c;
-            vi++;
 
-            //printf("read_value=%sE\n",read_value);
-        }
-        else {
+      //use str_float hashmap for variables
+      //-------------------//
+      //Does line contain '=' (might not be optimal solution)
+      if (strchr(line_buf, '=') != NULL) { //does not work if '=' is in a comment
+        //assign a variable mode
+        trimmed = trim(line_buf); //remove whitespaces before, after & around '='
+        parse_line(trimmed, &key, &value);
 
-          //save value
-          if (read_value[0] != 0) {
-            printf("read_value=%s\n",read_value);
 
-            if (keypos >= 0) {
-              set_key_value(keypos,read_value,
-                            di, ti, dtuple_list, tl,
-                            &dim_changed);
-              if (dim_changed > 0) {
-                printf("dim_changed=%u\n",dim_changed);
-                dim_changed = 0;
-              }
 
+        //--------
+        k = strfloat_put(h, line_buf, &absent);  // Key is a const char* pointer
+
+
+        if (absent) {
+            kh_key(h, k) = strdup(line_buf);}
+
+        if (is_part_of_num(value[0])) {
+            kh_val(h, k) = atof(value);}
+        else { //if 'value' is another variable
+            //lookup value for key on the right of '='
+            //key on the left of '=' gets its value instead
+            k2 = strfloat_get(h, value); // get iterator k
+            if (k2 < kh_end(h)) {
+                kh_val(h, k) = kh_val(h, k2);
             }
+            //this works recursivly already?!
+        }
+      }
+      //-------------------//
+      else {
+        bi = 0;
+        vi = 0;
+        //read line charwise
+        for (size_t li=0; li < max_line_len; li++){
+          c = line_buf[li];
+
+          if (read_number && is_part_of_num(c)) {
+              //check if current buf is matching to a keyword
+              //parse value
+              read_value[vi] = c;
+              vi++;
+
+              //printf("read_value=%sE\n",read_value);
           }
-          if (c != ' ') {
-          read_number = 0;
-          memset(read_value, 0, max_line_len);
-          vi = 0;
+          else {
+
+            //save value
+            if (read_value[0] != 0) {
+              printf("read_value=%s\n",read_value);
+
+              if (keypos >= 0) {
+                set_key_value(keypos,read_value,
+                              di, ti, dtuple_list, tl,
+                              &dim_changed);
+                if (dim_changed > 0) {
+                  printf("dim_changed=%u\n",dim_changed);
+                  dim_changed = 0;
+                }
+
+              }
+            }
+            if (c != ' ') {
+              read_number = 0;
+              memset(read_value, 0, max_line_len);
+              vi = 0;
+            }
+
+
+            //inc buf
+            buf[bi] = c;
+            bi++;
+          }
+          printf("%c\n",c);
+
+          //printf("Checking %s as keyword...",buf);
+          keypos = is_in_list(buf, keywords, keywords_len);
+          if (keypos != -1) {
+            printf("KEYWORD %d FOUND!",keypos);
+            read_number = 1;
           }
 
 
-          //inc buf
-          buf[bi] = c;
-          bi++;
+          if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
+              //buf[0] = '\0';
+              memset(buf, 0, max_line_len);
+              bi = 0;
+              if (c == '\0' || c == ';') {break;}
+          }
+
         }
-        printf("%c\n",c);
-
-        //printf("Checking %s as keyword...",buf);
-        keypos = is_in_list(buf, keywords, keywords_len);
-        if (keypos != -1) {
-          printf("KEYWORD %d FOUND!",keypos);
-          read_number = 1;
-        }
-
-
-        if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
-            //buf[0] = '\0';
-            memset(buf, 0, max_line_len);
-            bi = 0;
-            if (c == '\0' || c == ';') {break;}
-        }
-
       }
 
 
@@ -201,6 +254,24 @@ void read_mpf (
   fclose(file);
   fclose(csv_file);
   printf("Points from %s, were saved in %s!\n",mpf_path,config->data_tuples_csv);
+
+
+  //-----str_float variable hashmap
+
+  //Print all variables from hashmap
+  puts("-----");
+  kh_foreach(h, k) {
+      if (k < kh_end(h)) {  // Check if found (k != end iterator)
+          printf("var %s=%f\n", kh_key(h, k), kh_val(h, k));
+      }
+  }
+  puts("-----");
+
+  //Cleanup str_float variable hashmap
+  kh_foreach(h, k) {
+      free((char*)kh_key(h, k));  // Free duplicated strings
+  }
+  strfloat_destroy(h);
 }
 
 
@@ -222,11 +293,15 @@ int read_config(const char* filename, Config* config) {
         if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
             continue;
         }
+
         char* key;
         char* value;
+
         parse_line(trimmed, &key, &value);
         if (!key || !value) {
-            fprintf(stderr, "Error: Invalid line format: %s\n", line);
+            fprintf(stderr,
+              "Error: Invalid line format: %s!\
+              \r\nLine should contain <key>'='<value>;",line);
             continue;
         }
 

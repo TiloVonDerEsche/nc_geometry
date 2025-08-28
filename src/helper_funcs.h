@@ -4,8 +4,15 @@
 #include <string.h>
 #include <math.h>
 #include <ctype.h>
-
 #include <errno.h>
+
+//used for variable str_float hashmap
+#include "khashl.h"
+KHASHL_MAP_INIT(KH_LOCAL,
+  strfloat_t, strfloat,
+  const char*, float,
+  kh_hash_str, kh_eq_str)
+
 
 typedef struct {
   size_t mpf_lines;
@@ -236,6 +243,7 @@ int is_in_list(const char* str, const char** list, size_t list_size) {
 }
 
 //ugly static mapping
+//use hashmap instead
 //smarter solution required
 void set_key_value(
   int keypos, const char* read_value,

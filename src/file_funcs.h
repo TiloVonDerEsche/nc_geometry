@@ -26,28 +26,27 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   }
 }
 
-void read_mpf (
-  char mpf_path[], size_t mpf_lines, size_t max_line_len, uint8_t read_all,
+void read_mpf (uint8_t read_all,
   data_tuple** dtuple_list, track** tl, size_t* tl_len,
   Config* config){
+  //set config for mpf_lines, mpf_file path, data_tuples_csv
 
 
-
-  printf("Opening: %s in read mode...\n",mpf_path);
-  FILE* file = fopen(mpf_path, "r");
-  if (file == NULL) {
-      fprintf(stderr, "Error: Could not open %s (in read mode)!\n", mpf_path);
+  printf("Opening: %s in read mode...\n",config->mpf_file);
+  FILE* mpf = fopen(config->mpf_file, "r");
+  if (mpf == NULL) {
+      fprintf(stderr, "Error: Could not open %s (in read mode)!\n", config->mpf_file);
       return;
   }
 
   //open csv file for writing the data_tuples there
-  FILE* csv_file = fopen(config->data_tuples_csv, "w"); // or "a" to append
-  if (csv_file == NULL){
+  FILE* dtuple_csv = fopen(config->data_tuples_csv, "w"); // or "a" to append
+  if (dtuple_csv == NULL){
       fprintf(stderr, "An error occured, while trying to open %s (in write mode)!\n", config->data_tuples_csv);
       return;
   }
 
-  fprintf(csv_file, "P.x,P.y,P.z, laser_on_off, laser_power, machine_speed\n");
+  fprintf(dtuple_csv, "G, p_x,p_y,p_z, laser_on_off, laser_power_w, machine_speed_mm_per_min\n");
 
   uint8_t laser_on_off = 0;
   float puis_laser = 0; //laser_power
@@ -78,7 +77,7 @@ void read_mpf (
     "G"
   };
 
-  printf("Reading %ld lines from %s...\n",mpf_lines,mpf_path);
+  printf("Reading %ld lines from %s...\n",config->mpf_lines,config->mpf_file);
 
   //////////////////////////////////////////////////////////////////////////////
   //----------------------NC Code Interpreter Reading Loop--------------------//
@@ -106,9 +105,9 @@ void read_mpf (
   size_t di = 0; //data_tuple id (for dtuple_list)
   //size_t li = 0;
   //continue as long as the line contains something
-  char line_buf[max_line_len];
-  char buf[max_line_len];
-  char read_value[max_line_len];
+  char line_buf[config->max_line_len];
+  char buf[config->max_line_len];
+  char read_value[config->max_line_len];
   char c = '\0';
   size_t bi = 0;
   size_t vi = 0;
@@ -116,7 +115,7 @@ void read_mpf (
   int keypos = -1;
   //fgets prints the new line in line_buf, and keeps a line index count
   //read mpf linewise
-  while ((fgets(line_buf, max_line_len, file) != NULL) && (di < mpf_lines || read_all)) {
+  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
 
       //line_buf and line are currently always equal
       printf("line_buf=%s",line_buf);
@@ -157,7 +156,7 @@ void read_mpf (
         bi = 0;
         vi = 0;
         //read line charwise
-        for (size_t li=0; li < max_line_len; li++){
+        for (size_t li=0; li < config->max_line_len; li++){
           c = line_buf[li];
 
           if (read_number && is_part_of_num(c)) {
@@ -172,22 +171,17 @@ void read_mpf (
 
             //save value
             if (read_value[0] != 0) {
-              printf("read_value=%s\n",read_value);
+              //printf("read_value=%s\n",read_value);
 
               if (keypos >= 0) {
                 set_key_value(keypos,read_value,
                               di, ti, dtuple_list, tl,
                               &dim_changed);
-                if (dim_changed > 0) {
-                  printf("dim_changed=%u\n",dim_changed);
-                  dim_changed = 0;
-                }
-
               }
             }
             if (c != ' ') {
               read_number = 0;
-              memset(read_value, 0, max_line_len);
+              memset(read_value, 0, config->max_line_len);
               vi = 0;
             }
 
@@ -196,19 +190,19 @@ void read_mpf (
             buf[bi] = c;
             bi++;
           }
-          printf("%c\n",c);
+          //printf("%c\n",c);
 
           //printf("Checking %s as keyword...",buf);
           keypos = is_in_list(buf, keywords, keywords_len);
           if (keypos != -1) {
-            printf("KEYWORD %d FOUND!",keypos);
+            //printf("KEYWORD %d FOUND!",keypos);
             read_number = 1;
           }
 
 
           if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
               //buf[0] = '\0';
-              memset(buf, 0, max_line_len);
+              memset(buf, 0, config->max_line_len);
               bi = 0;
               if (c == '\0' || c == ';') {break;}
           }
@@ -216,44 +210,63 @@ void read_mpf (
         }
       }
 
+      //See what bits of dim_changed are still zero
+      //Give the according dims the value of the last point
 
-      // if (x_has_changed == 1 || y_has_changed == 1 || z_has_changed == 1){
+
+
+      if (dim_changed > 0) {
+        if (dim_changed < 7) {
+          //check every dim
+
+          //X
+          if (dim_changed & 4 == 0) {
+            (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+            printf("G=%u, p_x=%f, laser=%s, laser_power=%f, machine_speed=%f\n",
+            (*dtuple_list)[di].G,
+            (*dtuple_list)[di].P.x,
+            (*dtuple_list)[di].laser ? "on" : "off",
+            (*dtuple_list)[di].laser_power,
+            (*dtuple_list)[di].machine_speed);
+          }
+          //Y
+          if (dim_changed & 2 == 0) {
+            (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
+          }
+          //Z
+          if (dim_changed & 1 == 0) {
+            (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
+          }
+        }
+        else if (dim_changed > 7) {
+          fprintf(stderr,"Error: dim_changed overflow! dim_changed=%u",dim_changed);
+        }
+
+        //set rest of the features of data_tuple
 
 
 
-      //
-      //     //"X10.0" in the NC means copy values of the old point and
-      //     //change X to 10.0
-      //     copy_data_tuple(i,dtuple_list);
-      //
-      //     //then only change the parameters that have changed
-      //     if (x_has_changed) (*dtuple_list)[i].P.x = new_P.x;
-      //     if (y_has_changed) (*dtuple_list)[i].P.y = new_P.y;
-      //     if (z_has_changed) (*dtuple_list)[i].P.z = new_P.z;
-      //line
-              //should be set in set_key_value
-      //     (*dtuple_list)[i].laser = laser_on_off;
-      //     (*dtuple_list)[i].laser_power = puis_laser;
-      //     (*dtuple_list)[i].machine_speed = vit_tir;
-      //
-      //     fprintf(csv_file, "(%f, %f, %f), %s, %f, %f\n",
-      //     (*dtuple_list)[i].P.x, (*dtuple_list)[i].P.y, (*dtuple_list)[i].P.z,
-      //     (*dtuple_list)[i].laser ? "on" : "off", (*dtuple_list)[i].laser_power,
-      //     (*tuple_list)[i].machine_speed);
-      //
-      //data tuple index should only be incremented after a new point has been saved
-      //and not after setting the laser_power f.e.
-      di++;
-      // }
+        //write point to data_tuples csv
+        fprintf(dtuple_csv,
+        "%u, %f,%f,%f, %s, %f, %f\n",
+        (*dtuple_list)[di].G,
+        (*dtuple_list)[di].P.x,(*dtuple_list)[di].P.y,(*dtuple_list)[di].P.z,
+        (*dtuple_list)[di].laser ? "on" : "off",
+        (*dtuple_list)[di].laser_power,
+        (*dtuple_list)[di].machine_speed);
+
+        dim_changed = 0;
+        di++;
+      }
   }
 
   //save the length of tl (track_list) arr in tl_len
   (*tl_len) = ti;
 
   //close the mpf file
-  fclose(file);
-  fclose(csv_file);
-  printf("Points from %s, were saved in %s!\n",mpf_path,config->data_tuples_csv);
+  fclose(mpf);
+  fclose(dtuple_csv);
+  printf("Points from %s, were saved in %s!\n",config->mpf_file,config->data_tuples_csv);
 
 
   //-----str_float variable hashmap

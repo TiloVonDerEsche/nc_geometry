@@ -46,8 +46,7 @@ int main() {
 
 
     size_t track_list_len = -1;
-    read_mpf(
-      config.mpf_file, config.mpf_lines, config.max_line_len, read_all,
+    read_mpf(read_all,
       &tuple_list, &track_list, &track_list_len, &config
     );
 

@@ -190,9 +190,9 @@ float str_to_float(const char* str) {
   if (str == endptr) {
       // No conversion occurred (invalid input)
       printf("Invalid float string.\n");
-  } else {
-      printf("Converted float: %f\n", value);
   }
+  // else {
+  //     printf("Converted float: %f\n", value);}
 
   return value;
 }
@@ -211,7 +211,7 @@ uint8_t str_to_uint8(const char* str) {
       printf("Value out of uint8_t range.\n");
   } else {
       uint8_t result = (uint8_t)value;
-      printf("Converted uint8_t: %u\n", result);
+      //printf("Converted uint8_t: %u\n", result);
   }
 
   return 0;
@@ -268,19 +268,19 @@ void set_key_value(
         case 3: //VIT_TIR
             fval = str_to_float(read_value);
             (*tuple_list)[tui].machine_speed = fval;
-            (*track_list)[tri].machine_speed = fval;
+            (*track_list)[tri].machine_speed = fval; //gets set multiple times per same track
             break;
         case 4: //3D Point from mpf file
             (*tuple_list)[tui].P.x = str_to_float(read_value);
-            (*dim_changed) = 4;
+            (*dim_changed) += 4;
             break;
         case 5:
             (*tuple_list)[tui].P.y = str_to_float(read_value);
-            (*dim_changed) = 2;
+            (*dim_changed) += 2;
             break;
         case 6:
             (*tuple_list)[tui].P.z = str_to_float(read_value);
-            (*dim_changed) = 1;
+            (*dim_changed) += 1;
             break;
         case 7: //G (Operating Mode)
             (*tuple_list)[tui].G = str_to_uint8(read_value);

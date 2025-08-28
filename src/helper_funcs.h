@@ -256,19 +256,23 @@ void set_key_value(
     switch (keypos) {
         case 0: //LASER_ON
             (*tuple_list)[tui].laser = 1;
+            (*dim_changed) += 16;
             break;
         case 1: //LASER_OFF
             (*tuple_list)[tui].laser = 0;
+            (*dim_changed) += 16;
             break;
         case 2: //PUIS_LASER
             fval = str_to_float(read_value);
             (*tuple_list)[tui].laser_power = fval;
             (*track_list)[tri].laser_power = fval;
+            (*dim_changed) += 32;
             break;
         case 3: //VIT_TIR
-            fval = str_to_float(read_value);
-            (*tuple_list)[tui].machine_speed = fval;
-            (*track_list)[tri].machine_speed = fval; //gets set multiple times per same track
+            fval = str_to_float(read_value);   //sanity check ToDo revert!
+            (*tuple_list)[tui].machine_speed = str_to_float(read_value);
+            (*track_list)[tri].machine_speed = str_to_float(read_value); //gets set multiple times per same track
+            (*dim_changed) += 64;
             break;
         case 4: //3D Point from mpf file
             (*tuple_list)[tui].P.x = str_to_float(read_value);
@@ -284,6 +288,7 @@ void set_key_value(
             break;
         case 7: //G (Operating Mode)
             (*tuple_list)[tui].G = str_to_uint8(read_value);
+            (*dim_changed) += 8;
             break;
         default:
             fprintf(stderr,"Invalid keypos=%d",keypos);

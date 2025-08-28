@@ -118,7 +118,7 @@ void read_mpf (uint8_t read_all,
   while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
 
       //line_buf and line are currently always equal
-      printf("line_buf=%s",line_buf);
+      printf("buf=%s",line_buf);
 
 
 
@@ -215,30 +215,51 @@ void read_mpf (uint8_t read_all,
 
 
 
+
+
+      //dim_changed seems to be redundant for some reason
+      //(X,Y,Z) seem to be correctly set by set_key_value fn
       if (dim_changed > 0) {
+        //puts("dim_changed YES!");
+        //dim_changed=0b0%u%u%u%u%u%u%u
+        printf("G=%u, p_x=%f, laser=%s, laser_power=%f, machine_speed=%f\n",
+        (*dtuple_list)[di].G,
+        (*dtuple_list)[di].P.x,
+        (*dtuple_list)[di].laser ? "on" : "off",
+        (*dtuple_list)[di].laser_power,
+        (*dtuple_list)[di].machine_speed);
+
+        printf("%s%s%s%s%s%s%s",
+                (dim_changed & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n",
+                (dim_changed & 32) ? "laser_power changed!\n" : "laser_power did not change!\n" ,
+                (dim_changed & 16) ? "laser changed!\n" : "laser did not change!\n",
+                (dim_changed & 8) ? "G changed!\n" : "G did not changed!\n",
+                (dim_changed & 4) ?  "X changed!\n" : "X did not change!\n",
+                (dim_changed & 2) ?  "Y changed!\n" : "Y did not change!\n",
+                (dim_changed & 1) ?  "Z changed!\n" : "Z did not change!\n");
+
         if (dim_changed < 7) {
           //check every dim
-
+          // puts("dim_changed < 7 YES!");
           //X
-          if (dim_changed & 4 == 0) {
-            (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-            printf("G=%u, p_x=%f, laser=%s, laser_power=%f, machine_speed=%f\n",
-            (*dtuple_list)[di].G,
-            (*dtuple_list)[di].P.x,
-            (*dtuple_list)[di].laser ? "on" : "off",
-            (*dtuple_list)[di].laser_power,
-            (*dtuple_list)[di].machine_speed);
+          if ((dim_changed & 4) == 0) {
+            //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+            puts("X did not change!");
           }
           //Y
-          if (dim_changed & 2 == 0) {
-            (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
+          if ((dim_changed & 2) == 0) {
+            puts("Y did not change!");
+            //(*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
           }
           //Z
-          if (dim_changed & 1 == 0) {
-            (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
+          if ((dim_changed & 1) == 0) {
+            puts("Z did not change!");
+          //   (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
           }
+          //
+          //}
         }
-        else if (dim_changed > 7) {
+        else if (dim_changed > 127) {
           fprintf(stderr,"Error: dim_changed overflow! dim_changed=%u",dim_changed);
         }
 

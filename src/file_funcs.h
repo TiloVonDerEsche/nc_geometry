@@ -250,6 +250,8 @@ void read_mpf (uint8_t read_all,
                 (dim_changed & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n"
               );
 
+
+
         //G
         if ((dim_changed & 1) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
@@ -293,20 +295,26 @@ void read_mpf (uint8_t read_all,
         //set rest of the features of data_tuple
 
 
+        // X || Y || Z changed
+        if ((dim_changed & 14) > 0) {
+          //create new point
 
-        //write point to data_tuples csv
-        fprintf(dtuple_csv,
-        "%u, %f,%f,%f, %s, %f, %f\n",
-        (*dtuple_list)[di].G,
-        (*dtuple_list)[di].P.x,(*dtuple_list)[di].P.y,(*dtuple_list)[di].P.z,
-        (*dtuple_list)[di].laser ? "on" : "off",
-        (*dtuple_list)[di].laser_power,
-        (*dtuple_list)[di].machine_speed);
+          //printf("Writing new point to csv=%s...\n",config->data_tuples_csv);
+          //write point to data_tuples csv
+          fprintf(dtuple_csv,
+          "%u, %f,%f,%f, %s, %f, %f\n",
+          (*dtuple_list)[di].G,
+          (*dtuple_list)[di].P.x,(*dtuple_list)[di].P.y,(*dtuple_list)[di].P.z,
+          (*dtuple_list)[di].laser ? "on" : "off",
+          (*dtuple_list)[di].laser_power,
+          (*dtuple_list)[di].machine_speed);
 
-        dim_changed = 0;
+          dim_changed = 0;
 
-        puts("");
-        di++;
+          puts("");
+          di++;
+        }
+
       }
   }
 

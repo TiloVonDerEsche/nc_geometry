@@ -190,6 +190,7 @@ void read_mpf (uint8_t read_all,
                             &dim_changed);
             }
 
+            //don't clear read_num_buf btw keyword and number
             if (c != ' ') {
               read_num_mode = 0;
               memset(read_num_buf, 0, config->max_line_len);

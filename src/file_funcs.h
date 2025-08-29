@@ -277,6 +277,8 @@ void read_mpf (uint8_t read_all,
         (*dtuple_list)[di].machine_speed);
 
         dim_changed = 0;
+
+        puts("");
         di++;
       }
   }

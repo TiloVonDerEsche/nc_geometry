@@ -202,19 +202,19 @@ uint8_t str_to_uint8(const char* str) {
   errno = 0;                // Reset errno before call
 
   unsigned long value = strtoul(str, &endptr, 10);  // Base 10 for decimal
+  uint8_t result = 0;
 
   if (str == endptr) {
       // No conversion occurred (invalid input)
       printf("Invalid uint8_t string.\n");
   } else if (errno == ERANGE || value > UINT8_MAX) {
-      // Out of range for uint8_t (0-255)
       printf("Value out of uint8_t range.\n");
   } else {
-      uint8_t result = (uint8_t)value;
+      result = (uint8_t)value;
       //printf("Converted uint8_t: %u\n", result);
   }
 
-  return 0;
+  return result;
 }
 
 
@@ -255,38 +255,46 @@ void set_key_value(
 
     switch (keypos) {
         case 0: //LASER_ON
+            printf("Setting laser=1\n");
             (*tuple_list)[tui].laser = 1;
             (*dim_changed) += 16;
             break;
         case 1: //LASER_OFF
+            printf("Setting laser=0\n");
             (*tuple_list)[tui].laser = 0;
             (*dim_changed) += 16;
             break;
         case 2: //PUIS_LASER
+            printf("Setting laser_power=%f\n",str_to_float(read_value));
             fval = str_to_float(read_value);
             (*tuple_list)[tui].laser_power = fval;
             (*track_list)[tri].laser_power = fval;
             (*dim_changed) += 32;
             break;
         case 3: //VIT_TIR
+            printf("Setting machine_speed=%f\n",str_to_float(read_value));
             fval = str_to_float(read_value);   //sanity check ToDo revert!
             (*tuple_list)[tui].machine_speed = str_to_float(read_value);
             (*track_list)[tri].machine_speed = str_to_float(read_value); //gets set multiple times per same track
             (*dim_changed) += 64;
             break;
         case 4: //3D Point from mpf file
+            //printf("Setting p_x=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.x = str_to_float(read_value);
             (*dim_changed) += 4;
             break;
         case 5:
+            //printf("Setting p_y=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.y = str_to_float(read_value);
             (*dim_changed) += 2;
             break;
         case 6:
+            //printf("Setting p_z=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.z = str_to_float(read_value);
             (*dim_changed) += 1;
             break;
         case 7: //G (Operating Mode)
+            //printf("Setting G=%u\n",str_to_uint8(read_value));
             (*tuple_list)[tui].G = str_to_uint8(read_value);
             (*dim_changed) += 8;
             break;

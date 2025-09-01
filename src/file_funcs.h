@@ -105,7 +105,7 @@ void read_mpf (uint8_t read_all,
   size_t di = 0; //data_tuple id (for dtuple_list)
   //size_t li = 0;
 
-  //continue as long as the line contains something
+
   char line_buf[config->max_line_len];
   //saves the chars of individual tokens / keywords while reading a line
   // gets cleared after reading ' ', '\n' etc
@@ -117,7 +117,9 @@ void read_mpf (uint8_t read_all,
   size_t vi = 0;
   uint8_t read_num_mode = 0;
   int keypos = -1;
+
   //fgets prints the new line in line_buf, and keeps a line index count
+  //continue as long as the line contains something
   //read mpf linewise
   while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
 
@@ -143,11 +145,10 @@ void read_mpf (uint8_t read_all,
         if (absent) {
             kh_key(h, k) = strdup(line_buf);}
 
+        //check if right token is a num or another var
         if (is_part_of_num(value[0])) {
             kh_val(h, k) = atof(value);}
-        else { //if 'value' is another variable
-            //lookup value for key on the right of '='
-            //key on the left of '=' gets its value instead
+        else { //lookup the value of the that var on the right of '='
             k2 = strfloat_get(h, value); // get iterator k
             if (k2 < kh_end(h)) {
                 kh_val(h, k) = kh_val(h, k2);
@@ -164,6 +165,7 @@ void read_mpf (uint8_t read_all,
           c = line_buf[li];
 
           if (read_num_mode && is_part_of_num(c)) {
+              printf("IF li=%lu\n\n",li);
               printf("read_num_mode on! Reading number for keyword %s...\n",token_buf);
               //check if current buf is matching to a keyword
               //parse value
@@ -174,7 +176,7 @@ void read_mpf (uint8_t read_all,
           }
           else { // !(read_num_mode && is_part_of_num(c))
             //!read_num_mode || !is_part_of_num(c)
-
+            printf("ELSE li=%lu\n\n",li);
 
 
             //should be wrong for laser commands,
@@ -182,6 +184,7 @@ void read_mpf (uint8_t read_all,
             //if (read_num_buf[0] != 0) {
               //printf("read_num_buf=%s\n",read_num_buf);
 
+            printf("keypos=%d, (keypos >= 0)=%s\n",keypos,(keypos >= 0) ? "true" : "false");
             if (keypos >= 0) {
               printf("\nSaving value %s for key %s with pos=%d...\n",
               read_num_buf, token_buf, keypos);
@@ -191,7 +194,9 @@ void read_mpf (uint8_t read_all,
             }
 
             //don't clear read_num_buf btw keyword and number
-            if (c != ' ') {
+            //clear if not inbetween token and buf is filled and not in num
+            if (c != ' ' && read_num_buf[0] != 0) {
+              printf("Clearing num_buf=%s...\n\n",read_num_buf);
               read_num_mode = 0;
               memset(read_num_buf, 0, config->max_line_len);
               vi = 0;
@@ -201,24 +206,24 @@ void read_mpf (uint8_t read_all,
             //append char to token
             token_buf[bi] = c;
             bi++;
-          }
+
           //printf("%c\n",c);
 
-          //printf("Checking %s as keyword...",token_buf);
-          keypos = is_in_list(token_buf, keywords, keywords_len);
-          if (keypos != -1 && !read_num_mode) {
-            printf("KEYWORD %s with pos=%d FOUND!\n",token_buf,keypos);
-            read_num_mode = 1;
+            printf("Checking %s as keyword...\n",token_buf);
+            keypos = is_in_list(token_buf, keywords, keywords_len);
+            if (keypos != -1 && !read_num_mode) {
+              printf("KEYWORD %s with pos=%d FOUND!\n",token_buf,keypos);
+              read_num_mode = 1;
+            }
+
+
+            if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
+                //token_buf[0] = '\0';
+                memset(token_buf, 0, config->max_line_len);
+                bi = 0;
+                if (c == '\0' || c == ';') {break;}
+            }
           }
-
-
-          if (c == '\0' || c == ';' || c == ' ' || c == '\n') {
-              //token_buf[0] = '\0';
-              memset(token_buf, 0, config->max_line_len);
-              bi = 0;
-              if (c == '\0' || c == ';') {break;}
-          }
-
         }
       }
 
@@ -253,6 +258,7 @@ void read_mpf (uint8_t read_all,
 
 
 
+        //copy previous value, if value has not been set in read line
         //G
         if ((dim_changed & 1) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
@@ -260,18 +266,18 @@ void read_mpf (uint8_t read_all,
         }
         //X
         if ((dim_changed & 2) == 0) {
-          //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+          (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
           puts("X did not change!");
         }
         //Y
         if ((dim_changed & 4) == 0) {
+          (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
           puts("Y did not change!");
-          //(*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
         }
         //Z
         if ((dim_changed & 8) == 0) {
+          (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
           puts("Z did not change!");
-        //   (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
         }
         //laser_on_off
         if ((dim_changed & 16) == 0) {
@@ -280,7 +286,7 @@ void read_mpf (uint8_t read_all,
         }
         //laser_power
         if ((dim_changed & 32) == 0) {
-          //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+          (*dtuple_list)[di].laser_power = (*dtuple_list)[di-1].laser_power;
           puts("laser_power did not change!");
         }
         //machine_speed

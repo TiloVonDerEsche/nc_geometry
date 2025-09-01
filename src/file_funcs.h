@@ -62,7 +62,7 @@ void read_mpf (uint8_t read_all,
 
   //vec3D new_P = {0,0,0};
 
-  uint8_t dim_changed = 0b000; //bool x y z
+  uint8_t feat_change = 0b000; //bool x y z
 
 
   const size_t keywords_len = 8;
@@ -190,7 +190,7 @@ void read_mpf (uint8_t read_all,
               read_num_buf, token_buf, keypos);
               set_key_value(keypos,read_num_buf,
                             di, ti, dtuple_list, tl,
-                            &dim_changed);
+                            &feat_change);
             }
 
             //don't clear read_num_buf btw keyword and number
@@ -227,18 +227,17 @@ void read_mpf (uint8_t read_all,
         }
       }
 
-      //See what bits of dim_changed are still zero
+      //See what bits of feat_change are still zero
       //Give the according dims the value of the last point
 
 
 
 
 
-      //dim_changed seems to be redundant for some reason
-      //(X,Y,Z) seem to be correctly set by set_key_value fn
-      if (dim_changed > 0) {
-        //puts("dim_changed YES!");
-        //dim_changed=0b0%u%u%u%u%u%u%u
+
+      if (feat_change > 0) {
+        //puts("feat_change YES!");
+        //feat_change=0b0%u%u%u%u%u%u%u
         printf("G=%u, p_x=%f, laser=%s, laser_power=%f, machine_speed=%f\n",
         (*dtuple_list)[di].G,
         (*dtuple_list)[di].P.x,
@@ -247,63 +246,63 @@ void read_mpf (uint8_t read_all,
         (*dtuple_list)[di].machine_speed);
 
         printf("%s%s%s%s%s%s%s",
-                (dim_changed & 1) ?  "G changed!\n" : "G did not changed!\n",
-                (dim_changed & 2) ?  "X changed!\n" : "X did not change!\n",
-                (dim_changed & 4) ?  "Y changed!\n" : "Y did not change!\n",
-                (dim_changed & 8) ?  "Z changed!\n" : "Z did not change!\n",
-                (dim_changed & 16) ? "laser changed!\n" : "laser did not change!\n",
-                (dim_changed & 32) ? "laser_power changed!\n" : "laser_power did not change!\n" ,
-                (dim_changed & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n"
+                (feat_change & 1) ?  "G changed!\n" : "G did not changed!\n",
+                (feat_change & 2) ?  "X changed!\n" : "X did not change!\n",
+                (feat_change & 4) ?  "Y changed!\n" : "Y did not change!\n",
+                (feat_change & 8) ?  "Z changed!\n" : "Z did not change!\n",
+                (feat_change & 16) ? "laser changed!\n" : "laser did not change!\n",
+                (feat_change & 32) ? "laser_power changed!\n" : "laser_power did not change!\n" ,
+                (feat_change & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n"
               );
 
 
 
         //copy previous value, if value has not been set in read line
         //G
-        if ((dim_changed & 1) == 0) {
+        if ((feat_change & 1) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
           puts("G did not change!");
         }
         //X
-        if ((dim_changed & 2) == 0) {
+        if ((feat_change & 2) == 0) {
           (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
           puts("X did not change!");
         }
         //Y
-        if ((dim_changed & 4) == 0) {
+        if ((feat_change & 4) == 0) {
           (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
           puts("Y did not change!");
         }
         //Z
-        if ((dim_changed & 8) == 0) {
+        if ((feat_change & 8) == 0) {
           (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
           puts("Z did not change!");
         }
         //laser_on_off
-        if ((dim_changed & 16) == 0) {
+        if ((feat_change & 16) == 0) {
           (*dtuple_list)[di].laser = (*dtuple_list)[di-1].laser;
           puts("laser_on_off did not change!");
         }
         //laser_power
-        if ((dim_changed & 32) == 0) {
+        if ((feat_change & 32) == 0) {
           (*dtuple_list)[di].laser_power = (*dtuple_list)[di-1].laser_power;
           puts("laser_power did not change!");
         }
         //machine_speed
-        if ((dim_changed & 64) == 0) {
+        if ((feat_change & 64) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
           puts("machine_speed did not change!");
         }
 
-        // if (dim_changed > 127) {
-        //   fprintf(stderr,"Error: dim_changed overflow! dim_changed=%u",dim_changed);
+        // if (feat_change > 127) {
+        //   fprintf(stderr,"Error: feat_change overflow! feat_change=%u",feat_change);
         // }
 
         //set rest of the features of data_tuple
 
 
         // X || Y || Z changed
-        if ((dim_changed & 14) > 0) {
+        if ((feat_change & 14) > 0) {
           //create new point
 
           //printf("Writing new point to csv=%s...\n",config->data_tuples_csv);
@@ -316,7 +315,7 @@ void read_mpf (uint8_t read_all,
           (*dtuple_list)[di].laser_power,
           (*dtuple_list)[di].machine_speed);
 
-          dim_changed = 0;
+          feat_change = 0;
 
           puts("");
           di++;

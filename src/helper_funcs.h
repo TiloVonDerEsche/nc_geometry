@@ -248,41 +248,41 @@ int is_in_list(const char* str, const char** list, size_t list_size) {
 void set_key_value(
   int keypos, const char* read_value,
   int tui, int tri, data_tuple** tuple_list, track** track_list,
-  uint8_t* dim_changed) {
+  uint8_t* feat_change) {
 
     float fval = 0.0;
-    //uint8_t dim_changed = 0b000; //bool x y z
+    //uint8_t feat_change = 0b000; //bool x y z
 
     switch (keypos) {
         case 0:  //G (Operating Mode)
             //printf("Setting G=%u\n",str_to_uint8(read_value));
             (*tuple_list)[tui].G = str_to_uint8(read_value);
-            (*dim_changed) += 1;
+            (*feat_change) += 1;
             break;
         case 1: //3D Point from mpf file
             //printf("Setting p_x=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.x = str_to_float(read_value);
-            (*dim_changed) += 2;
+            (*feat_change) += 2;
             break;
         case 2:
             //printf("Setting p_y=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.y = str_to_float(read_value);
-            (*dim_changed) += 4;
+            (*feat_change) += 4;
             break;
         case 3:
             //printf("Setting p_z=%f\n",str_to_float(read_value));
             (*tuple_list)[tui].P.z = str_to_float(read_value);
-            (*dim_changed) += 8;
+            (*feat_change) += 8;
             break;
         case 4://LASER_ON
             printf("Setting laser=1\n");
             (*tuple_list)[tui].laser = 1;
-            (*dim_changed) += 16;
+            (*feat_change) += 16;
             break;
         case 5://LASER_OFF
             printf("Setting laser=0\n");
             (*tuple_list)[tui].laser = 0;
-            (*dim_changed) += 16;
+            (*feat_change) += 16;
             break;
 
         case 6://PUIS_LASER
@@ -290,7 +290,7 @@ void set_key_value(
             fval = str_to_float(read_value);
             (*tuple_list)[tui].laser_power = fval;
             (*track_list)[tri].laser_power = fval;
-            (*dim_changed) += 32;
+            (*feat_change) += 32;
             break;
 
         case 7://VIT_TIR
@@ -298,7 +298,7 @@ void set_key_value(
             fval = str_to_float(read_value);   //sanity check ToDo revert!
             (*tuple_list)[tui].machine_speed = str_to_float(read_value);
             (*track_list)[tri].machine_speed = str_to_float(read_value); //gets set multiple times per same track
-            (*dim_changed) += 64;
+            (*feat_change) += 64;
             break;
         default:
             fprintf(stderr,"Invalid keypos=%d",keypos);

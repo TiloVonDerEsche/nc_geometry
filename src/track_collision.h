@@ -17,8 +17,8 @@ void track_collision(size_t track_list_len, track** track_list) {
 
         //assuming that the tracks are parallel -> point line distance
         //distance_point_to_line(t1->A,t2->A,connecting_vec(t2->A,t2->B));
-        v = vec_minus(t1->B,t1->A);
-        FQ = lotfuss(t1->A,v,t2->A, &foot_point, &distance_t1_t2);
+        v = vec_minus(t1->EP,t1->SP);
+        FQ = lotfuss(t1->SP,v,t2->SP, &foot_point, &distance_t1_t2);
 
         FQ_normed = norm_vec(FQ);
 

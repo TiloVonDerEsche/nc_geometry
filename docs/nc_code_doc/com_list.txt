@@ -1,0 +1,27 @@
+Befehl,Kurze Erklärung
+A,Rotationsachse um X (A-Achse Position oder Bewegung).
+B,Rotationsachse um Y (B-Achse Position oder Bewegung).
+C,Rotationsachse um Z (C-Achse Position oder Bewegung).
+D,Werkzeug-Radius-Kompensation oder Werkzeugnummer für Kompensation.
+E,Endabstand in Drehmaschinen-Zyklen oder Extruder (bei 3D-Druck).
+F,Vorschubgeschwindigkeit (Feedrate).
+G,Vorbereitungsfunktion (z.B. für Bewegungen wie Rapid oder Linear).
+H,Werkzeuglängen-Offset oder zusätzlicher Längen-Offset.
+I,"Inkrementeller Offset für X in Bögen, Splines oder Gewindeschneiden."
+J,"Inkrementeller Offset für Y in Bögen, Splines oder Gewindeschneiden."
+K,"Inkrementeller Offset für Z, Gewindetiefe oder Abstand pro Umdrehung."
+L,Wiederholungszähler in Zyklen oder Level in Werkzeugtabelle.
+M,"Sonstige Funktion (z.B. Spindel ein/aus, Programmende)."
+N,Zeilennummer im Programm.
+O,Programmnummer oder Subroutine-Bezeichner.
+P,"Verweilzeit, Anzahl Umdrehungen oder Subroutine-Parameter."
+Q,"Inkrement in Bohrzyklen, Winkel oder Abstand in Schruppzyklen."
+R,"Rückzugsposition, Bogenradius oder Rotation um Z-Achse."
+S,Spindeldrehzahl (RPM) oder Oberflächengeschwindigkeit.
+T,Werkzeugnummer für Auswahl.
+U,Inkrementelle X-Bewegung oder U-Achse Position.
+V,Inkrementelle Y-Bewegung oder V-Achse Position.
+W,Inkrementelle Z-Bewegung oder W-Achse Position.
+X,X-Achse Position oder Bewegung.
+Y,Y-Achse Position oder Bewegung.
+Z,Z-Achse Position oder Bewegung.

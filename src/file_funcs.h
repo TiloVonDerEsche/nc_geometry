@@ -18,8 +18,8 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   for (size_t i = 0; i < track_list_len; i++) {
     fprintf(file,"%lu, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f\n",
            i,
-           (*tl)[i].A.x, (*tl)[i].A.y, (*tl)[i].A.z,
-           (*tl)[i].B.x, (*tl)[i].B.y, (*tl)[i].B.z,
+           (*tl)[i].SP.x, (*tl)[i].SP.y, (*tl)[i].SP.z,
+           (*tl)[i].EP.x, (*tl)[i].EP.y, (*tl)[i].EP.z,
            (*tl)[i].laser_power,(*tl)[i].machine_speed,
            (*tl)[i].coll_vec.x,(*tl)[i].coll_vec.y,(*tl)[i].coll_vec.z,
            (*tl)[i].hradius,(*tl)[i].vradius);
@@ -87,7 +87,8 @@ void read_mpf (uint8_t read_all,
   puts("Initializing str_float_map...");
   strfloat_t *h = strfloat_init();  // Create empty map
   int absent;
-  khint_t k; //portable unsigned int iterator, like size_t?
+   //khint_t is a portable unsigned int iterator, like size_t?
+  khint_t k;
   khint_t k2;
 
   char* key;
@@ -139,11 +140,11 @@ void read_mpf (uint8_t read_all,
 
 
         //--------
-        k = strfloat_put(h, line_buf, &absent);  // Key is a const char* pointer
+        k = strfloat_put(h, trimmed, &absent);  // Key is a const char* pointer
 
 
         if (absent) {
-            kh_key(h, k) = strdup(line_buf);}
+            kh_key(h, k) = strdup(trimmed);}
 
         //check if right token is a num or another var
         if (is_part_of_num(value[0])) {
@@ -165,8 +166,8 @@ void read_mpf (uint8_t read_all,
           c = line_buf[li];
 
           if (read_num_mode && is_part_of_num(c)) {
-              printf("IF li=%lu\n\n",li);
-              printf("read_num_mode on! Reading number for keyword %s...\n",token_buf);
+              //printf("IF li=%lu\n\n",li);
+              //printf("read_num_mode on! Reading number for keyword %s...\n",token_buf);
               //check if current buf is matching to a keyword
               //parse value
               read_num_buf[vi] = c;
@@ -176,7 +177,7 @@ void read_mpf (uint8_t read_all,
           }
           else { // !(read_num_mode && is_part_of_num(c))
             //!read_num_mode || !is_part_of_num(c)
-            printf("ELSE li=%lu\n\n",li);
+            //printf("ELSE li=%lu\n\n",li);
 
 
             //should be wrong for laser commands,
@@ -189,7 +190,7 @@ void read_mpf (uint8_t read_all,
               printf("\nSaving value %s for key %s with pos=%d...\n",
               read_num_buf, token_buf, keypos);
               set_key_value(keypos,read_num_buf,
-                            di, ti, dtuple_list, tl,
+                            di, &ti, dtuple_list, tl,
                             &feat_change);
             }
 
@@ -209,7 +210,7 @@ void read_mpf (uint8_t read_all,
 
           //printf("%c\n",c);
 
-            printf("Checking %s as keyword...\n",token_buf);
+            //printf("Checking %s as keyword...\n",token_buf);
             keypos = is_in_list(token_buf, keywords, keywords_len);
             if (keypos != -1 && !read_num_mode) {
               printf("KEYWORD %s with pos=%d FOUND!\n",token_buf,keypos);

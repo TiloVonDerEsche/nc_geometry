@@ -41,8 +41,8 @@ typedef struct {
 
 typedef struct {
   //set by read_mpf
-  vec3D A;
-  vec3D B;
+  vec3D SP; //start point
+  vec3D EP; //end point
   float laser_power;
   float machine_speed;
   //set by track_collision
@@ -50,6 +50,11 @@ typedef struct {
   //set by set_track_radius
   float hradius;
   float vradius;
+
+  //direction vec of track in polar coordinate form
+  //direction angles
+  float dir1;
+  float dir2;
 } track;
 
 typedef struct {
@@ -163,7 +168,7 @@ char* trim(char* str) {
     if (*str == 0) return str;
     // Remove trailing whitespace, quotes, and semicolon
     end = str + strlen(str) - 1;
-    while (end > str && (isspace((unsigned char)*end) || *end == '"' || *end == ';')) end--;
+    while (str < end && (isspace((unsigned char)*end) || *end == '"' || *end == ';')) end--;
     *(end + 1) = '\0';
     return str;
 }
@@ -247,7 +252,7 @@ int is_in_list(const char* str, const char** list, size_t list_size) {
 //smarter solution required
 void set_key_value(
   int keypos, const char* read_value,
-  int tui, int tri, data_tuple** tuple_list, track** track_list,
+  size_t di, size_t* ti, data_tuple** tuple_list, track** track_list,
   uint8_t* feat_change) {
 
     float fval = 0.0;
@@ -256,48 +261,69 @@ void set_key_value(
     switch (keypos) {
         case 0:  //G (Operating Mode)
             //printf("Setting G=%u\n",str_to_uint8(read_value));
-            (*tuple_list)[tui].G = str_to_uint8(read_value);
+            (*tuple_list)[di].G = str_to_uint8(read_value);
             (*feat_change) += 1;
             break;
         case 1: //3D Point from mpf file
             //printf("Setting p_x=%f\n",str_to_float(read_value));
-            (*tuple_list)[tui].P.x = str_to_float(read_value);
+            (*tuple_list)[di].P.x = str_to_float(read_value);
             (*feat_change) += 2;
             break;
         case 2:
             //printf("Setting p_y=%f\n",str_to_float(read_value));
-            (*tuple_list)[tui].P.y = str_to_float(read_value);
+            (*tuple_list)[di].P.y = str_to_float(read_value);
             (*feat_change) += 4;
             break;
         case 3:
             //printf("Setting p_z=%f\n",str_to_float(read_value));
-            (*tuple_list)[tui].P.z = str_to_float(read_value);
+            (*tuple_list)[di].P.z = str_to_float(read_value);
             (*feat_change) += 8;
             break;
         case 4://LASER_ON
+            //track start P is point in front of /LASER_ON
+            if(di > 0) {
+            printf("Setting Track Start Point to (%f,%f,%f)",
+            (*tuple_list)[di-1].P.x,
+            (*tuple_list)[di-1].P.y,
+            (*tuple_list)[di-1].P.z);
+
+            (*track_list)[*ti].SP.x = (*tuple_list)[di-1].P.x;
+            (*track_list)[*ti].SP.y = (*tuple_list)[di-1].P.y;
+            (*track_list)[*ti].SP.z = (*tuple_list)[di-1].P.z;
+            }
+
+
             printf("Setting laser=1\n");
-            (*tuple_list)[tui].laser = 1;
+            (*tuple_list)[di].laser = 1;
             (*feat_change) += 16;
             break;
         case 5://LASER_OFF
+            //point before /LASER_OFF is end point of track
+            printf("Setting Track End Point to (%f,%f,%f)",
+            (*tuple_list)[di].P.x,(*tuple_list)[di].P.y,(*tuple_list)[di].P.z);
+            (*track_list)[*ti].EP.x = (*tuple_list)[di].P.x;
+            (*track_list)[*ti].EP.y = (*tuple_list)[di].P.y;
+            (*track_list)[*ti].EP.z = (*tuple_list)[di].P.z;
+            (*ti)++;
+
             printf("Setting laser=0\n");
-            (*tuple_list)[tui].laser = 0;
+            (*tuple_list)[di].laser = 0;
             (*feat_change) += 16;
             break;
 
         case 6://PUIS_LASER
             printf("Setting laser_power=%f\n",str_to_float(read_value));
             fval = str_to_float(read_value);
-            (*tuple_list)[tui].laser_power = fval;
-            (*track_list)[tri].laser_power = fval;
+            (*tuple_list)[di].laser_power = fval;
+            (*track_list)[*ti].laser_power = fval;
             (*feat_change) += 32;
             break;
 
         case 7://VIT_TIR
             printf("Setting machine_speed=%f\n",str_to_float(read_value));
             fval = str_to_float(read_value);   //sanity check ToDo revert!
-            (*tuple_list)[tui].machine_speed = str_to_float(read_value);
-            (*track_list)[tri].machine_speed = str_to_float(read_value); //gets set multiple times per same track
+            (*tuple_list)[di].machine_speed = str_to_float(read_value);
+            (*track_list)[*ti].machine_speed = str_to_float(read_value); //gets set multiple times per same track
             (*feat_change) += 64;
             break;
         default:

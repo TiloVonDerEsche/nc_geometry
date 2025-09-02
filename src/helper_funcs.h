@@ -300,10 +300,11 @@ void set_key_value(
         case 5://LASER_OFF
             //point before /LASER_OFF is end point of track
             printf("Setting Track End Point to (%f,%f,%f)",
-            (*tuple_list)[di].P.x,(*tuple_list)[di].P.y,(*tuple_list)[di].P.z);
-            (*track_list)[*ti].EP.x = (*tuple_list)[di].P.x;
-            (*track_list)[*ti].EP.y = (*tuple_list)[di].P.y;
-            (*track_list)[*ti].EP.z = (*tuple_list)[di].P.z;
+            (*tuple_list)[di-1].P.x,(*tuple_list)[di-1].P.y,(*tuple_list)[di-1].P.z);
+
+            (*track_list)[*ti].EP.x = (*tuple_list)[di-1].P.x;
+            (*track_list)[*ti].EP.y = (*tuple_list)[di-1].P.y;
+            (*track_list)[*ti].EP.z = (*tuple_list)[di-1].P.z;
             (*ti)++;
 
             printf("Setting laser=0\n");

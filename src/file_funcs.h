@@ -13,7 +13,14 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
       return;
   }
 
-  fprintf(file,"Track_id, A.x, A.y, A.z, B.x, B.y, B.z, laser_power, machine_speed, coll_vec.x, coll_vec.y, coll_vec.z, hradius, vradius\n");
+  fprintf(file,
+  "track_id,"
+  "track_start_x, track_start_y, track_start_z,"
+  "track_end_x, track_end_y, track_end_z,"
+  "laser_power_w, machine_speed_mm_per_min,"
+  "coll_vec_x, coll_vec_y, coll_vec_z,"
+  "track_hradius, track_vradius,"
+  "track_direction_deg1, track_direction_deg2\n");
 
   for (size_t i = 0; i < track_list_len; i++) {
     fprintf(file,"%lu, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f\n",

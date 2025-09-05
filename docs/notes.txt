@@ -33,3 +33,18 @@ Writing to data_tuples.csv is only one fprintf line more.
 
 
 -flto flag to trim unused code for compiling with static linking
+
+hyperMill / hyperCAD wird verwendet
+
+STOPRE command?
+
+supports parametric programming (e.g., Siemens or Heidenhain)
+
+Siemens 840D: Siemens uses DC in some contexts to specify “direct control” of rotary axes,
+ensuring the shortest path or normalized angle.
+For example, C=DC(359.6191) commands the C-axis to 359.6191° via the shortest path.
+
+
+Laser-specific commands: LASER_OFF and STOPRE indicate this is a laser machining program.
+STOPRE is often used in Siemens controllers to stop preprocessing (buffering) of NC blocks,
+ensuring precise synchronization.

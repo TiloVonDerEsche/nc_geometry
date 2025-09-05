@@ -24,7 +24,7 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
 
   for (size_t i = 0; i < track_list_len; i++) {
     fprintf(file,"%lu, %f,%f,%f, %f,%f,%f, %f,%f, %f,%f,%f, %f,%f\n",
-           i,
+           (i+1),
            (*tl)[i].SP.x, (*tl)[i].SP.y, (*tl)[i].SP.z,
            (*tl)[i].EP.x, (*tl)[i].EP.y, (*tl)[i].EP.z,
            (*tl)[i].laser_power,(*tl)[i].machine_speed,
@@ -34,7 +34,7 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
 }
 
 void read_mpf (uint8_t read_all,
-  data_tuple** dtuple_list, track** tl, size_t* tl_len,
+  data_tuple** dtuple_list, track** track_list, size_t* tl_len,
   Config* config){
   //set config for mpf_lines, mpf_file path, data_tuples_csv
 
@@ -53,7 +53,7 @@ void read_mpf (uint8_t read_all,
       return;
   }
 
-  fprintf(dtuple_csv, "G, p_x,p_y,p_z, laser_on_off, laser_power_w, machine_speed_mm_per_min\n");
+  fprintf(dtuple_csv, "di, ti, g, p_x,p_y,p_z, laser_on_off, laser_power_w, machine_speed_mm_per_min\n");
 
   uint8_t laser_on_off = 0;
   float puis_laser = 0; //laser_power
@@ -131,10 +131,7 @@ void read_mpf (uint8_t read_all,
   //read mpf linewise
   while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
 
-      //line_buf and line are currently always equal
-      printf("lbuf=%s",line_buf);
-
-
+      //printf("lbuf=%s",line_buf);
 
       //use str_float hashmap for variables
       //-------------------//
@@ -180,7 +177,7 @@ void read_mpf (uint8_t read_all,
               read_num_buf[vi] = c;
               vi++;
 
-              printf("read_num_buf=%s\n",read_num_buf);
+              //printf("read_num_buf=%s\n",read_num_buf);
           }
           else { // !(read_num_mode && is_part_of_num(c))
             //!read_num_mode || !is_part_of_num(c)
@@ -192,19 +189,19 @@ void read_mpf (uint8_t read_all,
             //if (read_num_buf[0] != 0) {
               //printf("read_num_buf=%s\n",read_num_buf);
 
-            printf("keypos=%d, (keypos >= 0)=%s\n",keypos,(keypos >= 0) ? "true" : "false");
+            //printf("keypos=%d, (keypos >= 0)=%s\n",keypos,(keypos >= 0) ? "true" : "false");
             if (keypos >= 0) {
-              printf("\nSaving value %s for key %s with pos=%d...\n",
+              printf("Saving value %s for key %s with pos=%d...\n",
               read_num_buf, token_buf, keypos);
               set_key_value(keypos,read_num_buf,
-                            di, &ti, dtuple_list, tl,
+                            di, &ti, dtuple_list, track_list,
                             &feat_change);
             }
 
             //don't clear read_num_buf btw keyword and number
             //clear if not inbetween token and buf is filled and not in num
             if (c != ' ' && read_num_buf[0] != 0) {
-              printf("Clearing num_buf=%s...\n\n",read_num_buf);
+              //printf("Clearing num_buf=%s...\n\n",read_num_buf);
               read_num_mode = 0;
               memset(read_num_buf, 0, config->max_line_len);
               vi = 0;
@@ -220,7 +217,7 @@ void read_mpf (uint8_t read_all,
             //printf("Checking %s as keyword...\n",token_buf);
             keypos = is_in_list(token_buf, keywords, keywords_len);
             if (keypos != -1 && !read_num_mode) {
-              printf("KEYWORD %s with pos=%d FOUND!\n",token_buf,keypos);
+              //printf("KEYWORD %s with pos=%d FOUND!\n",token_buf,keypos);
               read_num_mode = 1;
             }
 
@@ -246,60 +243,65 @@ void read_mpf (uint8_t read_all,
       if (feat_change > 0) {
         //puts("feat_change YES!");
         //feat_change=0b0%u%u%u%u%u%u%u
-        printf("G=%u, p_x=%f, laser=%s, laser_power=%f, machine_speed=%f\n",
+        printf("\ndi=%lu, ti=%lu, g=%u, p=(%f,%f,%f), laser=%s, laser_power=%f, machine_speed=%f\n",
+        di, ti,
         (*dtuple_list)[di].G,
-        (*dtuple_list)[di].P.x,
+        (*dtuple_list)[di].P.x,(*dtuple_list)[di].P.y,(*dtuple_list)[di].P.z,
         (*dtuple_list)[di].laser ? "on" : "off",
         (*dtuple_list)[di].laser_power,
         (*dtuple_list)[di].machine_speed);
 
-        printf("%s%s%s%s%s%s%s",
-                (feat_change & 1) ?  "G changed!\n" : "G did not changed!\n",
-                (feat_change & 2) ?  "X changed!\n" : "X did not change!\n",
-                (feat_change & 4) ?  "Y changed!\n" : "Y did not change!\n",
-                (feat_change & 8) ?  "Z changed!\n" : "Z did not change!\n",
-                (feat_change & 16) ? "laser changed!\n" : "laser did not change!\n",
-                (feat_change & 32) ? "laser_power changed!\n" : "laser_power did not change!\n" ,
-                (feat_change & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n"
-              );
+        // printf("%s%s%s%s%s%s%s",
+        //         (feat_change & 1) ?  "G changed!\n" : "G did not changed!\n",
+        //         (feat_change & 2) ?  "X changed!\n" : "X did not change!\n",
+        //         (feat_change & 4) ?  "Y changed!\n" : "Y did not change!\n",
+        //         (feat_change & 8) ?  "Z changed!\n" : "Z did not change!\n",
+        //         (feat_change & 16) ? "laser changed!\n" : "laser did not change!\n",
+        //         (feat_change & 32) ? "laser_power changed!\n" : "laser_power did not change!\n" ,
+        //         (feat_change & 64) ? "machine_speed changed!\n" : "machine_speed did not change!\n"
+        //       );
 
 
 
+        //ensure persistence
         //copy previous value, if value has not been set in read line
         //G
         if ((feat_change & 1) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          puts("G did not change!");
+          //puts("G did not change!");
         }
         //X
         if ((feat_change & 2) == 0) {
           (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          puts("X did not change!");
+          //puts("X did not change!");
         }
         //Y
         if ((feat_change & 4) == 0) {
           (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
-          puts("Y did not change!");
+          //puts("Y did not change!");
         }
         //Z
         if ((feat_change & 8) == 0) {
           (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
-          puts("Z did not change!");
+          //puts("Z did not change!");
         }
         //laser_on_off
         if ((feat_change & 16) == 0) {
           (*dtuple_list)[di].laser = (*dtuple_list)[di-1].laser;
-          puts("laser_on_off did not change!");
+          //puts("laser_on_off did not change!");
         }
         //laser_power
         if ((feat_change & 32) == 0) {
           (*dtuple_list)[di].laser_power = (*dtuple_list)[di-1].laser_power;
-          puts("laser_power did not change!");
+
+          if(ti > 0) {
+          (*track_list)[ti].laser_power = (*track_list)[ti-1].laser_power;}
+          //puts("laser_power did not change!");
         }
         //machine_speed
         if ((feat_change & 64) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          puts("machine_speed did not change!");
+          //puts("machine_speed did not change!");
         }
 
         // if (feat_change > 127) {
@@ -316,7 +318,8 @@ void read_mpf (uint8_t read_all,
           //printf("Writing new point to csv=%s...\n",config->data_tuples_csv);
           //write point to data_tuples csv
           fprintf(dtuple_csv,
-          "%u, %f,%f,%f, %s, %f, %f\n",
+          "%lu, %lu, %u, %f,%f,%f, %s, %f, %f\n",
+          (di+1), (ti+1),
           (*dtuple_list)[di].G,
           (*dtuple_list)[di].P.x,(*dtuple_list)[di].P.y,(*dtuple_list)[di].P.z,
           (*dtuple_list)[di].laser ? "on" : "off",

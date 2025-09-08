@@ -16,15 +16,17 @@ KHASHL_MAP_INIT(KH_LOCAL,
 
 typedef struct {
   size_t mpf_lines;
-  size_t precision;
   size_t max_line_len;
 
   char mpf_file[256];
   char data_tuples_csv[256];
   char track_list_csv[256];
+  char intpol_csv[256];
 
   float horizontal_radius;
   float vertical_radius;
+
+  float step_dis;
 } Config;
 
 typedef struct {
@@ -114,8 +116,12 @@ vec3D vec_add(vec3D v1, vec3D v2) {
   return (vec3D) {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
 }
 
-vec3D vec_add_scaled(vec3D s, double scalar, vec3D t) {
+vec3D vec_add_scaled(vec3D s, float scalar, vec3D t) {
   return (vec3D) {s.x + scalar * t.x, s.y + scalar * t.y, s.z + scalar * t.z};
+}
+
+vec3D vec_scale(vec3D v, float s) {
+  return (vec3D) {v.x * s, v.y * s, v.z * s};
 }
 
 vec3D norm_vec(vec3D v) {

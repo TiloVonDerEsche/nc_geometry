@@ -396,9 +396,6 @@ int read_config(const char* filename, Config* config) {
         if (strcmp(key, "mpf_lines") == 0) {
             config->mpf_lines = (size_t)atoi(value);
         }
-        else if (strcmp(key, "precision") == 0) {
-            config->precision = (size_t)atoi(value);
-        }
         else if (strcmp(key, "max_line_len") == 0) {
             config->max_line_len = (size_t)atoi(value);
         }
@@ -414,11 +411,18 @@ int read_config(const char* filename, Config* config) {
             strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);
             config->track_list_csv[sizeof(config->track_list_csv) - 1] = '\0';
         }
+        else if (strcmp(key, "interpolation_csv") == 0) {
+            strncpy(config->intpol_csv, value, sizeof(config->intpol_csv) - 1);
+            config->intpol_csv[sizeof(config->intpol_csv) - 1] = '\0';
+        }
         else if (strcmp(key, "horizontal_radius") == 0) {
             config->horizontal_radius = atof(value);
         }
         else if (strcmp(key, "vertical_radius") == 0) {
             config->vertical_radius = atof(value);
+        }
+        else if (strcmp(key, "step_distance") == 0) {
+            config->step_dis = atof(value);
         }
         else if (strcmp(key, "tracks_to_plot") == 0) {
           //Do nothing; Used by t_vis_color.c

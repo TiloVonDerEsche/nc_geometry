@@ -1,6 +1,7 @@
 #include "helper_funcs.h"
 #include "file_funcs.h"
 #include "track_collision.h"
+#include "interpolation.h"
 
 int main() {
     // Initialize config struct with default values
@@ -19,15 +20,17 @@ int main() {
     puts("\nRead values from config.txt:");
     // Print the config.txt values to verify
     printf("mpf_lines=%zu\n", config.mpf_lines);
-    printf("precision=%zu\n", config.precision);
     printf("max_line_len=%zu\n", config.max_line_len);
 
     printf("\nmpf_file=%s\n", config.mpf_file);
     printf("data_tuples_csv=%s\n", config.data_tuples_csv);
     printf("track_list_csv=%s\n", config.track_list_csv);
+    printf("interpolation_csv=%s\n", config.intpol_csv);
 
     printf("\nhorizontal_radius=%.2f\n", config.horizontal_radius);
-    printf("vertical_radius=%.2f\n\n", config.vertical_radius);
+    printf("vertical_radius=%.2f\n", config.vertical_radius);
+
+    printf("\nstep_distance=%f\n\n",config.step_dis);
 
 
 
@@ -63,6 +66,11 @@ int main() {
     write_tracks_to_csv(
       config.track_list_csv,
       track_list_len,&track_list);
+
+
+    puts("\n\n");
+    //------Interpolation------//
+    linear_intpol(track_list_len, &track_list, &config);
 
     free(tuple_list);
     free(track_list);

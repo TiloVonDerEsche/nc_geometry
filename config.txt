@@ -1,14 +1,17 @@
 mpf_lines = 20; //amount of lines read (-1 for all lines)
-precision = 10; //1000 yields ridiculous amount of csv lines
 max_line_len = 1000;
-mpf_file = "./data/nc_code/dummy3.mpf";
-data_tuples_csv = "./data/tuple_lists/dummy3.csv";
-track_list_csv = "./data/track_lists/dummy3.csv";
+
+mpf_file = "./data/nc_code/dummy5_nc.mpf";
+data_tuples_csv = "./data/tuple_lists/dummy5_dl.csv";
+track_list_csv = "./data/track_lists/dummy5_tl.csv";
+interpolation_csv = "./data/interpolation/dummy5_intpol.csv";
 
 
 //radii of welding track
 horizontal_radius= 0.49;
 vertical_radius=0.31;
+
+step_distance = 1; //step distance of interpolation in mm
 
 //only used by 3d_track_visualizer
 tracks_to_plot = "./data/track_lists/01_MMProben_track_list.csv";

@@ -1,3 +1,203 @@
+Restore Functionality:
+persistence of laser_power does not work correctly??
+overwrites laser_power changes in track_list_csv with previous values
+
+persistence works for data_tuples_csv
+but not track_list_csv (quick sol in persistence switch case)
+
+Now the persistence quick sol is overwriting the actual new values for puis_laser
+which are set later in the program
+
+
+-----------------------------------------
+Increase Robustness:
+
+SegFault bei Pfadangabe mit noch nicht erstellten Ordnern
+
+Garbage Values for Coords which are not set
+
+Example:
+G00 X0
+G00 Y0
+G00 Z0
+
+First Y and Z are holding garbage
+Then only Z
+Then none of the cords
+
+--------------
+Punktewolke mit Precision in mm
+
+Nachdenken, da Mismatch zwischen Strecke (Precision in mm) und Bilderanzahl
+In Kurven bremst sie
+
+Wie sollte das Mapping zwischen Tracks und Bildern funktionieren
+
+
+Interpolation erstmal nur linear
+
+
+------------------------------------------
+Add new Features:
+
+Verfahrrichtung der Tracks in Grad
+
+
+Richtungsvektor der Tracks
+in Polarkoordinaten-Repräsentation umformen
+
+
+-> nachschauen wie die Umformung Mathematisch funktioniert.
+
+------------------------------------------
+
+Befehle für Arbeitsfeldrotation hinzufügen
+B23 C=DC(109) F=R8
+
+Check the controller manual: Identify your CNC controller
+(e.g., Siemens 840D, Heidenhain iTNC, Fanuc).
+Look for documentation on the DC function and parametric programming syntax.
+
+treat 'C' 'F' and 'VIT_TIR' as variables, since they use '='
+look in complex mpf's to ensure that this is always the case
+
+
+-----------------
+in set_key_value fn machine_speed and laser_power gets set multiple
+times.
+Maybe copy values instead from data_tuples afterwards when defining the tracks
+
+-----------------
+str_to_float vs atof inconsistency
+
+
+
+
+
+
+
+---------------
+Code Quality:
+Change to-file-printing functions (print to csv),
+to just print every member of the according struct
+in the defined order
+
+Make similar changes all across the proj.
+-> Limit the amount of hand changes that need to be made,
+after adding / removing a feature.
+
+
+-------------------------
+
+
+-----------------
+(Use str_float hashmap for every value
+currently only used for VIT_TIR=1750 assignments so <key>=<value>
+allow multiple delimiters, so either '=' or ' '.
+G00, or X12, just use the switch from char to number as delimiter, which should causes problems,
+since they are naming variables also like "R8", which might just be a register.
+But it will be interpreted as R=8, which is wrong)
+-----------------
+
+Searching for weaknesses:
+Analyse the proj behavior for the new more complex NC code files.
+Seems to work as expected.
+
+
+If we input a path for a output file, where the folders in the path still need to be created, we get a seg fault!!
+An error occured, while trying to open ./data/tuple_lists/MMProben/02_MMProben_data_tuples.csv (in write mode)!
+Segmentation fault (core dumped)
+
+Maybe read NC Code compiler documentation, to learn what syntax is acceptable
+So that our interpreter is comptatible with every coding style
+
+
+-1 lines mpf logic doesn't work anymore / or didn't at all
+
+If a var gets set in the first line of the mpf, it reads value '@', at least with "VIT_TIR=1750."
+1750 gets lost :(
+
+is_in_list should return the index of the word in the list, and on failure -1
+-1 technically works as an index, smarter solution required!!
+
+find a better solution for set_key_value fn, to map the keypos to the keyword / feature
+-----------------
+Refactor read_mpf
+
+Extra function for curvature detection?
+
+Function that takes a line:
+Skips if reads a ';' char
+
+struct with laser_on_off, puis_laser, vit_tir,
+new_P
+
+Should we pass the data_tuples and track_list,
+and set the laser_power, machine_speed and laser_on_off directly
+
+Where do we save the new point?
+Can it be instantly set in read_line or does read_line then become read_mpf
+
+returns which coordinate changed, maybe a 3bit number
+uint8_t
+
+Replace the strstr logic of read_line
+with character wise reading
+------------
+Fix comments:
+Rethink the NC Code interpreter (read_mpf fn)
+
+Does strstr(line, ";") read the whole line at once?
+
+I am not sure if we somehow can get a position from this function
+-> compare the position of the ; with the pos of the command
+
+New Approach:
+Read the line character-wise and if a ';' is read, skip to the next line
+
+------------------------------------
+Add track curvature detection. (tcd)
+
+Must be implemented in read_mpf,
+since we need the subpoints of the track and not only A and B
+------------------------------------------------------------
+Add layer_id als zusatz feature der csv
+Does CYCLE832 get called for every job?
+What is a job? Table rotation setting, Machine Parameter setting?
+-----------------------------------------------------------
+Complex collision logic:
+
+Use horizontal and vertical radius
+(currently only using horizontal collision for all cases)
+
+speciliazed spatial partitioning for curved tracks
+
+precision in mm
+interpolation ->  how many points between
+
+
+
+
+Could be ignored for most NC codes
+(End to End collision)
+
+
+
+The circular bases of the squished cylinders, could collide aswell
+
+
+errlog.txt?
+
+
+
+
+
+
+
+
+----------------------------------------
+Towert PC old ToDo
+
 implement z collision
 analyze x,y area collision
 

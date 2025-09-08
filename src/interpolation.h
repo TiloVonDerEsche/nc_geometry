@@ -45,7 +45,7 @@ void linear_intpol(size_t tl_len, track** tl, Config* config) {
     step_vec = vec_scale(track_dir, config->step_dis);
 
     lip = (vec3D) {0,0,0};
-    printf("Interpolation track %lu...\n", (ti+1));
+    printf("Interpolating track %lu...\n", (ti+1));
 
     while (vec_len(lip) < SE_len) {
       P = vec_add(start,lip);

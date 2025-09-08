@@ -1,4 +1,6 @@
 Restore Functionality:
+Write machine_speed var value to csv's!!
+
 persistence of laser_power does not work correctly??
 overwrites laser_power changes in track_list_csv with previous values
 
@@ -35,13 +37,30 @@ Wie sollte das Mapping zwischen Tracks und Bildern funktionieren
 
 
 Interpolation erstmal nur linear
+DONE!!
 
 
 ------------------------------------------
 Add new Features:
 
 Verfahrrichtung der Tracks in Grad
+In Interpolation Funktion schon vorhanden
+Maybe Verfahrrichtung in intpol_csv mit restlichen Features
+-> intpol_csv wird End-Ergebnis csv
 
+Should I add intpol_point_list as a data_structure, since we
+have a data_structure for tuple, data_t
+-> YES!!
+--------!!!--------
+Copy values of track in interpolation.h lin_intpol fn
+
+Change track t; to track* t;
+To allow changes of t attr
+
+Set vec3D dir_vec in interpolation fn
+
+Convert dir_vec to polar_coords
+--------!!!--------
 
 Richtungsvektor der Tracks
 in Polarkoordinaten-Repräsentation umformen

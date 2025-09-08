@@ -40,6 +40,28 @@ typedef struct {
   vec3D P;
 } plane;
 
+typedef struct {
+  //set by interpolation.h
+  vec3D P; //intpol point
+
+  //copied from track
+  float laser_power;
+  float machine_speed;
+  vec3D coll_vec;
+  float hradius;
+  float vradius;
+
+
+  //set in interpolation fn
+  vec3D dir_vec;
+
+  //direction vec of track in polar coordinate form
+  //direction angles
+  float dir1;
+  float dir2;
+
+} intpol_tuple;
+
 
 typedef struct {
   //set by read_mpf
@@ -52,11 +74,6 @@ typedef struct {
   //set by set_track_radius
   float hradius;
   float vradius;
-
-  //direction vec of track in polar coordinate form
-  //direction angles
-  float dir1;
-  float dir2;
 } track;
 
 typedef struct {

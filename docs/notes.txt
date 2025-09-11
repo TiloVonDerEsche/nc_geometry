@@ -48,3 +48,12 @@ For example, C=DC(359.6191) commands the C-axis to 359.6191° via the shortest p
 Laser-specific commands: LASER_OFF and STOPRE indicate this is a laser machining program.
 STOPRE is often used in Siemens controllers to stop preprocessing (buffering) of NC blocks,
 ensuring precise synchronization.
+
+
+The NC Code that my organization uses seemed quite strange to me aswell,
+since PUIS_LASER uses a space as delimiter, as the only command,
+most the commands use the change from char to number as delimiter,
+and only machine_speed and the angle of the working table: A,B,C commands,
+use a '=' as delimiter. I am not sure why the nc code is so inconsistent,
+since they are using a CNC program to generate it. But I saw people programming by hand,
+so perhaps it is a mix of CNC generation and hand programming, which produces this discrepancy.

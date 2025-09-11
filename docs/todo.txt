@@ -11,8 +11,22 @@ Now the persistence quick sol is overwriting the actual new values for puis_lase
 which are set later in the program
 
 
+Heap Corruption: Your complex character-by-character parsing logic might be overrunning a buffer, such as read_num_buf or token_buf,
+or writing to a corrupted memory location.
+While you're not trying to write past the bounds of tuple_list, some other part of your code may have already corrupted the heap.
+When set_key_value tries to access (*tuple_list)[0], the program's memory management system
+(e.g., the CRT malloc implementation) detects the corruption and terminates the process with a memory-related error,
+which manifests as a segmentation fault.
+
+Stack Corruption: Your recursive parse_line calls, combined with how pointers are being passed and manipulated,
+could lead to stack buffer overflows. A crash in set_key_value could be a symptom of a buffer on the stack being overwritten in a previous call.
+
 -----------------------------------------
 Increase Robustness:
+
+The read_mpf function attempts to use both parse_line for key=value pairs and a manual character-by-character loop for commands.
+This dual-approach is confusing and likely buggy.
+The token_buf and read_num_buf arrays are especially susceptible to off-by-one errors or unintended data manipulation.
 
 SegFault bei Pfadangabe mit noch nicht erstellten Ordnern
 

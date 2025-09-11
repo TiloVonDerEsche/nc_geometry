@@ -51,7 +51,7 @@ void linear_intpol(size_t tl_len, track** tl, Config* config) {
       P = vec_add(start,lip);
 
 
-      printf("(%f, %f, %f)\n",P.x, P.y, P.z);
+      //printf("(%f, %f, %f)\n",P.x, P.y, P.z);
       fprintf(intpol_csv, "%f, %f, %f\n",P.x, P.y, P.z);
 
       //take step on track

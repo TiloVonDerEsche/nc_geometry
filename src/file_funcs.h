@@ -69,7 +69,8 @@ void read_mpf (uint8_t read_all,
 
   //vec3D new_P = {0,0,0};
 
-  uint8_t feat_change = 0b000; //bool x y z
+  //8 bools: using only 7 bit for feature changes
+  uint8_t feat_change = 0;
 
 
   const size_t keywords_len = 8;
@@ -80,8 +81,8 @@ void read_mpf (uint8_t read_all,
     "Z",
     "/LASER_ON",
     "/LASER_OFF",
-    "PUIS_LASER ",
-    "VIT_TIR="
+    "PUIS_LASER "
+    //"VIT_TIR="
   };
 
   printf("Reading %ld lines from %s...\n",config->mpf_lines,config->mpf_file);
@@ -103,6 +104,7 @@ void read_mpf (uint8_t read_all,
 
   char* trimmed;
   //-------
+  float machine_speed = -1;
 
 
 
@@ -130,7 +132,8 @@ void read_mpf (uint8_t read_all,
   //continue as long as the line contains something
   //read mpf linewise
   while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
-
+      //reset feat_change every line
+      feat_change = 0; //TEST
       //printf("lbuf=%s",line_buf);
 
       //use str_float hashmap for variables
@@ -148,7 +151,7 @@ void read_mpf (uint8_t read_all,
 
 
         if (absent) {
-            kh_key(h, k) = strdup(trimmed);}
+            kh_key(h, k) = strdup(key);}
 
         //check if right token is a num or another var
         if (is_part_of_num(value[0])) {
@@ -192,27 +195,33 @@ void read_mpf (uint8_t read_all,
             //printf("keypos=%d, (keypos >= 0)=%s\n",keypos,(keypos >= 0) ? "true" : "false");
             if (keypos >= 0) {
               printf("Saving value %s for key %s with pos=%d...\n",
-              read_num_buf, token_buf, keypos);
+                            read_num_buf, token_buf, keypos);
               set_key_value(keypos,read_num_buf,
                             di, &ti, dtuple_list, track_list,
                             &feat_change);
-            }
 
-            //don't clear read_num_buf btw keyword and number
-            //clear if not inbetween token and buf is filled and not in num
-            if (c != ' ' && read_num_buf[0] != 0) {
-              //printf("Clearing num_buf=%s...\n\n",read_num_buf);
+              keypos = -1;
               read_num_mode = 0;
               memset(read_num_buf, 0, config->max_line_len);
               vi = 0;
             }
+
+            //TEST
+            //don't clear read_num_buf btw keyword and number
+            //clear if not inbetween token and buf is filled and not in num
+            // if (c != ' ' && read_num_buf[0] != 0) {
+            //   //printf("Clearing num_buf=%s...\n\n",read_num_buf);
+            //   read_num_mode = 0;
+            //   memset(read_num_buf, 0, config->max_line_len);
+            //   vi = 0;
+            // }
 
 
             //append char to token
             token_buf[bi] = c;
             bi++;
 
-          //printf("%c\n",c);
+            //printf("%c\n",c);
 
             //printf("Checking %s as keyword...\n",token_buf);
             keypos = is_in_list(token_buf, keywords, keywords_len);
@@ -266,37 +275,41 @@ void read_mpf (uint8_t read_all,
         //ensure persistence
         //copy previous value, if value has not been set in read line
         //G
-        if ((feat_change & 1) == 0) {
-          //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          //puts("G did not change!");
-        }
-        //X
-        if ((feat_change & 2) == 0) {
-          (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          //puts("X did not change!");
-        }
-        //Y
-        if ((feat_change & 4) == 0) {
-          (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
-          //puts("Y did not change!");
-        }
-        //Z
-        if ((feat_change & 8) == 0) {
-          (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
-          //puts("Z did not change!");
-        }
-        //laser_on_off
-        if ((feat_change & 16) == 0) {
-          (*dtuple_list)[di].laser = (*dtuple_list)[di-1].laser;
-          //puts("laser_on_off did not change!");
-        }
-        //laser_power
-        if ((feat_change & 32) == 0) {
-          (*dtuple_list)[di].laser_power = (*dtuple_list)[di-1].laser_power;
+        if (di > 0) {
+          if ((feat_change & 1) == 0) {
+            //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+            //puts("G did not change!");
+          }
+          //X
+          if ((feat_change & 2) == 0) {
+            (*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
+            //puts("X did not change!");
+          }
+          //Y
+          if ((feat_change & 4) == 0) {
+            (*dtuple_list)[di].P.y = (*dtuple_list)[di-1].P.y;
+            //puts("Y did not change!");
+          }
+          //Z
+          if ((feat_change & 8) == 0) {
+            (*dtuple_list)[di].P.z = (*dtuple_list)[di-1].P.z;
+            //puts("Z did not change!");
+          }
+          //laser_on_off
+          if ((feat_change & 16) == 0) {
+            (*dtuple_list)[di].laser = (*dtuple_list)[di-1].laser;
+            //puts("laser_on_off did not change!");
+          }
+          //laser_power
+          if ((feat_change & 32) == 0) {
+            (*dtuple_list)[di].laser_power = (*dtuple_list)[di-1].laser_power;
 
-          if(ti > 0) {
-          (*track_list)[ti].laser_power = (*track_list)[ti-1].laser_power;}
-          //puts("laser_power did not change!");
+            //TEST
+            if(ti > 0) {
+            (*track_list)[ti].laser_power = (*track_list)[ti-1].laser_power;}
+
+            //puts("laser_power did not change!");
+          }
         }
         //machine_speed
         if ((feat_change & 64) == 0) {
@@ -313,7 +326,20 @@ void read_mpf (uint8_t read_all,
 
         // X || Y || Z changed
         if ((feat_change & 14) > 0) {
-          //create new point
+          //create new point / entry in data_tuple csv and list
+
+          //copy var value (hashmap) of machine_speed to dtuple struct obj
+          // k2 = strfloat_get(h, "VIT_TIR"); //get index k of VIT_TIR var
+          // if (k2 < kh_end(h)) {
+          //     //machine_speed = kh_val(h, k2);
+          //     printf("Setting machine_speed=%f",machine_speed);
+          //
+          //     //(*dtuple_list)[di].machine_speed = kh_val(h, k2);
+          // } //TEST
+          // else {
+          //   printf("VIT_TIR key not in hashmap!");
+          // }
+
 
           //printf("Writing new point to csv=%s...\n",config->data_tuples_csv);
           //write point to data_tuples csv
@@ -325,6 +351,8 @@ void read_mpf (uint8_t read_all,
           (*dtuple_list)[di].laser ? "on" : "off",
           (*dtuple_list)[di].laser_power,
           (*dtuple_list)[di].machine_speed);
+
+
 
           feat_change = 0;
 

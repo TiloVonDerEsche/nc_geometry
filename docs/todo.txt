@@ -1,7 +1,33 @@
+Two additional params in config.txt
+
+track_start_margin
+track_end_margin
+-> margin where machine accelerates or decacellerates
+maybe only one param instead, if they are equal?
+track_accel_margin
+
+Implement if conditions, value comparisson (eq,gt,lt,...)
+
+Implement goto statements, which jump to a specified line
+-> make program jump to that line in nc code
+Does it suffice to then just continue as usual?
+
+
+
+
+
+----------
+
+
+
+
 Restore Functionality:
+The changing of feat_change in set_key_value causes the crash
+Might be the usage of feat_change afterwards
+
+
 Write machine_speed var value to csv's!!
 
-persistence of laser_power does not work correctly??
 overwrites laser_power changes in track_list_csv with previous values
 
 persistence works for data_tuples_csv

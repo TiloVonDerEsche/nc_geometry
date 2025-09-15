@@ -196,6 +196,16 @@ void read_mpf (uint8_t read_all,
             if (keypos >= 0) {
               printf("Saving value %s for key %s with pos=%d...\n",
                             read_num_buf, token_buf, keypos);
+
+              if (vi < config->max_line_len) {
+                read_num_buf[vi] = '\0';}
+              else {
+                fprintf(stderr, "vi >= config->max_line_len\n"
+                                "Meaning read_num_buf was overflown!\n"
+                                "Exiting the program...\n");
+                exit(-1);
+              }
+
               set_key_value(keypos,read_num_buf,
                             di, &ti, dtuple_list, track_list,
                             &feat_change);
@@ -220,6 +230,7 @@ void read_mpf (uint8_t read_all,
             //append char to token
             token_buf[bi] = c;
             bi++;
+            token_buf[bi] = '\0';
 
             //printf("%c\n",c);
 
@@ -314,7 +325,7 @@ void read_mpf (uint8_t read_all,
         //machine_speed
         if ((feat_change & 64) == 0) {
           //(*dtuple_list)[di].P.x = (*dtuple_list)[di-1].P.x;
-          //puts("machine_speed did not change!");
+          puts("machine_speed did not change!");
         }
 
         // if (feat_change > 127) {
@@ -331,10 +342,10 @@ void read_mpf (uint8_t read_all,
           //copy var value (hashmap) of machine_speed to dtuple struct obj
           // k2 = strfloat_get(h, "VIT_TIR"); //get index k of VIT_TIR var
           // if (k2 < kh_end(h)) {
-          //     //machine_speed = kh_val(h, k2);
+          //     machine_speed = kh_val(h, k2);
           //     printf("Setting machine_speed=%f",machine_speed);
           //
-          //     //(*dtuple_list)[di].machine_speed = kh_val(h, k2);
+          //     (*dtuple_list)[di].machine_speed = kh_val(h, k2);
           // } //TEST
           // else {
           //   printf("VIT_TIR key not in hashmap!");

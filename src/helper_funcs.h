@@ -182,6 +182,11 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
   return FQ;
 }
 
+void skip_spaces(char** char_ptr) {
+  while (isspace((unsigned char)**char_ptr)) { //TEST
+      char_ptr++;}
+}
+
 
 // Function to trim leading and trailing whitespaces and quotes from a string
 char* trim(char* str) {
@@ -243,6 +248,32 @@ uint8_t str_to_uint8(const char* str) {
   }
 
   return result;
+}
+
+bool is_valid_varname(const char* name) {
+    char c;
+    for (int i = 0; name[i] != '\0'; i++) {
+        c = name[i];
+        if ( !(isalnum(c) || c == '_') ) {
+            //invalid variable name
+            return false;
+        }
+    }
+    // All characters passed the check
+    return true;
+}
+
+bool is_valid_literal(const char* lit) {
+  char c;
+  for (int i = 0; name[i] != '\0'; i++) {
+      c = name[i];
+      if ( !(is_part_of_num(c)) ) {
+          //invalid variable name
+          return false;
+      }
+  }
+  // All characters passed the check
+  return true;
 }
 
 

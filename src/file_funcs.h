@@ -33,6 +33,20 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   }
 }
 
+
+void print_hashmap(strfloat_t* h) {
+  //Print all variables from hashmap
+  khint_t k;
+  puts("-----");
+  kh_foreach(h, k) {
+      if (k < kh_end(h)) {  // Check if found (k != end iterator)
+          printf("var %s=%f\n", kh_key(h, k), kh_val(h, k));
+      }
+  }
+  puts("-----");
+}
+
+
 void read_mpf (uint8_t read_all,
   data_tuple** dtuple_list, track** track_list, size_t* tl_len,
   Config* config){
@@ -84,8 +98,10 @@ void read_mpf (uint8_t read_all,
   //str_float hashmap for variables
   puts("Initializing str_float_map...");
   strfloat_t* h = strfloat_init();  // Create hashmap
-  strfloat_put(h, "laser", &absent); //TEST does this work?
 
+  puts("Writing laser key to hashmap...");
+  strfloat_put(h, "laser", &absent);
+  print_hashmap(h);
 
   int keypos = -1;
 
@@ -128,7 +144,7 @@ void read_mpf (uint8_t read_all,
 
 
           int i = 0;
-          while (isalnum((unsigned char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
+          while (isalpha((unsigned char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
               keyword_buf[i++] = *char_ptr++;}
           keyword_buf[i] = '\0';
 
@@ -137,12 +153,15 @@ void read_mpf (uint8_t read_all,
           //ToDo: check keyword validity?
 
           //add keyword in buf to hashmap
+          printf("Adding keyword %s to hashmap...",keyword_buf);
           khint_t k;
           k = strfloat_put(h, keyword_buf, &absent);
 
           if (absent) {
               kh_key(h, k) = strdup(keyword_buf);}
           //----
+          puts("Current hashmap:");
+          print_hashmap(h);
 
           if (i == 0) { // No keyword found, maybe just a number or symbol
               char_ptr++; continue;}
@@ -220,20 +239,9 @@ void read_mpf (uint8_t read_all,
   fclose(dtuple_csv);
   printf("Points from %s, were saved in %s!\n",config->mpf_file,config->data_tuples_csv);
 
-
-  //-----str_float variable hashmap
-
-  //Print all variables from hashmap
-  khint_t k;
-  puts("-----");
-  kh_foreach(h, k) {
-      if (k < kh_end(h)) {  // Check if found (k != end iterator)
-          printf("var %s=%f\n", kh_key(h, k), kh_val(h, k));
-      }
-  }
-  puts("-----");
-
+  print_hashmap(h);
   //Cleanup str_float variable hashmap
+  khint_t k;
   kh_foreach(h, k) {
       free((char*)kh_key(h, k));  // Free duplicated strings
   }

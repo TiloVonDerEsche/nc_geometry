@@ -250,33 +250,6 @@ uint8_t str_to_uint8(const char* str) {
   return result;
 }
 
-bool is_valid_varname(const char* name) {
-    char c;
-    for (int i = 0; name[i] != '\0'; i++) {
-        c = name[i];
-        if ( !(isalnum(c) || c == '_') ) {
-            //invalid variable name
-            return false;
-        }
-    }
-    // All characters passed the check
-    return true;
-}
-
-bool is_valid_literal(const char* lit) {
-  char c;
-  for (int i = 0; name[i] != '\0'; i++) {
-      c = name[i];
-      if ( !(is_part_of_num(c)) ) {
-          //invalid variable name
-          return false;
-      }
-  }
-  // All characters passed the check
-  return true;
-}
-
-
 uint8_t is_part_of_num(char c) {
     if (c >= '0' && c <= '9') {
         return 1;
@@ -289,6 +262,34 @@ uint8_t is_part_of_num(char c) {
 
     return 0;
 }
+
+
+uint8_t is_valid_varname(const char* name) {
+    char c;
+    for (int i = 0; name[i] != '\0'; i++) {
+        c = name[i];
+        if ( !(isalnum(c) || c == '_') ) {
+            //invalid variable name
+            return 0;
+        }
+    }
+    // All characters passed the check
+    return 1;
+}
+
+uint8_t is_valid_literal(const char* lit) {
+  char c;
+  for (int i = 0; lit[i] != '\0'; i++) {
+      c = lit[i];
+      if ( !(is_part_of_num(c)) ) {
+          //invalid variable name
+          return 0;
+      }
+  }
+  // All characters passed the check
+  return 1;
+}
+
 
 
 int is_in_list(const char* str, const char** list, size_t list_size) {

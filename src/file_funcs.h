@@ -79,21 +79,23 @@ void read_mpf (uint8_t read_all,
   //----------------------NC Code Interpreter Reading Loop--------------------//
   //////////////////////////////////////////////////////////////////////////////
 
+  int absent;
+
   //str_float hashmap for variables
   puts("Initializing str_float_map...");
   strfloat_t* h = strfloat_init();  // Create hashmap
+  strfloat_put(h, "laser", &absent); //TEST does this work?
 
-  int absent;
+
   int keypos = -1;
 
   //hashmap indices
   khint_t kl; //index left token
   khint_t kr; //index right token
 
-  size_t ti = 0; //track id
-  size_t di = 0; //data_tuple id
-  size_t bi = 0;
-  size_t vi = 0;
+  size_t ti = 0; //track id / index
+  size_t di = 0; //data_tuple id / index
+  size_t li = 0; //line index
 
   uint8_t feat_change = 0; //8bit bool for feature changes
   //uint8_t read_num_mode = 0;
@@ -135,6 +137,7 @@ void read_mpf (uint8_t read_all,
           //ToDo: check keyword validity?
 
           //add keyword in buf to hashmap
+          khint_t k;
           k = strfloat_put(h, keyword_buf, &absent);
 
           if (absent) {
@@ -152,18 +155,18 @@ void read_mpf (uint8_t read_all,
 
               //read right token
               while
-              (is_part_of_num((unsigned char)*char_ptr) ||
-                isalnum((unsigned char)*char_ptr) ||
+              (is_part_of_num((char)*char_ptr) ||
+                isalnum((char)*char_ptr) ||
                 *char_ptr == '_') {
                   value_buf[i++] = *char_ptr++;}
               value_buf[i] = '\0';
 
 
               //check if value is a literal or another var
-              if(is_valid_literal(value_buf) {
-                kh_val(h, kl) = atof(value);}
+              if(is_valid_literal(value_buf)) {
+                kh_val(h, kl) = atof(value_buf);}
               else if( is_valid_varname(value_buf) ) {
-                kr = strfloat_get(h, value); //lookup value of right var
+                kr = strfloat_get(h, value_buf); //lookup value of right var
 
                 if (kr < kh_end(h)) {
                     kh_val(h, kl) = kh_val(h, kr);}
@@ -176,18 +179,37 @@ void read_mpf (uint8_t read_all,
               }
 
 
-          } else if (is_part_of_num(*char_ptr)) {
+          } else if (is_part_of_num((char)*char_ptr)) {
               // It's a command with a number
+
+
               // ... read number into value_buf ...
-              // call set_key_value(keyword_buf, value_buf, ...)
-          } else {
-              // It's a standalone command like /LASER_ON
-              // call set_key_value(keyword_buf, "", ...)
+              while (is_part_of_num((char)*char_ptr)) {
+                  value_buf[i++] = *char_ptr++;}
+              value_buf[i] = '\0';
+
+              //save value in hashmap
+              //ToDo: add isfloat check
+              //(f.e. "..." would be a valid float for is_part_of_num)
+              kh_val(h, kl) = atof(value_buf);
+          } else if ((keyword_buf[0]) == '/') { //Special '/' cmds
+
+              khint_t k = strfloat_get(h, "laser");
+              if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
+                kh_val(h, k) = 1;}
+              else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
+                kh_val(h, k) = 0;}
+              //save laser status in "laser" = 0 || 1 entry
+          }
+          else {
+            fprintf(stderr,"Weird command?!");
           }
 
       }
 
       // ... handle feat_change logic after this line ...
+
+      li++;
   }
 
   //save the length of tl (track_list) arr in tl_len
@@ -202,6 +224,7 @@ void read_mpf (uint8_t read_all,
   //-----str_float variable hashmap
 
   //Print all variables from hashmap
+  khint_t k;
   puts("-----");
   kh_foreach(h, k) {
       if (k < kh_end(h)) {  // Check if found (k != end iterator)

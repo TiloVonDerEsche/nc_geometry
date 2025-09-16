@@ -122,7 +122,6 @@ void read_mpf (uint8_t read_all,
       while (*char_ptr != '\0' && *char_ptr != ';') {
 
           skip_spaces(&char_ptr);
-
           if (*char_ptr == '\0' || *char_ptr == ';') break;
 
 
@@ -131,6 +130,17 @@ void read_mpf (uint8_t read_all,
               keyword_buf[i++] = *char_ptr++;}
           keyword_buf[i] = '\0';
 
+          //keyword_buf="VIT_TIR"
+
+          //ToDo: check keyword validity?
+
+          //add keyword in buf to hashmap
+          k = strfloat_put(h, keyword_buf, &absent);
+
+          if (absent) {
+              kh_key(h, k) = strdup(keyword_buf);}
+          //----
+
           if (i == 0) { // No keyword found, maybe just a number or symbol
               char_ptr++; continue;}
 
@@ -138,10 +148,9 @@ void read_mpf (uint8_t read_all,
 
           // Check for delimiter
           if (*char_ptr == '=') {
-              // It's a variable assignment
               char_ptr++; // Move past '='
 
-              //read value on right side of '='
+              //read right token
               while
               (is_part_of_num((unsigned char)*char_ptr) ||
                 isalnum((unsigned char)*char_ptr) ||
@@ -152,13 +161,14 @@ void read_mpf (uint8_t read_all,
 
               //check if value is a literal or another var
               if(is_valid_literal(value_buf) {
-                kh_val(h, kl) = atof(value);
-              } else if( is_valid_varname(value_buf) ) {
-                kr = strfloat_get(h, value);
+                kh_val(h, kl) = atof(value);}
+              else if( is_valid_varname(value_buf) ) {
+                kr = strfloat_get(h, value); //lookup value of right var
 
                 if (kr < kh_end(h)) {
                     kh_val(h, kl) = kh_val(h, kr);}
-              } else {
+              }
+              else {
                 fprintf(stderr,
                   "Line %lu:"
                   "Token on the right of '=' is neither a valid literal or varname!",
@@ -166,13 +176,6 @@ void read_mpf (uint8_t read_all,
               }
 
 
-
-
-                //lookup value of var
-
-              }
-
-              //handle hashmap logic ...
           } else if (is_part_of_num(*char_ptr)) {
               // It's a command with a number
               // ... read number into value_buf ...

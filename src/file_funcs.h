@@ -116,11 +116,13 @@ void read_mpf (uint8_t read_all,
   uint8_t feat_change = 0; //8bit bool for feature changes
   //uint8_t read_num_mode = 0;
   uint8_t laser_on_off = 0;
+  uint8_t isvarname = 0;
 
   char line_buf[config->max_line_len];
   char token_buf[config->max_line_len];
   char read_num_buf[config->max_line_len];
   char keyword_buf[config->max_line_len];
+  char varname_buf[config->max_line_len];
   char value_buf[config->max_line_len];
 
   char* key;
@@ -132,11 +134,13 @@ void read_mpf (uint8_t read_all,
   float puis_laser = 0; //laser_power
   float vit_tir = 0; //machine_speed
 
+  //linewise loop
   while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
       feat_change = 0;
       char_ptr = line_buf; //start of the line
 
 
+      //charwise loop
       while (*char_ptr != '\0' && *char_ptr != ';') {
 
           skip_spaces(&char_ptr);
@@ -144,13 +148,23 @@ void read_mpf (uint8_t read_all,
 
 
           int i = 0;
-          while (isalpha((unsigned char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
-              keyword_buf[i++] = *char_ptr++;}
-          keyword_buf[i] = '\0';
+          int j = 0;
+          while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
+              if (!isvarname && isdigit((char)*char_ptr)) {isvarname=1;}
+              if (isvarname) {varname_buf[i++] = *char_ptr++;}
+              else {keyword_buf[j++] = *char_ptr++;}}
+          varname_buf[i] = '\0';
+          keyword_buf[j] = '\0';
 
           //keyword_buf="VIT_TIR"
 
           //ToDo: check keyword validity?
+          if (isvarname) {
+            if (is_valid_varname(keyword_buf)) {
+              printf("%s is a valid varname!\n",keyword_buf);}
+            else {
+              printf("%s is NOT a valid varname!\n",keyword_buf);}
+          }
 
           //add keyword in buf to hashmap
           printf("Adding keyword %s to hashmap...",keyword_buf);

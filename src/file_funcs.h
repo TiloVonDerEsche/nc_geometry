@@ -164,6 +164,9 @@ void read_mpf (uint8_t read_all,
             varname_buf[i] = '\0';
             keyword_buf[j] = '\0';
 
+            printf("varname_buf=%s\n",varname_buf);
+            printf("keyword_buf=%s\n",keyword_buf);
+
             //keyword_buf="VIT_TIR"
 
             //ToDo: check if there is a '=' after the potential varname
@@ -171,7 +174,6 @@ void read_mpf (uint8_t read_all,
             //ToDo: check keyword validity?
             if (isvarname) {
               if (is_valid_varname(keyword_buf)) {
-
                 printf("%s is a valid varname!\n",keyword_buf);}
               else {
                 printf("%s is NOT a valid varname!\n",keyword_buf);}
@@ -245,7 +247,11 @@ void read_mpf (uint8_t read_all,
                 //save laser status in "laser" = 0 || 1 entry
             }
             else {
-              fprintf(stderr,"Weird command?!");
+              puts("\n--------------");
+              fprintf(stderr,"Command does not start with '/',\n"
+                             "Is neither a cmd followed by a num,\n"
+                             "Nor is a variable assignment!\n");
+              puts("--------------\n");
             }
 
         }

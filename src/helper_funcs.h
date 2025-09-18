@@ -268,7 +268,7 @@ uint8_t is_valid_varname(const char* name) {
     char c;
     for (int i = 0; name[i] != '\0'; i++) {
         c = name[i];
-        if ( !(isalnum(c) || c == '_') ) {
+        if ( !(isalnum(c) || c == '_') || c == ' ' || c == '\0' || c == '\n') {
             //invalid variable name
             return 0;
         }

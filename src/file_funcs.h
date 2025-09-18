@@ -140,104 +140,115 @@ void read_mpf (uint8_t read_all,
       char_ptr = line_buf; //start of the line
 
 
-      //charwise loop
+      //token loop (full line)
       while (*char_ptr != '\0' && *char_ptr != ';') {
 
-          skip_spaces(&char_ptr);
-          if (*char_ptr == '\0' || *char_ptr == ';') break;
+        if (*char_ptr == '\0' || *char_ptr == ';') break;
+
+        //single command char loop
+        while (*char_ptr != '\0' && *char_ptr != ';') {
+
+            if (*char_ptr == '\0' || *char_ptr == ';') break;
 
 
-          int i = 0;
-          int j = 0;
-          while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
-              if (!isvarname && isdigit((char)*char_ptr)) {isvarname=1;}
-              if (isvarname) {varname_buf[i++] = *char_ptr++;}
-              else {keyword_buf[j++] = *char_ptr++;}}
-          varname_buf[i] = '\0';
-          keyword_buf[j] = '\0';
+            //read one token-> either a cmd keyword or varname
+            int i = 0;
+            int j = 0;
+            while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
+                if (!isvarname && isdigit((char)*char_ptr)) {
+                  isvarname=1;}
+                if (isvarname) {
+                  varname_buf[i++] = *char_ptr++;}
+                else {
+                  keyword_buf[j++] = *char_ptr++;}}
+            varname_buf[i] = '\0';
+            keyword_buf[j] = '\0';
 
-          //keyword_buf="VIT_TIR"
+            //keyword_buf="VIT_TIR"
 
-          //ToDo: check keyword validity?
-          if (isvarname) {
-            if (is_valid_varname(keyword_buf)) {
-              printf("%s is a valid varname!\n",keyword_buf);}
-            else {
-              printf("%s is NOT a valid varname!\n",keyword_buf);}
-          }
+            //ToDo: check if there is a '=' after the potential varname
 
-          //add keyword in buf to hashmap
-          printf("Adding keyword %s to hashmap...",keyword_buf);
-          khint_t k;
-          k = strfloat_put(h, keyword_buf, &absent);
+            //ToDo: check keyword validity?
+            if (isvarname) {
+              if (is_valid_varname(keyword_buf)) {
 
-          if (absent) {
-              kh_key(h, k) = strdup(keyword_buf);}
-          //----
-          puts("Current hashmap:");
-          print_hashmap(h);
-
-          if (i == 0) { // No keyword found, maybe just a number or symbol
-              char_ptr++; continue;}
-
-          skip_spaces(&char_ptr);
-
-          // Check for delimiter
-          if (*char_ptr == '=') {
-              char_ptr++; // Move past '='
-
-              //read right token
-              while
-              (is_part_of_num((char)*char_ptr) ||
-                isalnum((char)*char_ptr) ||
-                *char_ptr == '_') {
-                  value_buf[i++] = *char_ptr++;}
-              value_buf[i] = '\0';
-
-
-              //check if value is a literal or another var
-              if(is_valid_literal(value_buf)) {
-                kh_val(h, kl) = atof(value_buf);}
-              else if( is_valid_varname(value_buf) ) {
-                kr = strfloat_get(h, value_buf); //lookup value of right var
-
-                if (kr < kh_end(h)) {
-                    kh_val(h, kl) = kh_val(h, kr);}
-              }
+                printf("%s is a valid varname!\n",keyword_buf);}
               else {
-                fprintf(stderr,
-                  "Line %lu:"
-                  "Token on the right of '=' is neither a valid literal or varname!",
-                  li);
-              }
+                printf("%s is NOT a valid varname!\n",keyword_buf);}
+            }
+
+            //add keyword in buf to hashmap
+            printf("Adding keyword %s to hashmap...\n",keyword_buf);
+            khint_t k;
+            k = strfloat_put(h, keyword_buf, &absent);
+
+            if (absent) {
+                kh_key(h, k) = strdup(keyword_buf);}
+            //----
+            puts("Current hashmap:");
+            print_hashmap(h);
+
+            if (i == 0) { // No keyword found, maybe just a number or symbol
+                char_ptr++; continue;}
+
+            // Check for delimiter
+            if (*char_ptr == '=') {
+                char_ptr++; // Move past '='
+
+                //read right token
+                while
+                (is_part_of_num((char)*char_ptr) ||
+                  isalnum((char)*char_ptr) ||
+                  *char_ptr == '_') {
+                    value_buf[i++] = *char_ptr++;}
+                value_buf[i] = '\0';
 
 
-          } else if (is_part_of_num((char)*char_ptr)) {
-              // It's a command with a number
+                //check if value is a literal or another var
+                if(is_valid_literal(value_buf)) {
+                  kh_val(h, kl) = atof(value_buf);}
+                else if(is_valid_varname(value_buf)) {
+                  kr = strfloat_get(h, value_buf); //lookup value of right var
+
+                  //give left var value of right var
+                  if (kr < kh_end(h)) {
+                      kh_val(h, kl) = kh_val(h, kr);}
+                }
+                else {
+                  fprintf(stderr,
+                    "Line %lu: "
+                    "Token on the right of '=' is neither a valid literal or varname!",
+                    (li+1));
+                }
 
 
-              // ... read number into value_buf ...
-              while (is_part_of_num((char)*char_ptr)) {
-                  value_buf[i++] = *char_ptr++;}
-              value_buf[i] = '\0';
+            } else if (is_part_of_num((char)*char_ptr)) {
+                // It's a command with a number
 
-              //save value in hashmap
-              //ToDo: add isfloat check
-              //(f.e. "..." would be a valid float for is_part_of_num)
-              kh_val(h, kl) = atof(value_buf);
-          } else if ((keyword_buf[0]) == '/') { //Special '/' cmds
 
-              khint_t k = strfloat_get(h, "laser");
-              if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
-                kh_val(h, k) = 1;}
-              else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
-                kh_val(h, k) = 0;}
-              //save laser status in "laser" = 0 || 1 entry
-          }
-          else {
-            fprintf(stderr,"Weird command?!");
-          }
+                // ... read number into value_buf ...
+                while (is_part_of_num((char)*char_ptr)) {
+                    value_buf[i++] = *char_ptr++;}
+                value_buf[i] = '\0';
 
+                //save value in hashmap
+                //ToDo: add isfloat check
+                //(f.e. "..." would be a valid float for is_part_of_num)
+                kh_val(h, kl) = atof(value_buf);
+            } else if ((keyword_buf[0]) == '/') { //Special '/' cmds
+
+                khint_t k = strfloat_get(h, "laser");
+                if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
+                  kh_val(h, k) = 1;}
+                else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
+                  kh_val(h, k) = 0;}
+                //save laser status in "laser" = 0 || 1 entry
+            }
+            else {
+              fprintf(stderr,"Weird command?!");
+            }
+
+        }
       }
 
       // ... handle feat_change logic after this line ...

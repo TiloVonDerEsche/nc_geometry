@@ -170,14 +170,22 @@ void read_mpf (uint8_t read_all,
 
                 char_ptr++; // Move past '='
 
+
                 //read right token
+                size_t i = 0;
                 while
                 (is_part_of_num((char)*char_ptr) ||
-                  isalnum((char)*char_ptr) ||
-                  *char_ptr == '_') {
-                    value_buf[i++] = *char_ptr++;}
+                        isalnum((char)*char_ptr) ||
+                               *char_ptr == '_') {
+                    printf("(char)*char_ptr=%c\n",(char)*char_ptr);
+                    value_buf[i++] = *char_ptr++;
+                    printf("value_buf=%s\n",value_buf);
+                }
                 value_buf[i] = '\0';
 
+                puts("-----");
+                printf("Read %s=%s\n",keyword_buf,value_buf);
+                puts("-----");
 
                 //check if value is a literal or another var
                 if(is_valid_literal(value_buf)) {
@@ -188,10 +196,6 @@ void read_mpf (uint8_t read_all,
                   //give left var value of right var
                   if (kr < kh_end(h)) {
                       kh_val(h, kl) = kh_val(h, kr);}
-
-                  //----Done----
-                  puts("Current hashmap:");
-                  print_hashmap(h);
                 }
                 else {
                   fprintf(stderr,
@@ -200,7 +204,9 @@ void read_mpf (uint8_t read_all,
                     (li+1));
                 }
 
-
+                //----Done----
+                puts("Current hashmap:");
+                print_hashmap(h);
             } else if (is_part_of_num((char)*char_ptr)) {
                 // It's a command with a number
 

@@ -1,3 +1,6 @@
+Allow R8=-R7 expressions.
+Lookup value of R7 and negate it 
+
 Improve is_valid_literal fn.
 ".." "eeeeeeeeeee" are valid literals.
 

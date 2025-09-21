@@ -265,16 +265,19 @@ uint8_t is_part_of_num(char c) {
 
 
 uint8_t is_valid_varname(const char* name) {
+    uint8_t onechar = 0; //at least one char bool
     char c;
     for (int i = 0; name[i] != '\0'; i++) {
         c = name[i];
+        if(!onechar && isalpha(c)) {onechar=1;}
         if ( !(isalnum(c) || c == '_') || c == ' ' || c == '\0' || c == '\n') {
             //invalid variable name
             return 0;
         }
     }
-    // All characters passed the check
-    return 1;
+    //at least one char in varname
+    if (onechar) {return 1;}
+    return 0; //no chars in varname
 }
 
 uint8_t is_valid_literal(const char* lit) {

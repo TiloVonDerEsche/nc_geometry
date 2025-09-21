@@ -99,10 +99,6 @@ void read_mpf (uint8_t read_all,
   puts("Initializing str_float_map...");
   strfloat_t* h = strfloat_init();  // Create hashmap
 
-  puts("Writing laser key to hashmap...");
-  strfloat_put(h, "laser", &absent);
-  print_hashmap(h);
-
   int keypos = -1;
 
   //hashmap indices
@@ -155,46 +151,23 @@ void read_mpf (uint8_t read_all,
             int i = 0;
             int j = 0;
             while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
-                if (!isvarname && isdigit((char)*char_ptr)) {
-                  isvarname=1;}
-                if (isvarname) {
-                  varname_buf[i++] = *char_ptr++;}
-                else {
-                  keyword_buf[j++] = *char_ptr++;}}
-            varname_buf[i] = '\0';
-            keyword_buf[j] = '\0';
-
-            printf("varname_buf=%s\n",varname_buf);
+                keyword_buf[i++] = *char_ptr++;}
+            keyword_buf[i] = '\0';
             printf("keyword_buf=%s\n",keyword_buf);
-
-            //keyword_buf="VIT_TIR"
-
-            //ToDo: check if there is a '=' after the potential varname
-
-            //ToDo: check keyword validity?
-            if (isvarname) {
-              if (is_valid_varname(keyword_buf)) {
-                printf("%s is a valid varname!\n",keyword_buf);}
-              else {
-                printf("%s is NOT a valid varname!\n",keyword_buf);}
-            }
-
-            //add keyword in buf to hashmap
-            printf("Adding keyword %s to hashmap...\n",keyword_buf);
-            khint_t k;
-            k = strfloat_put(h, keyword_buf, &absent);
-
-            if (absent) {
-                kh_key(h, k) = strdup(keyword_buf);}
-            //----
-            puts("Current hashmap:");
-            print_hashmap(h);
 
             if (i == 0) { // No keyword found, maybe just a number or symbol
                 char_ptr++; continue;}
 
             // Check for delimiter
             if (*char_ptr == '=') {
+                //add left token (varname) as a hashmap key
+                printf("Adding keyword %s to hashmap...\n",keyword_buf);
+                kl = strfloat_put(h, keyword_buf, &absent);
+
+                if (absent) {
+                  kh_key(h, kl) = strdup(keyword_buf);}
+                //----
+
                 char_ptr++; // Move past '='
 
                 //read right token
@@ -215,6 +188,10 @@ void read_mpf (uint8_t read_all,
                   //give left var value of right var
                   if (kr < kh_end(h)) {
                       kh_val(h, kl) = kh_val(h, kr);}
+
+                  //----Done----
+                  puts("Current hashmap:");
+                  print_hashmap(h);
                 }
                 else {
                   fprintf(stderr,
@@ -239,18 +216,18 @@ void read_mpf (uint8_t read_all,
                 kh_val(h, kl) = atof(value_buf);
             } else if ((keyword_buf[0]) == '/') { //Special '/' cmds
 
-                khint_t k = strfloat_get(h, "laser");
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
-                  kh_val(h, k) = 1;}
+                  //set_key_value
+                }
                 else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
-                  kh_val(h, k) = 0;}
-                //save laser status in "laser" = 0 || 1 entry
+                  //set_key_value
+                }
             }
             else {
               puts("\n--------------");
-              fprintf(stderr,"Command does not start with '/',\n"
+              fprintf(stderr,"Read Keyword:'%s' does not start with '/',\n"
                              "Is neither a cmd followed by a num,\n"
-                             "Nor is a variable assignment!\n");
+                             "Nor is a variable assignment!\n",keyword_buf);
               puts("--------------\n");
             }
 

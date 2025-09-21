@@ -1,7 +1,5 @@
-Improve is_valid_varname function.
-Check if at least one character is used.
-"14" and "__" are currently valid variable names!
-
+Improve is_valid_literal fn.
+".." "eeeeeeeeeee" are valid literals.
 
 Understand why only one command is read per line (the first)
 

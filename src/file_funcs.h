@@ -60,6 +60,22 @@ void read_mpf (uint8_t read_all,
       return;
   }
 
+
+  char program[config->max_line_len][config->mpf_lines];
+  char line_buf[config->max_line_len];
+
+  size_t mi = 0;
+  while (fgets(line_buf, config->max_line_len, mpf) != NULL) {
+    strcpy(program[mi],line_buf);
+    printf("Copied %s to program[%lu]\n",line_buf,mi);
+    mi++;
+  }
+  fclose(mpf);
+  size_t line_num = mi+1;
+
+
+
+
   //open csv file for writing the data_tuples there
   FILE* dtuple_csv = fopen(config->data_tuples_csv, "w"); // or "a" to append
   if (dtuple_csv == NULL){
@@ -114,7 +130,7 @@ void read_mpf (uint8_t read_all,
   uint8_t laser_on_off = 0;
   uint8_t isvarname = 0;
 
-  char line_buf[config->max_line_len];
+
   char token_buf[config->max_line_len];
   char read_num_buf[config->max_line_len];
   char keyword_buf[config->max_line_len];
@@ -131,21 +147,18 @@ void read_mpf (uint8_t read_all,
   float vit_tir = 0; //machine_speed
 
   //linewise loop
-  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (di < config->mpf_lines || read_all)) {
+  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (li < config->mpf_lines || read_all)) {
+
+
       feat_change = 0;
       char_ptr = line_buf; //start of the line
 
 
-      //token loop (full line)
-      while (*char_ptr != '\0' && *char_ptr != ';') {
 
-        if (*char_ptr == '\0' || *char_ptr == ';') break;
+      //single command char loop
+      while (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr == '\n') {
 
-        //single command char loop
-        while (*char_ptr != '\0' && *char_ptr != ';') {
-
-            if (*char_ptr == '\0' || *char_ptr == ';') break;
-
+          if (*char_ptr == '\0' || *char_ptr == ';' || *char_ptr == '\n') break;
 
             //read one token-> either a cmd keyword or varname
             int i = 0;
@@ -177,9 +190,7 @@ void read_mpf (uint8_t read_all,
                 (is_part_of_num((char)*char_ptr) ||
                         isalnum((char)*char_ptr) ||
                                *char_ptr == '_') {
-                    printf("(char)*char_ptr=%c\n",(char)*char_ptr);
                     value_buf[i++] = *char_ptr++;
-                    printf("value_buf=%s\n",value_buf);
                 }
                 value_buf[i] = '\0';
 
@@ -207,9 +218,17 @@ void read_mpf (uint8_t read_all,
                 //----Done----
                 puts("Current hashmap:");
                 print_hashmap(h);
-            } else if (is_part_of_num((char)*char_ptr)) {
+            }
+            else if (is_part_of_num((char)*(char_ptr-1))) {
                 // It's a command with a number
+                puts("COMMAND WITH NUMBER");
+                printf("%c");
 
+                //rewind char_ptr to begin of num
+                while (!isalpha((char)*char_ptr)){
+                  printf("CWN:%c\n",*char_ptr);
+                  *(char_ptr--);
+                }
 
                 // ... read number into value_buf ...
                 while (is_part_of_num((char)*char_ptr)) {
@@ -220,7 +239,8 @@ void read_mpf (uint8_t read_all,
                 //ToDo: add isfloat check
                 //(f.e. "..." would be a valid float for is_part_of_num)
                 kh_val(h, kl) = atof(value_buf);
-            } else if ((keyword_buf[0]) == '/') { //Special '/' cmds
+            }
+            else if ((keyword_buf[0]) == '/') { //Special '/' cmds
 
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
                   //set_key_value
@@ -237,19 +257,19 @@ void read_mpf (uint8_t read_all,
               puts("--------------\n");
             }
 
-        }
+
       }
 
       // ... handle feat_change logic after this line ...
 
       li++;
+
   }
 
   //save the length of tl (track_list) arr in tl_len
   (*tl_len) = ti;
 
   //close the mpf file
-  fclose(mpf);
   fclose(dtuple_csv);
   printf("Points from %s, were saved in %s!\n",config->mpf_file,config->data_tuples_csv);
 

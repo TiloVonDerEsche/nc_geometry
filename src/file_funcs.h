@@ -90,9 +90,9 @@ void read_mpf (
   fclose(mpf);
 
 
-  for (size_t li = 0; li < config->lines_to_read; li++) {
-    printf("program[%lu]=%s\n",li,program[li]);
-  }
+  // for (size_t li = 0; li < config->lines_to_read; li++) {
+  //   printf("program[%lu]=%s\n",li,program[li]);
+  // }
 
 
 
@@ -167,18 +167,27 @@ void read_mpf (
   float vit_tir = 0; //machine_speed
 
   //linewise loop
-  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (li < config->mpf_lines)) {
+  for (size_t li = 0; li < config->lines_to_read; li++) {
+      char_ptr = program[li]; //set to start of line
 
-
+      printf("program[%lu]=%s",li,program[li]);
+      printf("*char_ptr=%c\n",*char_ptr);
       feat_change = 0;
-      char_ptr = line_buf; //start of the line
-
 
 
       //single command char loop
-      while (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr == '\n') {
+      // printf("((*char_ptr != '\\0') && (*char_ptr != ';') && (*char_ptr != '\\n'))=%u\n"
+      //        "(*char_ptr != '\\0')=%u\n"
+      //        "(*char_ptr != ';')=%u\n"
+      //        "(*char_ptr != '\\n')=%u\n",
+      //         ((*char_ptr != '\0') && (*char_ptr != ';') && (*char_ptr != '\n')),
+      //         (*char_ptr != '\0'),(*char_ptr != ';'),(*char_ptr != '\n'));
+      while (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr != '\n') {
+          printf("*char_ptr=%c\n",*char_ptr);
 
-          if (*char_ptr == '\0' || *char_ptr == ';' || *char_ptr == '\n') break;
+          if (*char_ptr == '\0' || *char_ptr == ';' || *char_ptr == '\n') {break;}
+
+
 
             //read one token-> either a cmd keyword or varname
             int i = 0;
@@ -191,8 +200,8 @@ void read_mpf (
             if (i == 0) { // No keyword found, maybe just a number or symbol
                 char_ptr++; continue;}
 
-            // Check for delimiter
-            if (*char_ptr == '=') {
+
+            if (*char_ptr == '=') { //variable assignment
                 //add left token (varname) as a hashmap key
                 printf("Adding keyword %s to hashmap...\n",keyword_buf);
                 kl = strfloat_put(h, keyword_buf, &absent);
@@ -239,7 +248,10 @@ void read_mpf (
                 puts("Current hashmap:");
                 print_hashmap(h);
             }
-            else if (is_part_of_num((char)*(char_ptr-1))) {
+            else if (*char_ptr == ':') { //LABEL for goto cmd
+
+            }
+            else if (is_part_of_num((char)*(char_ptr-1))) { //cmd with num
                 // It's a command with a number
                 puts("COMMAND WITH NUMBER");
                 printf("%c");
@@ -260,7 +272,7 @@ void read_mpf (
                 //(f.e. "..." would be a valid float for is_part_of_num)
                 kh_val(h, kl) = atof(value_buf);
             }
-            else if ((keyword_buf[0]) == '/') { //Special '/' cmds
+            else if ((keyword_buf[0]) == '/') { //special '/' cmds
 
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
                   //set_key_value
@@ -281,8 +293,6 @@ void read_mpf (
       }
 
       // ... handle feat_change logic after this line ...
-
-      li++;
 
   }
 

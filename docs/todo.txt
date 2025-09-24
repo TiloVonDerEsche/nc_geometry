@@ -1,5 +1,15 @@
+Replace main while loop with a for loop
+When a goto statement is being executed, just set the local for loop index
+li to the specified label, which is given to the gotob function.
+
+Label LOOP:
+gotob LOOP
+
+LOOP=5
+gotob LOOP -> li=kh_val(LOOP)  = 5
+
 Allow R8=-R7 expressions.
-Lookup value of R7 and negate it 
+Lookup value of R7 and negate it
 
 Improve is_valid_literal fn.
 ".." "eeeeeeeeeee" are valid literals.

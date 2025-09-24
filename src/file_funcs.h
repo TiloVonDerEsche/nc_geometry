@@ -61,18 +61,22 @@ void read_mpf (uint8_t read_all,
   }
 
 
-  char program[config->max_line_len][config->mpf_lines];
+  char program[config->mpf_lines][config->max_line_len];
   char line_buf[config->max_line_len];
 
   size_t mi = 0;
-  while (fgets(line_buf, config->max_line_len, mpf) != NULL) {
+  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (mi < config->mpf_lines)) {
     strcpy(program[mi],line_buf);
     printf("Copied %s to program[%lu]\n",line_buf,mi);
     mi++;
   }
   fclose(mpf);
-  size_t line_num = mi+1;
+  size_t line_num = mi;
 
+
+  for (size_t li = 0; li < line_num; li++) {
+    printf("program[%lu]=%s\n",li,program[li]);
+  }
 
 
 

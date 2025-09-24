@@ -1,4 +1,4 @@
-mpf_lines = 20; //amount of lines read (-1 for all lines)
+mpf_lines = 5; //amount of lines read (-1 for all lines)
 max_line_len = 1000;
 
 mpf_file = "./data/nc_code/dummy2_nc.mpf";

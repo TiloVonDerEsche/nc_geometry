@@ -46,8 +46,25 @@ void print_hashmap(strfloat_t* h) {
   puts("-----");
 }
 
+size_t count_lines(FILE* fp) {
+  char c;
+  size_t lines = 0;
+  while(!feof(fp))
+  {
+    c = fgetc(fp);
+    if(c == '\n')
+    {
+      lines++;
+    }
+  }
 
-void read_mpf (uint8_t read_all,
+  rewind(fp);
+
+  return lines;
+}
+
+
+void read_mpf (
   data_tuple** dtuple_list, track** track_list, size_t* tl_len,
   Config* config){
   //set config for mpf_lines, mpf_file path, data_tuples_csv
@@ -60,21 +77,20 @@ void read_mpf (uint8_t read_all,
       return;
   }
 
-
+  //read mpf into program str_arr, each entry is a line of the mpf
   char program[config->mpf_lines][config->max_line_len];
   char line_buf[config->max_line_len];
 
   size_t mi = 0;
-  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (mi < config->mpf_lines)) {
+  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (mi < config->lines_to_read)) {
     strcpy(program[mi],line_buf);
     printf("Copied %s to program[%lu]\n",line_buf,mi);
     mi++;
   }
   fclose(mpf);
-  size_t line_num = mi;
 
 
-  for (size_t li = 0; li < line_num; li++) {
+  for (size_t li = 0; li < config->lines_to_read; li++) {
     printf("program[%lu]=%s\n",li,program[li]);
   }
 
@@ -151,7 +167,7 @@ void read_mpf (uint8_t read_all,
   float vit_tir = 0; //machine_speed
 
   //linewise loop
-  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (li < config->mpf_lines || read_all)) {
+  while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (li < config->mpf_lines)) {
 
 
       feat_change = 0;
@@ -317,8 +333,8 @@ int read_config(const char* filename, Config* config) {
             continue;
         }
 
-        if (strcmp(key, "mpf_lines") == 0) {
-            config->mpf_lines = (size_t)atoi(value);
+        if (strcmp(key, "lines_to_read") == 0) {
+            config->lines_to_read = (size_t)atoi(value);
         }
         else if (strcmp(key, "max_line_len") == 0) {
             config->max_line_len = (size_t)atoi(value);

@@ -6,20 +6,16 @@
 int main() {
     // Initialize config struct with default values
     Config config = {0};
-    uint8_t read_all = 0; //read whole mpf file=yes / no
 
     // Read the config file
     if (read_config("config.txt", &config) != 0) {
       return 1;
     }
 
-    if (config.mpf_lines == -1) {
-      read_all = 1;
-    }
 
     puts("\nRead values from config.txt:");
     // Print the config.txt values to verify
-    printf("mpf_lines=%zu\n", config.mpf_lines);
+    printf("lines_to_read=%zu\n", config.lines_to_read);
     printf("max_line_len=%zu\n", config.max_line_len);
 
     printf("\nmpf_file=%s\n", config.mpf_file);
@@ -31,6 +27,27 @@ int main() {
     printf("vertical_radius=%.2f\n", config.vertical_radius);
 
     printf("\nstep_distance=%f\n\n",config.step_dis);
+
+    //count lines of mpf
+    FILE* mpf = fopen(config.mpf_file, "r");
+    if (mpf == NULL) {
+        fprintf(stderr, "Error: Could not open %s (in read mode)!\n", config.mpf_file);
+        return 1;
+    }
+    config.mpf_lines = count_lines(mpf);
+    fclose(mpf);
+
+    if (config.lines_to_read > config.mpf_lines) {
+      printf("%s got only %lu lines, but lines_to_read was set to %lu"
+      ,config.mpf_file,config.mpf_lines,config.lines_to_read);
+
+      if(config.lines_to_read == -1) {printf(", which is equal to -1");}
+      puts("!");
+
+      printf("Resetting lines_to_read to %lu...\n\n",config.mpf_lines);
+
+      config.lines_to_read=config.mpf_lines;
+    }
 
 
 
@@ -49,9 +66,7 @@ int main() {
 
 
     size_t track_list_len = -1;
-    read_mpf(read_all,
-      &tuple_list, &track_list, &track_list_len, &config
-    );
+    read_mpf(&tuple_list, &track_list, &track_list_len, &config);
 
 
     set_track_radius(

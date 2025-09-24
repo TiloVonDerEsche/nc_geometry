@@ -15,6 +15,7 @@ KHASHL_MAP_INIT(KH_LOCAL,
 
 
 typedef struct {
+  size_t lines_to_read;
   size_t mpf_lines;
   size_t max_line_len;
 
@@ -182,8 +183,8 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
   return FQ;
 }
 
-void skip_spaces(char** char_ptr) {
-  while (isspace((unsigned char)**char_ptr)) { //TEST
+void skip_spaces(char* char_ptr) {
+  while (isspace((char)*char_ptr)) { //TEST
       char_ptr++;}
 }
 

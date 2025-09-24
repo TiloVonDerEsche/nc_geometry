@@ -252,25 +252,35 @@ void read_mpf (
 
             }
             else if (is_part_of_num((char)*(char_ptr-1))) { //cmd with num
-                // It's a command with a number
+                *char_ptr--;
+
                 puts("COMMAND WITH NUMBER");
-                printf("%c");
 
-                //rewind char_ptr to begin of num
-                while (!isalpha((char)*char_ptr)){
-                  printf("CWN:%c\n",*char_ptr);
-                  *(char_ptr--);
-                }
 
-                // ... read number into value_buf ...
+                //read value backwards
+                int i = 0;
                 while (is_part_of_num((char)*char_ptr)) {
-                    value_buf[i++] = *char_ptr++;}
+                    value_buf[i++] = *char_ptr--;}
                 value_buf[i] = '\0';
 
+                flip_str(value_buf,i);
+                printf("Read num after cmd=%s, with len=%lu\n",value_buf,i);
+
+                //i should parse the cmd with num
                 //save value in hashmap
-                //ToDo: add isfloat check
+
+                // printf("Adding keyword %s to hashmap...\n",keyword_buf);
+                // kl = strfloat_put(h, keyword_buf, &absent);
+                //
+                // if (absent) {
+                //   kh_key(h, kl) = strdup(keyword_buf);}
+
+
                 //(f.e. "..." would be a valid float for is_part_of_num)
                 kh_val(h, kl) = atof(value_buf);
+
+                //move past read cmd
+                char_ptr += 3; //ToDo: Replace with sophisticated solution
             }
             else if ((keyword_buf[0]) == '/') { //special '/' cmds
 

@@ -102,6 +102,20 @@ void print_buf(char* buf, size_t buf_len) {
   }
 }
 
+void flip(size_t i, size_t j, char str[]) {
+  char temp = str[i];
+  str[i] = str[j];
+  str[j] = temp;
+}
+
+//mutates str
+void flip_str(char str[], size_t str_len) {
+  for (size_t i = 0; i < str_len/2; i++) {
+    printf("Flipping %c with %c...\n",str[i], str[str_len-i-1]);
+    flip(i, str_len-i-1, str);
+  }
+}
+
 float dot_product(vec3D s, vec3D t) {
   return (s.x * t.x) + (s.y * t.y) + (s.z * t.z);
 }

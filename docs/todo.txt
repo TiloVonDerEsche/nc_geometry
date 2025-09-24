@@ -1,4 +1,8 @@
-Replace main while loop with a for loop
+Write parsing function which splits a cmd with num
+into the cmd and the num
+
+
+
 When a goto statement is being executed, just set the local for loop index
 li to the specified label, which is given to the gotob function.
 

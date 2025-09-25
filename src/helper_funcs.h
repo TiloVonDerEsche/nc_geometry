@@ -96,25 +96,7 @@ void copy_data_tuple(size_t i, data_tuple** arr) {
 }
 
 
-void print_buf(char* buf, size_t buf_len) {
-  for (size_t i = 0; i < buf_len && buf[i] != '\0'; i++) {
-    printf("%c",buf[i]);
-  }
-}
-
-void flip(size_t i, size_t j, char str[]) {
-  char temp = str[i];
-  str[i] = str[j];
-  str[j] = temp;
-}
-
-//mutates str
-void flip_str(char str[], size_t str_len) {
-  for (size_t i = 0; i < str_len/2; i++) {
-    printf("Flipping %c with %c...\n",str[i], str[str_len-i-1]);
-    flip(i, str_len-i-1, str);
-  }
-}
+//---------vector math functions-----------//
 
 float dot_product(vec3D s, vec3D t) {
   return (s.x * t.x) + (s.y * t.y) + (s.z * t.z);
@@ -197,6 +179,25 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
   return FQ;
 }
 
+//-----------string operation functions-----------------//
+
+
+
+void flip(size_t i, size_t j, char str[]) {
+  char temp = str[i];
+  str[i] = str[j];
+  str[j] = temp;
+}
+
+//mutates str
+void flip_str(char str[], size_t str_len) {
+  for (size_t i = 0; i < str_len/2; i++) {
+    printf("Flipping %c with %c...\n",str[i], str[str_len-i-1]);
+    flip(i, str_len-i-1, str);
+  }
+}
+
+
 void skip_spaces(char* char_ptr) {
   while (isspace((char)*char_ptr)) { //TEST
       char_ptr++;}
@@ -229,6 +230,62 @@ void parse_line(char* line, char** key, char** value) {
     //inc the char pointer to give trim the str which starts after '='
     *value = trim(eq_pos + 1);
 }
+
+//mutates str[]
+// void parse_cmd_w_num(char str[], size_t str_len,
+//                      char** alphas, size_t* alphas_len,
+//                      char** f_chars, size_t* f_chars_len) {
+//   size_t m = 0;
+//   char* char_ptr = str; //set to start of str
+//
+//   while (isalpha(*char_ptr) && m < str_len) {
+//     char_ptr++;m++;
+//   }
+//
+//   char dest[20];
+//   strcpy(dest, str); //avoids setting '\0' at i 0 for f_chars aswell
+//
+//   *alphas = dest;
+//   *alphas_len = m;
+//   (*alphas)[m] = '\0';
+//
+//   *f_chars = &(str[m]);
+//   *f_chars_len = str_len - m;
+// }
+
+
+
+//-------------Example Usage---------------//
+// char str[] = "AB123"; size_t str_len = 5;
+//
+// char A[20]; size_t A_len;
+// char* F = str; size_t F_len;
+//
+//IMPORTANT!, so that we can set '\0' at A[m],
+//without affecting F, which is using the str arr memory
+// strcpy(A, str);
+//
+//parse_cmd_w_num(str_len,&A,&A_len,&F,&F_len);
+//printf("str_len=%lu\nA=%s,%lu\nB=%s,%lu,\n",str_len,A,A_len,F,F_len);
+
+//split string across the switch from aplhas to a float num
+void parse_cmd_w_num(size_t str_len, char (*A)[20], size_t* A_len,
+                                     char **F, size_t* F_len) {
+  size_t m = 0;
+  char* char_ptr = *A; //set to start of str
+
+  //find where the switch betw the alphas & the float num happens
+  while (isalpha(*char_ptr) && m < str_len) {
+    char_ptr++;m++;}
+
+  (*A)[m] = '\0';
+  *A_len = m;
+
+  (*F) += m;
+  *F_len = str_len - m;
+}
+
+//---------------str conversion functions------------------//
 
 float str_to_float(const char* str) {
   char* endptr;  // To handle potential parsing errors
@@ -264,6 +321,8 @@ uint8_t str_to_uint8(const char* str) {
 
   return result;
 }
+
+//---------------string boolean checking functions------------------//
 
 uint8_t is_part_of_num(char c) {
     if (c >= '0' && c <= '9') {
@@ -319,6 +378,15 @@ int is_in_list(const char* str, const char** list, size_t list_size) {
 
     return -1;
 }
+
+//-------------------------temporary garbage------------------------//
+void print_buf(char* buf, size_t buf_len) {
+  for (size_t i = 0; i < buf_len && buf[i] != '\0'; i++) {
+    printf("%c",buf[i]);
+  }
+}
+
+
 
 //ugly static mapping
 //use hashmap instead

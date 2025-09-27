@@ -260,7 +260,7 @@ void read_mpf (
                 char cmd_buf[cb_len] = {}; //replace 20 w global constant (config.txt)
 
                 size_t fnb_len = 20;
-                char* fnum_buf;
+                char* fnum_buf; // = NULL;
                 //key & value, seperated through letters to digits
                 parse_cmd_w_num(char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 

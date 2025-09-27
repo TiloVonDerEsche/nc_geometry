@@ -280,10 +280,10 @@ void parse_cmd_w_num(char* c,       size_t str_len,
     c--;m++;}
 
   //test if A or F causes mem issues
-  (*A)[m] = '\0';
+  //(*A)[m] = '\0';
   *A_len = m;
 
-  (*F) += m;
+  //(*F) += m;
   *F_len = str_len - m;
 }
 

@@ -269,8 +269,8 @@ void parse_line(char* line, char** key, char** value) {
 //printf("str_len=%lu\nA=%s,%lu\nB=%s,%lu,\n",str_len,A,A_len,F,F_len);
 
 //split string across the switch from aplhas to a float num
-void parse_cmd_w_num(size_t str_len, char (*A)[20], size_t* A_len,
-                                     char **F, size_t* F_len) {
+void parse_cmd_w_num(size_t str_len, size_t* A_len, char (*A)[20],
+                                    size_t* F_len, char **F) {
   size_t m = 0;
   char* char_ptr = *A; //set to start of str
 

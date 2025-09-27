@@ -144,6 +144,7 @@ void read_mpf (
   size_t ti = 0; //track id / index
   size_t di = 0; //data_tuple id / index
   size_t li = 0; //line index
+  size_t ki = 0; //keyword index
 
   uint8_t feat_change = 0; //8bit bool for feature changes
   //uint8_t read_num_mode = 0;
@@ -189,15 +190,14 @@ void read_mpf (
 
 
 
+            ki = 0; //reset keyword_buf index
             //read one token-> either a cmd keyword or varname
-            int i = 0;
-            int j = 0;
             while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
-                keyword_buf[i++] = *char_ptr++;}
-            keyword_buf[i] = '\0';
+                keyword_buf[ki++] = *char_ptr++;}
+            keyword_buf[ki] = '\0';
             printf("keyword_buf=%s\n",keyword_buf);
 
-            if (i == 0) { // No keyword found, maybe just a number or symbol
+            if (ki == 0) { // No keyword found, maybe just a number or symbol
                 char_ptr++; continue;}
 
 
@@ -256,15 +256,23 @@ void read_mpf (
 
                 puts("COMMAND WITH NUMBER");
 
+                size_t cb_len = 20;
+                char cmd_buf[cb_len]; //replace 20 w global constant (config.txt)
+
+                size_t fnb_len = 20;
+                char* fnum_buf;
+                //key & value, seperated through letters to digits
+                parse_cmd_w_num(ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 
                 //read value backwards
-                int i = 0;
-                while (is_part_of_num((char)*char_ptr)) {
-                    value_buf[i++] = *char_ptr--;}
-                value_buf[i] = '\0';
+                // int i = 0;
+                // while (is_part_of_num((char)*char_ptr)) {
+                //     value_buf[i++] = *char_ptr--;}
+                // value_buf[i] = '\0';
 
-                flip_str(value_buf,i);
-                printf("Read num after cmd=%s, with len=%lu\n",value_buf,i);
+                //flip_str(value_buf,i);
+                printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
+                printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
 
                 //i should parse the cmd with num
                 //save value in hashmap
@@ -280,7 +288,7 @@ void read_mpf (
                 kh_val(h, kl) = atof(value_buf);
 
                 //move past read cmd
-                char_ptr += 3; //ToDo: Replace with sophisticated solution
+                //char_ptr += 3; //ToDo: Replace with sophisticated solution
             }
             else if ((keyword_buf[0]) == '/') { //special '/' cmds
 

@@ -254,15 +254,15 @@ void read_mpf (
             else if (is_part_of_num((char)*(char_ptr-1))) { //cmd with num
                 *char_ptr--;
 
-                puts("COMMAND WITH NUMBER");
+                puts("CMD WITH NUMBER");
 
                 size_t cb_len = 20;
-                char cmd_buf[cb_len]; //replace 20 w global constant (config.txt)
+                char cmd_buf[cb_len] = {}; //replace 20 w global constant (config.txt)
 
                 size_t fnb_len = 20;
                 char* fnum_buf;
                 //key & value, seperated through letters to digits
-                parse_cmd_w_num(ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
+                parse_cmd_w_num(char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 
                 //read value backwards
                 // int i = 0;

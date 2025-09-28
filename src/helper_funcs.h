@@ -269,22 +269,56 @@ void parse_line(char* line, char** key, char** value) {
 //printf("str_len=%lu\nA=%s,%lu\nB=%s,%lu,\n",str_len,A,A_len,F,F_len);
 
 //split string across the switch from aplhas to a float num
-void parse_cmd_w_num(char* c,       size_t str_len,
-                                    size_t* A_len, char (*A)[20],
-                                    size_t* F_len, char **F) {
+void parse_cmd_w_num(char** c,size_t str_len,
+                              size_t* A_len, char (*A)[20],
+                              size_t* F_len, char** F) {
+  printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+  puts("---*F = *A;---");
+  *F = *c;
+  (*A)[0] = 'T';
+  (*A)[1] = 'E';
+  (*A)[2] = 'S';
+  (*A)[3] = 'T';
+  (*A)[4] = '!';
+  (*A)[5] = '\n';
+
+  (*F)[0] = '1';
+  (*F)[1] = '2';
+  (*F)[2] = '3';
+  (*F)[3] = '\n';
+
+  printf("-------------\n"
+  "2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+  printf("F=%s\n\n",*F);
+      //==&(NULL) ?
+  if (*F == NULL) {
+    fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_num fn!\n");
+  }
+
+
   size_t m = 0;
-  //char* c = *A; //set to start of str
+  //*c = *A; //set to start of str
 
   //find where the switch betw the alphas & the float num happens
-  while (isalpha(*c) && m < str_len) {
-    c--;m++;}
+  while (isalpha(**c) && m < str_len) {
+    (*A)[m] = **c;
+    printf("(*A)[m]=%c\n",(*A)[m]);
+    printf("(*)A=%s\n", (*A));
+    puts("LOOP");
+    (*c)++;m++;
+    printf("**c=%c\n",**c);
+  }
 
   //test if A or F causes mem issues
-  //(*A)[m] = '\0';
+  (*A)[m] = '\0';
   *A_len = m;
 
-  //(*F) += m;
+
+  *F = (*c-m);
   *F_len = str_len - m;
+  (*F)[*F_len] = '\0';
+
+  printf("3.:\nstr_len=%lu,A=%s,%luF=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
 }
 
 //---------------str conversion functions------------------//

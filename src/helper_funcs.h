@@ -293,7 +293,7 @@ void flip(size_t i, size_t j, char str[]) {
 //mutates str
 void flip_str(char str[], size_t str_len) {
   for (size_t i = 0; i < str_len/2; i++) {
-    printf("Flipping %c with %c...\n",str[i], str[str_len-i-1]);
+    //printf("Flipping %c with %c...\n",str[i], str[str_len-i-1]);
     flip(i, str_len-i-1, str);
   }
 }
@@ -301,7 +301,7 @@ void flip_str(char str[], size_t str_len) {
 //mutates str pointed to
 void flip_str_ptr(char (*str)[20], size_t str_len) {
   for (size_t i = 0; i < str_len/2; i++) {
-    printf("Flipping %c with %c...\n",(*str)[i], (*str)[str_len-i-1]);
+    //printf("Flipping %c with %c...\n",(*str)[i], (*str)[str_len-i-1]);
     flip(i, str_len-i-1, (*str));
   }
 }
@@ -381,19 +381,16 @@ void parse_line(char* line, char** key, char** value) {
 void parse_cmd_w_num(char** c,size_t str_len,
                               size_t* A_len, char (*A)[20],
                               size_t* F_len, char (*F)[20]) {
+  //printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   if (str_len < 2) {
     fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2\n");
-    return;
-  }
-
-  printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+    return;}
 
   if (*F == NULL) {
     fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_num fn!\n");
-  }
+    return;}
 
-  printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",
-  str_len,*A,*A_len,*F,*F_len);
+  //printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   printf("F=%s\n\n",*F);
 
   //total length of str, which is cmd_w_num f.e. "X1.2"-> 4
@@ -401,19 +398,12 @@ void parse_cmd_w_num(char** c,size_t str_len,
   size_t alen = 0; //len for cmd (alphas) "X" -> 1
   size_t flen = 0; //len for num (float) "1.2" -> 3
 
-  // printf("m < str_len=%u, "
-  //        "isalnum(**c)=%u, "
-  //        "isalnum(**c) && m < str_len=%u\n",
-  //        m < str_len, isalnum(**c), isalnum(**c) && m < str_len);
-
    //read cmd_w_num backwards
-
    //read num
    while (is_part_of_num(**c) && tlen < str_len) {
      (*F)[flen] = **c;
 
-     printf("*F=%s\n", *F);
-     printf("**c=%c\n",**c);
+     //printf("*F=%s\n", *F); printf("**c=%c\n",**c);
      (*c)--;flen++;
      tlen++;}
 
@@ -421,8 +411,7 @@ void parse_cmd_w_num(char** c,size_t str_len,
   while (isalpha(**c) && tlen < str_len) {
     (*A)[alen] = **c;
 
-    printf("*A=%s\n", *A);
-    printf("**c=%c\n",**c);
+    //printf("*A=%s\n", *A); printf("**c=%c\n",**c);
     (*c)--;alen++;
     tlen++;}
 
@@ -435,7 +424,7 @@ void parse_cmd_w_num(char** c,size_t str_len,
   *F_len = flen;
   (*F)[flen] = '\0';
 
-  printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
+  //printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
 
   //set the char_ptr to the space behind read cmd_w_num
   (*c)+=tlen+1;

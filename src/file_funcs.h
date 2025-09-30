@@ -264,9 +264,10 @@ void read_mpf (
                 //key & value, seperated through letters to digits
                 parse_cmd_w_num(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 
-
+                puts("\n------");
                 printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
                 printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
+                puts("------\n");
 
                 //save value in hashmap
 

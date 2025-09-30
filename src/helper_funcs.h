@@ -372,7 +372,7 @@ void parse_line(char* line, char** key, char** value) {
 //split string across the switch from aplhas to a float num
 void parse_cmd_w_num(char** c,size_t str_len,
                               size_t* A_len, char (*A)[20],
-                              size_t* F_len, char** F) {
+                              size_t* F_len, char (*F)[20]) {
   if (str_len < 2) {
     fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2");
     return;
@@ -409,13 +409,14 @@ void parse_cmd_w_num(char** c,size_t str_len,
   char abuf[str_len-1];
   char fbuf[str_len];
   //find where the switch betw the alphas & the float num happens
-  printf("m < str_len=%u, "
-         "isalnum(**c)=%u, "
-         "isalnum(**c) && m < str_len=%u\n",
-         m < str_len, isalnum(**c), isalnum(**c) && m < str_len);
+  // printf("m < str_len=%u, "
+  //        "isalnum(**c)=%u, "
+  //        "isalnum(**c) && m < str_len=%u\n",
+  //        m < str_len, isalnum(**c), isalnum(**c) && m < str_len);
 
    while (is_part_of_num(**c) && m < str_len) {
      fbuf[flen] = **c;
+     (*F)[flen] = **c;
 
      printf("fbuf=%s\n", fbuf);
      printf("c=%c\n",c);
@@ -429,10 +430,12 @@ void parse_cmd_w_num(char** c,size_t str_len,
 
   while (isalpha(**c) && m < str_len) {
     abuf[alen] = **c;
+    (*A)[alen] = **c;
 
     printf("abuf=%s\n", abuf);
-    printf("c=%c\n",c);
-    printf("*c=%c\n",*c);
+    printf("(*A)=%s\n", (*A));
+    //printf("c=%c\n",c);
+    //printf("*c=%c\n",*c);
     printf("**c=%c\n",**c);
     (*c)--;alen++;
     m++;
@@ -442,13 +445,13 @@ void parse_cmd_w_num(char** c,size_t str_len,
   flip_str(abuf,alen);
   flip_str(fbuf,flen);
 
-  A = &abuf;
+  //A = abuf;
   //test if A or F causes mem issues
   (*A)[alen] = '\0';
   *A_len = alen;
 
 
-  F = &fbuf;
+  //F = fbuf;
   *F_len = flen;
   (*F)[flen] = '\0';
 

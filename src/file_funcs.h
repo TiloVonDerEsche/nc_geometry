@@ -256,25 +256,18 @@ void read_mpf (
 
                 puts("CMD WITH NUMBER");
 
-                size_t cb_len = 20;
-                char cmd_buf[cb_len] = {}; //replace 20 w global constant (config.txt)
+                size_t cb_len = 20; //replace 20 w global constant (config.txt)
+                char cmd_buf[cb_len] = {};
 
-                size_t fnb_len = 20;
-                char* fnum_buf = NULL;
+                size_t fnb_len = 20; //replace 20 w global constant (config.txt)
+                char fnum_buf[fnb_len] = {};
                 //key & value, seperated through letters to digits
                 parse_cmd_w_num(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 
-                //read value backwards
-                // int i = 0;
-                // while (is_part_of_num((char)*char_ptr)) {
-                //     value_buf[i++] = *char_ptr--;}
-                // value_buf[i] = '\0';
 
-                //flip_str(value_buf,i);
                 printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
                 printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
 
-                //i should parse the cmd with num
                 //save value in hashmap
 
                 // printf("Adding keyword %s to hashmap...\n",keyword_buf);

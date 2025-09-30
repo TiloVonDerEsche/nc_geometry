@@ -373,9 +373,14 @@ void parse_line(char* line, char** key, char** value) {
 void parse_cmd_w_num(char** c,size_t str_len,
                               size_t* A_len, char (*A)[20],
                               size_t* F_len, char** F) {
+  if (str_len < 2) {
+    fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2");
+    return;
+  }
+
   printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   puts("---*F = *A;---");
-  *F = *c;
+  //*F = *c;
   // (*A)[0] = 'T';
   // (*A)[1] = 'E';
   // (*A)[2] = 'S';
@@ -402,7 +407,7 @@ void parse_cmd_w_num(char** c,size_t str_len,
   size_t alen = 0;
   size_t flen = 0;
   char abuf[str_len-1];
-  char fbuf[str_len-1];
+  char fbuf[str_len];
   //find where the switch betw the alphas & the float num happens
   printf("m < str_len=%u, "
          "isalnum(**c)=%u, "
@@ -417,8 +422,9 @@ void parse_cmd_w_num(char** c,size_t str_len,
      printf("*c=%c\n",*c);
      printf("**c=%c\n",**c);
      (*c)--;flen++;
+     m++;
 
-   }
+   } //flen++; //prev used as index->len=i+1
 
 
   while (isalpha(**c) && m < str_len) {
@@ -429,8 +435,9 @@ void parse_cmd_w_num(char** c,size_t str_len,
     printf("*c=%c\n",*c);
     printf("**c=%c\n",**c);
     (*c)--;alen++;
+    m++;
 
-  }
+  } //alen++; //prev used as index->len=i+1
 
   flip_str(abuf,alen);
   flip_str(fbuf,flen);
@@ -441,9 +448,9 @@ void parse_cmd_w_num(char** c,size_t str_len,
   *A_len = alen;
 
 
-  // *F = (*c-m);
-  // *F_len = str_len - m;
-  // (*F)[*F_len] = '\0';
+  F = &fbuf;
+  *F_len = flen;
+  (*F)[flen] = '\0';
 
   printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
 }

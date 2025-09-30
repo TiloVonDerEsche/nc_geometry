@@ -298,6 +298,14 @@ void flip_str(char str[], size_t str_len) {
   }
 }
 
+//mutates str pointed to
+void flip_str_ptr(char (*str)[20], size_t str_len) {
+  for (size_t i = 0; i < str_len/2; i++) {
+    printf("Flipping %c with %c...\n",(*str)[i], (*str)[str_len-i-1]);
+    flip(i, str_len-i-1, (*str));
+  }
+}
+
 
 void skip_spaces(char* char_ptr) {
   while (isspace((char)*char_ptr)) { //TEST
@@ -442,8 +450,8 @@ void parse_cmd_w_num(char** c,size_t str_len,
 
   } //alen++; //prev used as index->len=i+1
 
-  flip_str(abuf,alen);
-  flip_str(fbuf,flen);
+  flip_str_ptr(A,alen);
+  flip_str_ptr(F,flen);
 
   //A = abuf;
   //test if A or F causes mem issues

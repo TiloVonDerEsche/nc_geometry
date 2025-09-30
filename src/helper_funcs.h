@@ -382,88 +382,63 @@ void parse_cmd_w_num(char** c,size_t str_len,
                               size_t* A_len, char (*A)[20],
                               size_t* F_len, char (*F)[20]) {
   if (str_len < 2) {
-    fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2");
+    fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2\n");
     return;
   }
 
   printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
-  puts("---*F = *A;---");
-  //*F = *c;
-  // (*A)[0] = 'T';
-  // (*A)[1] = 'E';
-  // (*A)[2] = 'S';
-  // (*A)[3] = 'T';
-  // (*A)[4] = '!';
-  // (*A)[5] = '\n';
-  //
-  // (*F)[0] = '1';
-  // (*F)[1] = '2';
-  // (*F)[2] = '3';
-  // (*F)[3] = '\n';
 
-  printf("-------------\n"
-  "2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
-  printf("F=%s\n\n",*F);
-      //==&(NULL) ?
   if (*F == NULL) {
     fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_num fn!\n");
   }
 
+  printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",
+  str_len,*A,*A_len,*F,*F_len);
+  printf("F=%s\n\n",*F);
 
-  size_t m = 0;
+  //total length of str, which is cmd_w_num f.e. "X1.2"-> 4
+  size_t tlen = 0;
+  size_t alen = 0; //len for cmd (alphas) "X" -> 1
+  size_t flen = 0; //len for num (float) "1.2" -> 3
 
-  size_t alen = 0;
-  size_t flen = 0;
-  char abuf[str_len-1];
-  char fbuf[str_len];
-  //find where the switch betw the alphas & the float num happens
   // printf("m < str_len=%u, "
   //        "isalnum(**c)=%u, "
   //        "isalnum(**c) && m < str_len=%u\n",
   //        m < str_len, isalnum(**c), isalnum(**c) && m < str_len);
 
-   while (is_part_of_num(**c) && m < str_len) {
-     fbuf[flen] = **c;
+   //read cmd_w_num backwards
+
+   //read num
+   while (is_part_of_num(**c) && tlen < str_len) {
      (*F)[flen] = **c;
 
-     printf("fbuf=%s\n", fbuf);
-     printf("c=%c\n",c);
-     printf("*c=%c\n",*c);
+     printf("*F=%s\n", *F);
      printf("**c=%c\n",**c);
      (*c)--;flen++;
-     m++;
+     tlen++;}
 
-   } //flen++; //prev used as index->len=i+1
-
-
-  while (isalpha(**c) && m < str_len) {
-    abuf[alen] = **c;
+  //read cmd
+  while (isalpha(**c) && tlen < str_len) {
     (*A)[alen] = **c;
 
-    printf("abuf=%s\n", abuf);
-    printf("(*A)=%s\n", (*A));
-    //printf("c=%c\n",c);
-    //printf("*c=%c\n",*c);
+    printf("*A=%s\n", *A);
     printf("**c=%c\n",**c);
     (*c)--;alen++;
-    m++;
-
-  } //alen++; //prev used as index->len=i+1
+    tlen++;}
 
   flip_str_ptr(A,alen);
   flip_str_ptr(F,flen);
 
-  //A = abuf;
-  //test if A or F causes mem issues
   (*A)[alen] = '\0';
   *A_len = alen;
 
-
-  //F = fbuf;
   *F_len = flen;
   (*F)[flen] = '\0';
 
   printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
+
+  //set the char_ptr to the space behind read cmd_w_num
+  (*c)+=tlen+1;
 }
 
 

@@ -86,16 +86,6 @@ typedef struct {
   float machine_speed;
 } data_tuple;
 
-
-void copy_data_tuple(size_t i, data_tuple** arr) {
-  if (i <= 0) { return; } // Avoid seg fault when i = 0
-  (*arr)[i].P.x = (*arr)[i-1].P.x;
-  (*arr)[i].P.y = (*arr)[i-1].P.y;
-  (*arr)[i].P.z = (*arr)[i-1].P.z;
-  (*arr)[i].laser = (*arr)[i-1].laser;
-}
-
-
 //---------vector math functions-----------//
 
 float dot_product(vec3D s, vec3D t) {
@@ -178,6 +168,117 @@ vec3D lotfuss(vec3D P, vec3D v, vec3D Q, vec3D *foot_point, double *distance) {
 
   return FQ;
 }
+
+//-----------------struct list fns---------------//
+void copy_data_tuple(size_t i, data_tuple** arr) {
+  if (i <= 0) { return; } // Avoid seg fault when i = 0
+  (*arr)[i].P.x = (*arr)[i-1].P.x;
+  (*arr)[i].P.y = (*arr)[i-1].P.y;
+  (*arr)[i].P.z = (*arr)[i-1].P.z;
+  (*arr)[i].laser = (*arr)[i-1].laser;
+}
+
+//---------------------printing fns---------------------//
+void print_buf(char* buf, size_t buf_len) {
+  for (size_t i = 0; i < buf_len && buf[i] != '\0'; i++) {
+    printf("%c",buf[i]);
+  }
+}
+
+//---------------string boolean checking functions------------------//
+
+uint8_t is_part_of_num(char c) {
+    if (c >= '0' && c <= '9') {
+        return 1;
+    }
+
+    // Check for specific characters: '-', '.', '/', 'e', '^'
+    if (c == '+' || c == '-' || c == '.' || c == 'e' || c == '^') {
+        return 1;
+    }
+
+    return 0;
+}
+
+
+uint8_t is_valid_varname(const char* name) {
+    uint8_t onechar = 0; //at least one char bool
+    char c;
+    for (int i = 0; name[i] != '\0'; i++) {
+        c = name[i];
+        if(!onechar && isalpha(c)) {onechar=1;}
+        if ( !(isalnum(c) || c == '_') || c == ' ' || c == '\0' || c == '\n') {
+            //invalid variable name
+            return 0;
+        }
+    }
+    //at least one char in varname
+    if (onechar) {return 1;}
+    return 0; //no chars in varname
+}
+
+uint8_t is_valid_literal(const char* lit) {
+  char c;
+  for (int i = 0; lit[i] != '\0'; i++) {
+      c = lit[i];
+      if ( !(is_part_of_num(c)) ) {
+          //invalid variable name
+          return 0;
+      }
+  }
+  // All characters passed the check
+  return 1;
+}
+
+
+//------------------------------misc----------------------------------//
+int is_in_list(const char* str, const char** list, size_t list_size) {
+    for (int i = 0; i < list_size; i++) {
+        if (strcmp(str, list[i]) == 0) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+//---------------str conversion functions------------------//
+
+float str_to_float(const char* str) {
+  char* endptr;  // To handle potential parsing errors
+
+  float value = strtof(str, &endptr);
+
+  if (str == endptr) {
+      // No conversion occurred (invalid input)
+      printf("Invalid float string.\n");
+  }
+  // else {
+  //     printf("Converted float: %f\n", value);}
+
+  return value;
+}
+
+uint8_t str_to_uint8(const char* str) {
+  char* endptr;             // To handle parsing errors
+  errno = 0;                // Reset errno before call
+
+  unsigned long value = strtoul(str, &endptr, 10);  // Base 10 for decimal
+  uint8_t result = 0;
+
+  if (str == endptr) {
+      // No conversion occurred (invalid input)
+      printf("Invalid uint8_t string.\n");
+  } else if (errno == ERANGE || value > UINT8_MAX) {
+      printf("Value out of uint8_t range.\n");
+  } else {
+      result = (uint8_t)value;
+      //printf("Converted uint8_t: %u\n", result);
+  }
+
+  return result;
+}
+
 
 //-----------string operation functions-----------------//
 
@@ -275,17 +376,17 @@ void parse_cmd_w_num(char** c,size_t str_len,
   printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   puts("---*F = *A;---");
   *F = *c;
-  (*A)[0] = 'T';
-  (*A)[1] = 'E';
-  (*A)[2] = 'S';
-  (*A)[3] = 'T';
-  (*A)[4] = '!';
-  (*A)[5] = '\n';
-
-  (*F)[0] = '1';
-  (*F)[1] = '2';
-  (*F)[2] = '3';
-  (*F)[3] = '\n';
+  // (*A)[0] = 'T';
+  // (*A)[1] = 'E';
+  // (*A)[2] = 'S';
+  // (*A)[3] = 'T';
+  // (*A)[4] = '!';
+  // (*A)[5] = '\n';
+  //
+  // (*F)[0] = '1';
+  // (*F)[1] = '2';
+  // (*F)[2] = '3';
+  // (*F)[3] = '\n';
 
   printf("-------------\n"
   "2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
@@ -297,131 +398,55 @@ void parse_cmd_w_num(char** c,size_t str_len,
 
 
   size_t m = 0;
-  //*c = *A; //set to start of str
 
+  size_t alen = 0;
+  size_t flen = 0;
+  char abuf[str_len-1];
+  char fbuf[str_len-1];
   //find where the switch betw the alphas & the float num happens
+  printf("m < str_len=%u, "
+         "isalnum(**c)=%u, "
+         "isalnum(**c) && m < str_len=%u\n",
+         m < str_len, isalnum(**c), isalnum(**c) && m < str_len);
+
+   while (is_part_of_num(**c) && m < str_len) {
+     fbuf[flen] = **c;
+
+     printf("fbuf=%s\n", fbuf);
+     printf("c=%c\n",c);
+     printf("*c=%c\n",*c);
+     printf("**c=%c\n",**c);
+     (*c)--;flen++;
+
+   }
+
+
   while (isalpha(**c) && m < str_len) {
-    (*A)[m] = **c;
-    printf("(*A)[m]=%c\n",(*A)[m]);
-    printf("(*)A=%s\n", (*A));
-    puts("LOOP");
-    (*c)++;m++;
+    abuf[alen] = **c;
+
+    printf("abuf=%s\n", abuf);
+    printf("c=%c\n",c);
+    printf("*c=%c\n",*c);
     printf("**c=%c\n",**c);
+    (*c)--;alen++;
+
   }
 
+  flip_str(abuf,alen);
+  flip_str(fbuf,flen);
+
+  A = &abuf;
   //test if A or F causes mem issues
-  (*A)[m] = '\0';
-  *A_len = m;
+  (*A)[alen] = '\0';
+  *A_len = alen;
 
 
-  *F = (*c-m);
-  *F_len = str_len - m;
-  (*F)[*F_len] = '\0';
+  // *F = (*c-m);
+  // *F_len = str_len - m;
+  // (*F)[*F_len] = '\0';
 
-  printf("3.:\nstr_len=%lu,A=%s,%luF=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+  printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
 }
-
-//---------------str conversion functions------------------//
-
-float str_to_float(const char* str) {
-  char* endptr;  // To handle potential parsing errors
-
-  float value = strtof(str, &endptr);
-
-  if (str == endptr) {
-      // No conversion occurred (invalid input)
-      printf("Invalid float string.\n");
-  }
-  // else {
-  //     printf("Converted float: %f\n", value);}
-
-  return value;
-}
-
-uint8_t str_to_uint8(const char* str) {
-  char* endptr;             // To handle parsing errors
-  errno = 0;                // Reset errno before call
-
-  unsigned long value = strtoul(str, &endptr, 10);  // Base 10 for decimal
-  uint8_t result = 0;
-
-  if (str == endptr) {
-      // No conversion occurred (invalid input)
-      printf("Invalid uint8_t string.\n");
-  } else if (errno == ERANGE || value > UINT8_MAX) {
-      printf("Value out of uint8_t range.\n");
-  } else {
-      result = (uint8_t)value;
-      //printf("Converted uint8_t: %u\n", result);
-  }
-
-  return result;
-}
-
-//---------------string boolean checking functions------------------//
-
-uint8_t is_part_of_num(char c) {
-    if (c >= '0' && c <= '9') {
-        return 1;
-    }
-
-    // Check for specific characters: '-', '.', '/', 'e', '^'
-    if (c == '+' || c == '-' || c == '.' || c == 'e' || c == '^') {
-        return 1;
-    }
-
-    return 0;
-}
-
-
-uint8_t is_valid_varname(const char* name) {
-    uint8_t onechar = 0; //at least one char bool
-    char c;
-    for (int i = 0; name[i] != '\0'; i++) {
-        c = name[i];
-        if(!onechar && isalpha(c)) {onechar=1;}
-        if ( !(isalnum(c) || c == '_') || c == ' ' || c == '\0' || c == '\n') {
-            //invalid variable name
-            return 0;
-        }
-    }
-    //at least one char in varname
-    if (onechar) {return 1;}
-    return 0; //no chars in varname
-}
-
-uint8_t is_valid_literal(const char* lit) {
-  char c;
-  for (int i = 0; lit[i] != '\0'; i++) {
-      c = lit[i];
-      if ( !(is_part_of_num(c)) ) {
-          //invalid variable name
-          return 0;
-      }
-  }
-  // All characters passed the check
-  return 1;
-}
-
-
-
-int is_in_list(const char* str, const char** list, size_t list_size) {
-    for (int i = 0; i < list_size; i++) {
-        if (strcmp(str, list[i]) == 0) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-//-------------------------temporary garbage------------------------//
-void print_buf(char* buf, size_t buf_len) {
-  for (size_t i = 0; i < buf_len && buf[i] != '\0'; i++) {
-    printf("%c",buf[i]);
-  }
-}
-
 
 
 //ugly static mapping

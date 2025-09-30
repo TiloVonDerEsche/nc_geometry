@@ -254,7 +254,7 @@ void read_mpf (
             else if (is_part_of_num((char)*(char_ptr-1))) { //cmd with num
                 *char_ptr--;
 
-                puts("CMD WITH NUMBER");
+                //puts("CMD WITH NUMBER");
 
                 size_t cb_len = 20; //replace 20 w global constant (config.txt)
                 char cmd_buf[cb_len] = {};

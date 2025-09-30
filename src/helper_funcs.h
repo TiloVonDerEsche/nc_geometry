@@ -391,7 +391,6 @@ void parse_cmd_w_num(char** c,size_t str_len,
     return;}
 
   //printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
-  printf("F=%s\n\n",*F);
 
   //total length of str, which is cmd_w_num f.e. "X1.2"-> 4
   size_t tlen = 0;

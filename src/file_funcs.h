@@ -147,15 +147,12 @@ void read_mpf (
   size_t ki = 0; //keyword index
 
   uint8_t feat_change = 0; //8bit bool for feature changes
-  //uint8_t read_num_mode = 0;
+  //uint8_t read_fnum_mode = 0;
   uint8_t laser_on_off = 0;
   uint8_t isvarname = 0;
 
 
-  char token_buf[config->max_line_len];
-  char read_num_buf[config->max_line_len];
   char keyword_buf[config->max_line_len];
-  char varname_buf[config->max_line_len];
   char value_buf[config->max_line_len];
 
   char* key;
@@ -216,7 +213,7 @@ void read_mpf (
                 //read right token
                 size_t i = 0;
                 while
-                (is_part_of_num((char)*char_ptr) ||
+                (is_part_of_fnum((char)*char_ptr) ||
                         isalnum((char)*char_ptr) ||
                                *char_ptr == '_') {
                     value_buf[i++] = *char_ptr++;
@@ -251,7 +248,7 @@ void read_mpf (
             else if (*char_ptr == ':') { //LABEL for goto cmd
 
             }
-            else if (is_part_of_num((char)*(char_ptr-1))) { //cmd with num
+            else if (is_part_of_fnum((char)*(char_ptr-1))) { //cmd with num
                 *char_ptr--;
 
                 //puts("CMD WITH NUMBER");
@@ -262,7 +259,7 @@ void read_mpf (
                 size_t fnb_len = 20; //replace 20 w global constant (config.txt)
                 char fnum_buf[fnb_len] = {};
                 //key & value, seperated through letters to digits
-                parse_cmd_w_num(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
+                parse_cmd_w_fnum(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
 
                 puts("\n------");
                 printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);

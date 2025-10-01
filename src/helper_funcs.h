@@ -187,7 +187,7 @@ void print_buf(char* buf, size_t buf_len) {
 
 //---------------string boolean checking functions------------------//
 
-uint8_t is_part_of_num(char c) {
+uint8_t is_part_of_fnum(char c) {
     if (c >= '0' && c <= '9') {
         return 1;
     }
@@ -221,7 +221,7 @@ uint8_t is_valid_literal(const char* lit) {
   char c;
   for (int i = 0; lit[i] != '\0'; i++) {
       c = lit[i];
-      if ( !(is_part_of_num(c)) ) {
+      if ( !(is_part_of_fnum(c)) ) {
           //invalid variable name
           return 0;
       }
@@ -341,7 +341,7 @@ void parse_line(char* line, char** key, char** value) {
 }
 
 //mutates str[]
-// void parse_cmd_w_num(char str[], size_t str_len,
+// void parse_cmd_w_fnum(char str[], size_t str_len,
 //                      char** alphas, size_t* alphas_len,
 //                      char** f_chars, size_t* f_chars_len) {
 //   size_t m = 0;
@@ -374,32 +374,32 @@ void parse_line(char* line, char** key, char** value) {
 //without affecting F, which is using the str arr memory
 // strcpy(A, str);
 //
-//parse_cmd_w_num(str_len,&A,&A_len,&F,&F_len);
+//parse_cmd_w_fnum(str_len,&A,&A_len,&F,&F_len);
 //printf("str_len=%lu\nA=%s,%lu\nB=%s,%lu,\n",str_len,A,A_len,F,F_len);
 
 //split string across the switch from aplhas to a float num
-void parse_cmd_w_num(char** c,size_t str_len,
+void parse_cmd_w_fnum(char** c,size_t str_len,
                               size_t* A_len, char (*A)[20],
                               size_t* F_len, char (*F)[20]) {
   //printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   if (str_len < 2) {
-    fprintf(stderr,"Trying to call parse_cmd_w_num with str_len<2\n");
+    fprintf(stderr,"Trying to call parse_cmd_w_fnum with str_len<2\n");
     return;}
 
-  if (*F == NULL) {
-    fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_num fn!\n");
-    return;}
+  // if (*F == NULL) {
+  //   fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_fnum fn!\n");
+  //   return;}
 
   //printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
 
-  //total length of str, which is cmd_w_num f.e. "X1.2"-> 4
+  //total length of str, which is cmd_w_fnum f.e. "X1.2"-> 4
   size_t tlen = 0;
   size_t alen = 0; //len for cmd (alphas) "X" -> 1
   size_t flen = 0; //len for num (float) "1.2" -> 3
 
-   //read cmd_w_num backwards
-   //read num
-   while (is_part_of_num(**c) && tlen < str_len) {
+   //read cmd_w_fnum backwards
+   //read fnum
+   while (is_part_of_fnum(**c) && tlen < str_len) {
      (*F)[flen] = **c;
 
      //printf("*F=%s\n", *F); printf("**c=%c\n",**c);
@@ -425,7 +425,7 @@ void parse_cmd_w_num(char** c,size_t str_len,
 
   //printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
 
-  //set the char_ptr to the space behind read cmd_w_num
+  //set the char_ptr to the space behind read cmd_w_fnum
   (*c)+=tlen+1;
 }
 

@@ -146,11 +146,7 @@ void read_mpf (
   size_t li = 0; //line index
   size_t ki = 0; //keyword index
 
-  uint8_t feat_change = 0; //8bit bool for feature changes
-  //uint8_t read_fnum_mode = 0;
   uint8_t laser_on_off = 0;
-  uint8_t isvarname = 0;
-
 
   char keyword_buf[config->max_line_len];
   char value_buf[config->max_line_len];
@@ -170,8 +166,6 @@ void read_mpf (
 
       printf("program[%lu]=%s",li,program[li]);
       printf("*char_ptr=%c\n",*char_ptr);
-      feat_change = 0;
-
 
       //single command char loop
       // printf("((*char_ptr != '\\0') && (*char_ptr != ';') && (*char_ptr != '\\n'))=%u\n"
@@ -295,7 +289,9 @@ void read_mpf (
 
       }
 
-      // ... handle feat_change logic after this line ...
+      // Write hashmap to csv to get hashmap history
+      // If a key is absent in hashmap, fill value of wanted key with NONE
+      //for non-existing
 
   }
 

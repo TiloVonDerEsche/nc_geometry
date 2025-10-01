@@ -269,20 +269,14 @@ void read_mpf (
                 printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
                 puts("------\n");
 
-                //save value in hashmap
 
-                // printf("Adding keyword %s to hashmap...\n",keyword_buf);
-                // kl = strfloat_put(h, keyword_buf, &absent);
-                //
-                // if (absent) {
-                //   kh_key(h, kl) = strdup(keyword_buf);}
+                printf("Adding keyword %s to hashmap...\n",cmd_buf);
+                kl = strfloat_put(h, cmd_buf, &absent);
 
+                if (absent) {
+                  kh_key(h, kl) = strdup(cmd_buf);}
 
-                //(f.e. "..." would be a valid float for is_part_of_num)
-                kh_val(h, kl) = atof(value_buf);
-
-                //move past read cmd
-                //char_ptr += 3; //ToDo: Replace with sophisticated solution
+                kh_val(h, kl) = atof(fnum_buf);
             }
             else if ((keyword_buf[0]) == '/') { //special '/' cmds
 

@@ -135,8 +135,6 @@ void read_mpf (
   puts("Initializing str_float_map...");
   strfloat_t* h = strfloat_init();  // Create hashmap
 
-  int keypos = -1;
-
   //hashmap indices
   khint_t kl; //index left token
   khint_t kr; //index right token
@@ -153,7 +151,6 @@ void read_mpf (
 
   char* key;
   char* value;
-  char* trimmed;
   char* char_ptr;
 
   float machine_speed = -1;

@@ -1,5 +1,5 @@
 /* The MIT License
-
+khashl.h
    Copyright (c) 2019- by Attractive Chaos <attractor@live.co.uk>
 
    Permission is hereby granted, free of charge, to any person obtaining

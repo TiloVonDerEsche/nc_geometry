@@ -1,0 +1,21 @@
+LOAD DATA INFILE '.\data\Loan.csv'
+INTO TABLE Loan FIELDS TERMINATED BY ',' ENCLOSED BY '"'
+LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
+
+CREATE TABLE Loan (
+	BookID varchar(10),
+	MemberID varchar(10),
+	LoanDate date,
+	DueDate date, 
+	FOREIGN KEY (BookID) REFERENCES Book(BookID),
+	FOREIGN KEY (MemberID) REFERENCES Member(MemberID)); 
+
+
+
+
+CREATE VIEW SuperTable AS
+SELECT *
+FROM Loan
+NATURAL JOIN Book
+NATURAL JOIN Member

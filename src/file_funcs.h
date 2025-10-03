@@ -58,14 +58,7 @@ void print_key_to_hmhis(strfloat_t* h) {
 }
 
 //print one line of hmhis, which is fnums seperated by ','
-void print_values_to_hmhis(strfloat_t* h) {
-  printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./data/hmhis.csv", "w");
-  if (hmhis == NULL) {
-      fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
-      return;
-  }
-
+void print_values_to_hmhis(strfloat_t* h, FILE* hmhis) {
   //Print all variables from hashmap
   khint_t k;
   kh_foreach(h, k) {
@@ -73,6 +66,8 @@ void print_values_to_hmhis(strfloat_t* h) {
           fprintf(hmhis,"%f,", kh_val(h, k));
       }
   }
+
+  fprintf(hmhis,"\n");
 }
 
 size_t count_lines(FILE* fp) {
@@ -103,6 +98,13 @@ void read_mpf (
   FILE* mpf = fopen(config->mpf_file, "r");
   if (mpf == NULL) {
       fprintf(stderr, "Error: Could not open %s (in read mode)!\n", config->mpf_file);
+      return;
+  }
+
+  printf("Opening: hmhis.csv in write mode...\n");
+  FILE* hmhis = fopen("./data/hmhis.csv", "w");
+  if (hmhis == NULL) {
+      fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
       return;
   }
 
@@ -318,6 +320,7 @@ void read_mpf (
       // Write hashmap to csv to get hashmap history
       // If a key is absent in hashmap, fill value of wanted key with NONE
       //for non-existing
+      print_values_to_hmhis(h,hmhis);
 
   }
 

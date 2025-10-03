@@ -1,5 +1,5 @@
-lines_to_read = 30; //amount of lines read (-1 for all lines)
-max_line_len = 1000;
+lines_to_read = -1; //amount of lines read (-1 for all lines)
+max_line_len = 1000; // max chars in one line
 
 mpf_file = "./data/nc_code/dummy2_nc.mpf";
 data_tuples_csv = "./data/tuple_lists/_dl.csv";

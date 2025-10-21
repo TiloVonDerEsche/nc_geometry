@@ -1,7 +1,3 @@
-Write parsing function which splits a cmd with num
-into the cmd and the num
-
-
 Allow R8=-R7 expressions.
 Lookup value of R7 and negate it
 

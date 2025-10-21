@@ -292,7 +292,7 @@ void read_mpf (
                 puts("------\n");
 
 
-                printf("Adding keyword %s to hashmap...\n",cmd_buf);
+                //printf("Adding keyword %s to hashmap...\n",cmd_buf);
                 kl = strfloat_put(h, cmd_buf, &absent);
 
                 if (absent) {
@@ -305,12 +305,12 @@ void read_mpf (
                 printf("Read special cmd: keyword_buf=%s\n",keyword_buf);
 
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
-                  puts("Read LASER_ON cmd!");
+                  //puts("Read LASER_ON cmd!");
                   kl = strfloat_put(h, "laser", &absent);
                   kh_val(h, kl) = 1;
                 }
                 else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
-                  puts("Read LASER_OFF cmd!");
+                  //puts("Read LASER_OFF cmd!");
                   kl = strfloat_put(h, "laser", &absent);
                   kh_val(h, kl) = 0;
                 }
@@ -322,9 +322,6 @@ void read_mpf (
                              "Nor is a variable assignment!\n",keyword_buf);
               puts("--------------\n");
             }
-
-            print_hashmap(h);
-
 
       }
 

@@ -1,10 +1,3 @@
-void set_track_radius(float hradius, float vradius, size_t track_list_len, track** tl) {
-  for (size_t i = 0; i < track_list_len; i++) {
-    (*tl)[i].hradius = hradius;
-    (*tl)[i].vradius = vradius;
-  }
-}
-
 void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
   printf("Writing to csv with path: %s...\n",csv_path);
   FILE* file = fopen(csv_path, "w");
@@ -31,43 +24,6 @@ void write_tracks_to_csv(char* csv_path, size_t track_list_len, track** tl) {
            (*tl)[i].coll_vec.x,(*tl)[i].coll_vec.y,(*tl)[i].coll_vec.z,
            (*tl)[i].hradius,(*tl)[i].vradius);
   }
-}
-
-
-void print_hashmap(strfloat_t* h) {
-  //Print all variables from hashmap
-  khint_t k;
-  puts("-----");
-  kh_foreach(h, k) {
-      if (k < kh_end(h)) {  // Check if found (k != end iterator)
-          printf("var %s=%f\n", kh_key(h, k), kh_val(h, k));
-      }
-  }
-  puts("-----");
-}
-
-//write keys at the end of nc program to first line of hmhis.csv
-void print_key_to_hmhis(strfloat_t* h) {
-  printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./data/hmhis.csv", "w");
-  if (hmhis == NULL) {
-      fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
-      return;}
-
-
-}
-
-//print one line of hmhis, which is fnums seperated by ','
-void print_values_to_hmhis(strfloat_t* h, FILE* hmhis) {
-  //Print all variables from hashmap
-  khint_t k;
-  kh_foreach(h, k) {
-      if (k < kh_end(h)) {  // Check if found (k != end iterator)
-          fprintf(hmhis,"%f,", kh_val(h, k));
-      }
-  }
-
-  fprintf(hmhis,"\n");
 }
 
 size_t count_lines(FILE* fp) {

@@ -88,6 +88,17 @@ typedef struct {
   float machine_speed;
 } data_tuple;
 
+//----------------------struct mutation fns---------------------------------//
+
+void set_track_radius(float hradius, float vradius,
+  size_t track_list_len, track** tl) {
+    
+  for (size_t i = 0; i < track_list_len; i++) {
+    (*tl)[i].hradius = hradius;
+    (*tl)[i].vradius = vradius;
+  }
+}
+
 //---------vector math functions-----------//
 
 float dot_product(vec3D s, vec3D t) {

@@ -1,3 +1,10 @@
+Is there a better format for the hmhis values?
+hmhis grows more columns during the program interpretion
+to adhere to csv syntax we would need to afterwards add the column names &
+fill in NULL for the rows, where the attr was still missing from hmhis
+
+No matter: Attr name to Attr value mapping is required
+-------------------------
 Allow R8=-R7 expressions.
 Lookup value of R7 and negate it
 

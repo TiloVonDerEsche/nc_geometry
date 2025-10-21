@@ -13,6 +13,8 @@ KHASHL_MAP_INIT(KH_LOCAL,
   const char*, float,
   kh_hash_str, kh_eq_str)
 
+#include "khashl_helper.h"
+
 
 typedef struct {
   size_t lines_to_read;

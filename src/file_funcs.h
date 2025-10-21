@@ -188,6 +188,9 @@ void read_mpf (
   float puis_laser = 0; //laser_power
   float vit_tir = 0; //machine_speed
 
+
+  strfloat_put(h, "laser", &absent);
+
   //linewise loop
   for (size_t li = 0; li < config->lines_to_read; li++) {
       char_ptr = program[li]; //set to start of line
@@ -299,11 +302,17 @@ void read_mpf (
             }
             else if ((keyword_buf[0]) == '/') { //special '/' cmds
 
+                printf("Read special cmd: keyword_buf=%s\n",keyword_buf);
+
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
-                  //set_key_value
+                  puts("Read LASER_ON cmd!");
+                  kl = strfloat_put(h, "laser", &absent);
+                  kh_val(h, kl) = 1;
                 }
                 else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
-                  //set_key_value
+                  puts("Read LASER_OFF cmd!");
+                  kl = strfloat_put(h, "laser", &absent);
+                  kh_val(h, kl) = 0;
                 }
             }
             else {
@@ -313,6 +322,8 @@ void read_mpf (
                              "Nor is a variable assignment!\n",keyword_buf);
               puts("--------------\n");
             }
+
+            print_hashmap(h);
 
 
       }

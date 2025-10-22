@@ -6,13 +6,6 @@
 #include <ctype.h>
 #include <errno.h>
 
-//used for variable str_float hashmap
-#include "khashl.h"
-KHASHL_MAP_INIT(KH_LOCAL,
-  strfloat_t, strfloat,
-  const char*, float,
-  kh_hash_str, kh_eq_str)
-
 #include "khashl_helper.h"
 
 
@@ -92,7 +85,7 @@ typedef struct {
 
 void set_track_radius(float hradius, float vradius,
   size_t track_list_len, track** tl) {
-    
+
   for (size_t i = 0; i < track_list_len; i++) {
     (*tl)[i].hradius = hradius;
     (*tl)[i].vradius = vradius;

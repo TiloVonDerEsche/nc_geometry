@@ -58,11 +58,13 @@ void read_mpf (
   }
 
   printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./data/hmhis.csv", "w");
+  FILE* hmhis = fopen("./hmhis_test.csv", "w");
   if (hmhis == NULL) {
       fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
+      exit(-1);
       return;
   }
+  fprintf(hmhis,"TEST!!!???");
 
   //read mpf into program str_arr, each entry is a line of the mpf
   char program[config->mpf_lines][config->max_line_len];
@@ -224,7 +226,7 @@ void read_mpf (
 
                 //----Done----
                 puts("Current hashmap:");
-                print_hashmap(h);
+                print_hashmap(h,hmhis);
             }
             else if (*char_ptr == ':') { //LABEL for goto cmd
 
@@ -284,7 +286,7 @@ void read_mpf (
       // Write hashmap to csv to get hashmap history
       // If a key is absent in hashmap, fill value of wanted key with NONE
       //for non-existing
-      print_values_to_hmhis(h,hmhis);
+      //print_values_to_hmhis(h,hmhis);
 
   }
 
@@ -295,7 +297,7 @@ void read_mpf (
   fclose(dtuple_csv);
   printf("Points from %s, were saved in %s!\n",config->mpf_file,config->data_tuples_csv);
 
-  print_hashmap(h);
+  print_hashmap(h,hmhis);
   //Cleanup str_float variable hashmap
   khint_t k;
   kh_foreach(h, k) {

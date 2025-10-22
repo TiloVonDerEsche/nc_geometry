@@ -1,23 +1,22 @@
-void print_hashmap(strfloat_t* h) {
+#include "khashl.h"
+KHASHL_MAP_INIT(KH_LOCAL,
+  strfloat_t, strfloat,
+  const char*, float,
+  kh_hash_str, kh_eq_str)
+
+void print_hashmap(strfloat_t* h, FILE* destination) {
   //Print all variables from hashmap
   khint_t k;
-  puts("-----");
+  fprintf(destination,"-----\n");
   kh_foreach(h, k) {
       if (k < kh_end(h)) {  // Check if found (k != end iterator)
-          printf("var %s=%f\n", kh_key(h, k), kh_val(h, k));
+          fprintf(destination,"%s=%f\n", kh_key(h, k), kh_val(h, k));
       }
   }
-  puts("-----");
 }
 
 //write keys at the end of nc program to first line of hmhis.csv
 void print_key_to_hmhis(strfloat_t* h) {
-  printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./data/hmhis.csv", "w");
-  if (hmhis == NULL) {
-      fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
-      return;}
-
 
 }
 

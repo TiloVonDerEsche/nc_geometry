@@ -113,13 +113,11 @@ void read_mpf (
       printf("program[%lu]=%s",li,program[li]);
       printf("*char_ptr=%c\n",*char_ptr);
 
+      //print hmhis every line, except for comment
+      if (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr != '\n') {
+        print_hashmap(h,hmhis);}
+
       //single command char loop
-      // printf("((*char_ptr != '\\0') && (*char_ptr != ';') && (*char_ptr != '\\n'))=%u\n"
-      //        "(*char_ptr != '\\0')=%u\n"
-      //        "(*char_ptr != ';')=%u\n"
-      //        "(*char_ptr != '\\n')=%u\n",
-      //         ((*char_ptr != '\0') && (*char_ptr != ';') && (*char_ptr != '\n')),
-      //         (*char_ptr != '\0'),(*char_ptr != ';'),(*char_ptr != '\n'));
       while (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr != '\n') {
           printf("*char_ptr=%c\n",*char_ptr);
 
@@ -181,9 +179,6 @@ void read_mpf (
                     (li+1));
                 }
 
-                //----Done----
-                puts("Current hashmap:");
-                print_hashmap(h,hmhis);
             }
             else if (*char_ptr == ':') { //LABEL for goto cmd
 
@@ -237,14 +232,7 @@ void read_mpf (
                              "Nor is a variable assignment!\n",keyword_buf);
               puts("--------------\n");
             }
-
       }
-
-      // Write hashmap to csv to get hashmap history
-      // If a key is absent in hashmap, fill value of wanted key with NONE
-      //for non-existing
-      //print_values_to_hmhis(h,hmhis);
-
   }
 
   //save the length of tl (track_list) arr in tl_len

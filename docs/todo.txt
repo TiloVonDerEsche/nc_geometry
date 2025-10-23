@@ -1,3 +1,25 @@
+Why can't we print to hmhis_test.csv or hmhis.csv in read_mpf fn?
+It works in write_to_file.c strfloat_map test...
+Find the err!
+
+hmhis:
+---
+laser=0
+G=00
+X=11
+---
+laser=1
+G=01
+X=12
+Y=1
+
+dynamic_db.csv:
+laser,G,X,Y
+0,00,11,NULL
+1,01,12,1
+
+
+------------------------------------------------
 Is there a better format for the hmhis values?
 hmhis grows more columns during the program interpretion
 to adhere to csv syntax we would need to afterwards add the column names &

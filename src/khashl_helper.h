@@ -13,6 +13,7 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
           fprintf(destination,"%s=%f\n", kh_key(h, k), kh_val(h, k));
       }
   }
+  fflush(destination);
 }
 
 //write keys at the end of nc program to first line of hmhis.csv

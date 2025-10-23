@@ -58,13 +58,11 @@ void read_mpf (
   }
 
   printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./hmhis_test.csv", "w");
+  FILE* hmhis = fopen("./data/hmhis.txt", "w");
   if (hmhis == NULL) {
       fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
-      exit(-1);
       return;
   }
-  fprintf(hmhis,"TEST!!!???");
 
   //read mpf into program str_arr, each entry is a line of the mpf
   char program[config->mpf_lines][config->max_line_len];
@@ -304,6 +302,8 @@ void read_mpf (
       free((char*)kh_key(h, k));  // Free duplicated strings
   }
   strfloat_destroy(h);
+
+  fclose(hmhis);
 }
 
 

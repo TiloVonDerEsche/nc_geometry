@@ -47,8 +47,7 @@ size_t count_lines(FILE* fp) {
 void read_mpf (
   data_tuple** dtuple_list, track** track_list, size_t* tl_len,
   Config* config){
-  //set config for mpf_lines, mpf_file path, data_tuples_csv
-
+  //set config for mpf_lines, mpf_file path
 
   printf("Opening: %s in read mode...\n",config->mpf_file);
   FILE* mpf = fopen(config->mpf_file, "r");
@@ -76,40 +75,6 @@ void read_mpf (
   }
   fclose(mpf);
 
-
-  // for (size_t li = 0; li < config->lines_to_read; li++) {
-  //   printf("program[%lu]=%s\n",li,program[li]);
-  // }
-
-
-
-  //open csv file for writing the data_tuples there
-  FILE* dtuple_csv = fopen(config->data_tuples_csv, "w"); // or "a" to append
-  if (dtuple_csv == NULL){
-      fprintf(stderr, "An error occured, while trying to open %s (in write mode)!\n", config->data_tuples_csv);
-      return;
-  }
-
-  fprintf(dtuple_csv, "di, ti, g, p_x,p_y,p_z, laser_on_off, laser_power_w, machine_speed_mm_per_min\n");
-
-  //init first point, because the successor needs its predeceding point to copy
-  (*dtuple_list)[0].P.x = 0;
-  (*dtuple_list)[0].P.y = 0;
-  (*dtuple_list)[0].P.z = 0;
-
-
-  const size_t keywords_len = 8;
-  const char* keywords[] = {
-    "G",
-    "X",
-    "Y",
-    "Z",
-    "/LASER_ON",
-    "/LASER_OFF",
-    "PUIS_LASER "
-    //"VIT_TIR="
-  };
-
   printf("Reading %ld lines from %s...\n",config->mpf_lines,config->mpf_file);
 
   //////////////////////////////////////////////////////////////////////////////
@@ -131,18 +96,12 @@ void read_mpf (
   size_t li = 0; //line index
   size_t ki = 0; //keyword index
 
-  uint8_t laser_on_off = 0;
-
   char keyword_buf[config->max_line_len];
   char value_buf[config->max_line_len];
 
   char* key;
   char* value;
   char* char_ptr;
-
-  float machine_speed = -1;
-  float puis_laser = 0; //laser_power
-  float vit_tir = 0; //machine_speed
 
 
   strfloat_put(h, "laser", &absent);
@@ -290,10 +249,6 @@ void read_mpf (
 
   //save the length of tl (track_list) arr in tl_len
   (*tl_len) = ti;
-
-  //close the mpf file
-  fclose(dtuple_csv);
-  printf("Points from %s, were saved in %s!\n",config->mpf_file,config->data_tuples_csv);
 
   print_hashmap(h,hmhis);
   //Cleanup str_float variable hashmap

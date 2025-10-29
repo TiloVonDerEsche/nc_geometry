@@ -62,7 +62,7 @@ void read_mpf (
       fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
       return;
   }
-  fprintf(hmhis,"'["); //JSON literal object list paranthesis
+  fprintf(hmhis,"["); //JSON literal object list paranthesis
 
   //read mpf into program str_arr, each entry is a line of the mpf
   char program[config->mpf_lines][config->max_line_len];
@@ -246,7 +246,7 @@ void read_mpf (
   print_hashmap(h,hmhis);
 
   fseek(hmhis, -3, SEEK_CUR); //overwrite last redundant comma
-  fprintf(hmhis,"]'"); //JSON literal object list paranthesis
+  fprintf(hmhis,"]"); //JSON literal object list paranthesis
 
   fclose(hmhis);
 

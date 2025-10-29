@@ -56,12 +56,13 @@ void read_mpf (
       return;
   }
 
-  printf("Opening: hmhis.csv in write mode...\n");
-  FILE* hmhis = fopen("./data/hmhis.txt", "w");
+  printf("Opening: hmhis.json in write mode...\n");
+  FILE* hmhis = fopen("./data/hmhis.json", "w");
   if (hmhis == NULL) {
       fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
       return;
   }
+  fprintf(hmhis,"'["); //JSON literal object list paranthesis
 
   //read mpf into program str_arr, each entry is a line of the mpf
   char program[config->mpf_lines][config->max_line_len];
@@ -87,7 +88,9 @@ void read_mpf (
   puts("Initializing str_float_map...");
   strfloat_t* h = strfloat_init();  // Create hashmap
 
+
   //hashmap indices
+  khint_t k;
   khint_t kl; //index left token
   khint_t kr; //index right token
 
@@ -104,7 +107,9 @@ void read_mpf (
   char* char_ptr;
 
 
-  strfloat_put(h, "laser", &absent);
+  k = strfloat_put(h, "laser", &absent);
+  //dup so that freeing loop has something to free
+  kh_key(h, k) = strdup("laser");
 
   //linewise loop
   for (size_t li = 0; li < config->lines_to_read; li++) {
@@ -239,14 +244,17 @@ void read_mpf (
   (*tl_len) = ti;
 
   print_hashmap(h,hmhis);
+
+  fseek(hmhis, -3, SEEK_CUR); //overwrite last redundant comma
+  fprintf(hmhis,"]'"); //JSON literal object list paranthesis
+
+  fclose(hmhis);
+
   //Cleanup str_float variable hashmap
-  khint_t k;
   kh_foreach(h, k) {
       free((char*)kh_key(h, k));  // Free duplicated strings
   }
   strfloat_destroy(h);
-
-  fclose(hmhis);
 }
 
 

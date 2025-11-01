@@ -2,6 +2,7 @@
 *.bin
 *.dll
 *.csv
+*.json
 *.mpf
 *.zip
 

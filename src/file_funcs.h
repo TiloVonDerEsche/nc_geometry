@@ -125,6 +125,9 @@ void read_mpf (
       printf("program[%lu]=%s",li,program[li]);
       printf("*char_ptr=%c\n",*char_ptr);
 
+      k = strfloat_put(h, "line", &absent);
+      kh_val(h, k) = li;
+
       //print hmhis every line, except for comment
       if (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr != '\n') {
         print_hashmap(h,hmhis);}

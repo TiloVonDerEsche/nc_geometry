@@ -99,6 +99,8 @@ void read_mpf (
   size_t li = 0; //line index
   size_t ki = 0; //keyword index
 
+  uint8_t lpower_mode = 0; //bool for puis_laser value fetching
+
   char keyword_buf[config->max_line_len];
   char value_buf[config->max_line_len];
 
@@ -107,9 +109,14 @@ void read_mpf (
   char* char_ptr;
 
 
+  k = strfloat_put(h, "line", &absent);
+  kh_key(h, k) = strdup("line");
+
   k = strfloat_put(h, "laser", &absent);
-  //dup so that freeing loop has something to free
-  kh_key(h, k) = strdup("laser");
+  kh_key(h, k) = strdup("laser");//dup so that freeing loop has something to free
+
+  k = strfloat_put(h, "laser_power", &absent);
+  kh_key(h, k) = strdup("laser_power");
 
   //linewise loop
   for (size_t li = 0; li < config->lines_to_read; li++) {
@@ -126,10 +133,6 @@ void read_mpf (
       while (*char_ptr != '\0' && *char_ptr != ';' && *char_ptr != '\n') {
           printf("*char_ptr=%c\n",*char_ptr);
 
-          if (*char_ptr == '\0' || *char_ptr == ';' || *char_ptr == '\n') {break;}
-
-
-
             ki = 0; //reset keyword_buf index
             //read one token-> either a cmd keyword or varname
             while (isalnum((char)*char_ptr) || *char_ptr == '/' || *char_ptr == '_') {
@@ -137,11 +140,12 @@ void read_mpf (
             keyword_buf[ki] = '\0';
             printf("keyword_buf=%s\n",keyword_buf);
 
-            if (ki == 0) { // No keyword found, maybe just a number or symbol
-                char_ptr++; continue;}
+            if (ki == 0) { // No keyword found, maybe just a symbol
+              char_ptr++; continue;
+            }
 
-
-            if (*char_ptr == '=') { //variable assignment
+            //-------------------variable assignment-------------------//
+            if (*char_ptr == '=') {
                 //add left token (varname) as a hashmap key
                 printf("Adding keyword %s to hashmap...\n",keyword_buf);
                 kl = strfloat_put(h, keyword_buf, &absent);
@@ -188,7 +192,10 @@ void read_mpf (
             else if (*char_ptr == ':') { //LABEL for goto cmd
 
             }
-            else if (is_part_of_fnum((char)*(char_ptr-1))) { //cmd with num
+
+            //-----------------------cmd with num or num literal------------------//
+            else if (is_part_of_fnum((char)*(char_ptr-1))) { //cmd with num or num
+              if (isalpha(keyword_buf[0]) || keyword_buf[0] == '_') { //cmd with num
                 *char_ptr--;
 
                 //puts("CMD WITH NUMBER");
@@ -211,25 +218,44 @@ void read_mpf (
                 kl = strfloat_put(h, cmd_buf, &absent);
 
                 if (absent) {
-                  kh_key(h, kl) = strdup(cmd_buf);}
+                  kh_key(h, kl) = strdup(cmd_buf);
+                }
 
                 kh_val(h, kl) = atof(fnum_buf);
+              }
+              else if (is_part_of_fnum(keyword_buf[0])) {
+                puts("Read a pure float num!");
+                if (lpower_mode) {
+                  k = strfloat_put(h, "laser_power", &absent);
+                  kh_val(h, k) = atof(keyword_buf);
+
+                  lpower_mode = 0;
+                }
+              }
+
             }
+            //-----------------special '/' cmds----------------------//
             else if ((keyword_buf[0]) == '/') { //special '/' cmds
 
                 printf("Read special cmd: keyword_buf=%s\n",keyword_buf);
 
                 if(strcmp(&keyword_buf[1],"LASER_ON") == 0) {
                   //puts("Read LASER_ON cmd!");
-                  kl = strfloat_put(h, "laser", &absent);
-                  kh_val(h, kl) = 1;
+                  k = strfloat_put(h, "laser", &absent);
+                  kh_val(h, k) = 1;
                 }
                 else if (strcmp(&keyword_buf[1],"LASER_OFF") == 0) {
                   //puts("Read LASER_OFF cmd!");
-                  kl = strfloat_put(h, "laser", &absent);
-                  kh_val(h, kl) = 0;
+                  k = strfloat_put(h, "laser", &absent);
+                  kh_val(h, k) = 0;
                 }
             }
+            //----------------cmds where value is seperated with ' '----------//
+            else if ((strcmp(keyword_buf,"PUIS_LASER") == 0)) {
+              lpower_mode = 1; //read value of laser_power in next iter
+              puts("PUIS_LASER read!");
+            }
+            //---------------------unknown cmd (format)---------------------//
             else {
               puts("\n--------------");
               fprintf(stderr,"Read Keyword:'%s' does not start with '/',\n"

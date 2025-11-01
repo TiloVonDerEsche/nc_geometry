@@ -1,7 +1,7 @@
 lines_to_read = -1; //amount of lines read (-1 for all lines)
 max_line_len = 1000; // max chars in one line
 
-mpf_file = "./data/nc_code/dummy2_nc.mpf";
+mpf_file = "./data/nc_code/dummy3_nc.mpf";
 data_tuples_csv = "./data/tuple_lists/_dl.csv";
 track_list_csv = "./data/track_lists/_tl.csv";
 interpolation_csv = "./data/interpolation/_intpol.csv";

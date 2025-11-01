@@ -196,35 +196,46 @@ void read_mpf (
 
             }
 
-            //-----------------------cmd with num or num literal------------------//
+            //-------------cmd with num, num literal or var without '=' ----------//
             else if (is_part_of_fnum((char)*(char_ptr-1))) { //cmd with num or num
-              if (isalpha(keyword_buf[0]) || keyword_buf[0] == '_') { //cmd with num
-                *char_ptr--;
+              if (isalpha(keyword_buf[0]) || keyword_buf[0] == '_') {
+                //check if keyword_buf is a known var
+                //kr = strfloat_put(h, keyword_buf, &absent);
 
-                //puts("CMD WITH NUMBER");
-
-                size_t cb_len = 20; //replace 20 w global constant (config.txt)
-                char cmd_buf[cb_len] = {};
-
-                size_t fnb_len = 20; //replace 20 w global constant (config.txt)
-                char fnum_buf[fnb_len] = {};
-                //key & value, seperated through letters to digits
-                parse_cmd_w_fnum(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
-
-                puts("\n------");
-                printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
-                printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
-                puts("------\n");
-
-
-                //printf("Adding keyword %s to hashmap...\n",cmd_buf);
-                kl = strfloat_put(h, cmd_buf, &absent);
-
-                if (absent) {
-                  kh_key(h, kl) = strdup(cmd_buf);
+                kr = strfloat_get(h, keyword_buf);   // search only
+                if (kh_exist(h, kr)) {
+                  if (lpower_mode) { //laser_power gets value of var
+                    kl = strfloat_put(h, "laser_power", &absent);
+                    kh_val(h, kl) = kh_val(h, kr);
+                  }
                 }
+                else { //cmd with num
 
-                kh_val(h, kl) = atof(fnum_buf);
+                  *char_ptr--;
+
+                  size_t cb_len = 20; //replace 20 w global constant (config.txt)
+                  char cmd_buf[cb_len] = {};
+
+                  size_t fnb_len = 20; //replace 20 w global constant (config.txt)
+                  char fnum_buf[fnb_len] = {};
+                  //key & value, seperated through letters to digits
+                  parse_cmd_w_fnum(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
+
+                  puts("\n------");
+                  printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
+                  printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
+                  puts("------\n");
+
+
+                  //printf("Adding keyword %s to hashmap...\n",cmd_buf);
+                  kl = strfloat_put(h, cmd_buf, &absent);
+
+                  if (absent) {
+                    kh_key(h, kl) = strdup(cmd_buf);
+                  }
+
+                  kh_val(h, kl) = atof(fnum_buf);
+                }
               }
               else if (is_part_of_fnum(keyword_buf[0])) {
                 puts("Read a pure float num!");

@@ -9,6 +9,9 @@
 #include "khashl_helper.h"
 
 
+#define CMD_BUF_LEN 20
+#define FNUM_BUF_LEN 20
+
 typedef struct {
   size_t lines_to_read;
   size_t mpf_lines;
@@ -135,7 +138,7 @@ vec3D vec_scale(vec3D v, float s) {
 }
 
 vec3D norm_vec(vec3D v) {
-  double v_len = vec_len(v);
+  float v_len = vec_len(v);
   if (v_len == 0) {printf("Error: Trying to norm zero vec!\n");
     return (vec3D) {0,0,0};}
   return (vec3D) {v.x / v_len, v.y / v_len, v.z / v_len};
@@ -383,10 +386,60 @@ void parse_line(char* line, char** key, char** value) {
 //parse_cmd_w_fnum(str_len,&A,&A_len,&F,&F_len);
 //printf("str_len=%lu\nA=%s,%lu\nB=%s,%lu,\n",str_len,A,A_len,F,F_len);
 
+
+// void parse_cmd_w_fnum(char** c,size_t str_len,
+//                               size_t* A_len, char (*A)[20],
+//                               size_t* F_len, char (*F)[20]) {
+//   //printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+//   if (str_len < 2) {
+//     fprintf(stderr,"Trying to call parse_cmd_w_fnum with str_len<2\n");
+//     return;}
+//
+//   // if (*F == NULL) {
+//   //   fprintf(stderr, "Passing of parameter 'F' failed, in parse_cmd_w_fnum fn!\n");
+//   //   return;}
+//
+//   //printf("2.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
+//
+//   //total length of str, which is cmd_w_fnum f.e. "X1.2"-> 4
+//   size_t tlen = 0;
+//   size_t alen = 0; //len for cmd (alphas) "X" -> 1
+//   size_t flen = 0; //len for num (float) "1.2" -> 3
+//
+//    //read cmd_w_fnum backwards
+//    //read fnum
+//    while (is_part_of_fnum(**c) && tlen < str_len) {
+//      (*F)[flen] = **c;
+//
+//      //printf("*F=%s\n", *F); printf("**c=%c\n",**c);
+//      (*c)--;flen++;
+//      tlen++;}
+//
+//   //read cmd
+//   while (isalpha(**c) && tlen < str_len) {
+//     (*A)[alen] = **c;
+//
+//     //printf("*A=%s\n", *A); printf("**c=%c\n",**c);
+//     (*c)--;alen++;
+//     tlen++;}
+//
+//   flip_str_ptr(A,alen);
+//   flip_str_ptr(F,flen);
+//
+//   (*A)[alen] = '\0';
+//   *A_len = alen;
+//
+//   *F_len = flen;
+//   (*F)[flen] = '\0';
+//
+//   //printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);
+//
+//   //set the char_ptr to the space behind read cmd_w_fnum
+//   (*c)+=tlen+1;
+// }
+
 //split string across the switch from aplhas to a float num
-void parse_cmd_w_fnum(char** c,size_t str_len,
-                              size_t* A_len, char (*A)[20],
-                              size_t* F_len, char (*F)[20]) {
+void parse_cmd_w_fnum(char** c, size_t str_len, char (*A)[20], char (*F)[20]) {
   //printf("1.:\nstr_len=%lu,A=%s,%lu,F=%s,%lu,\n",str_len,*A,*A_len,*F,*F_len);
   if (str_len < 2) {
     fprintf(stderr,"Trying to call parse_cmd_w_fnum with str_len<2\n");
@@ -424,9 +477,6 @@ void parse_cmd_w_fnum(char** c,size_t str_len,
   flip_str_ptr(F,flen);
 
   (*A)[alen] = '\0';
-  *A_len = alen;
-
-  *F_len = flen;
   (*F)[flen] = '\0';
 
   //printf("3.:\nstr_len=%lu A=%s,%lu F=%s,%lu\n",str_len,*A,*A_len,*F,*F_len);

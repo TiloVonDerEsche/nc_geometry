@@ -35,7 +35,7 @@ int main() {
     }
 
     len = strlen(input_buf);
-    if (0 < len && input_buf[len - 1] == '\n') {
+    if (0 < len && input_buf[len - 1] == '\n') { //remove '\n'
       input_buf[len - 1] = '\0';
       len--;
     }

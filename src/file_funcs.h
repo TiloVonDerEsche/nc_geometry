@@ -213,17 +213,14 @@ void read_mpf (
 
                   *char_ptr--;
 
-                  size_t cb_len = 20; //replace 20 w global constant (config.txt)
-                  char cmd_buf[cb_len] = {};
-
-                  size_t fnb_len = 20; //replace 20 w global constant (config.txt)
-                  char fnum_buf[fnb_len] = {};
+                  char cmd_buf[CMD_BUF_LEN] = {};
+                  char fnum_buf[FNUM_BUF_LEN] = {};
                   //key & value, seperated through letters to digits
-                  parse_cmd_w_fnum(&char_ptr, ki, &cb_len, &cmd_buf, &fnb_len, &fnum_buf);
+                  parse_cmd_w_fnum(&char_ptr, ki, &cmd_buf, &fnum_buf);
 
                   puts("\n------");
-                  printf("Read cmd=%s, with len=%lu\n",cmd_buf,cb_len);
-                  printf("Read num after cmd=%s, with len=%lu\n",fnum_buf,fnb_len);
+                  printf("Read cmd=%s\n",cmd_buf);
+                  printf("Read num after cmd=%s\n",fnum_buf);
                   puts("------\n");
 
 

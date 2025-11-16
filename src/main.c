@@ -51,14 +51,14 @@ int main() {
 
 
 
-    data_tuple* tuple_list = calloc(config.mpf_lines,sizeof(data_tuple));
+    data_tuple* tuple_list = (data_tuple*)calloc(config.mpf_lines,sizeof(data_tuple));
     if (tuple_list == NULL) {
       fprintf(stderr, "Memory allocation of tuple_list failed\n");
         exit(EXIT_FAILURE);
     }
 
 
-    track* track_list = calloc(config.mpf_lines,sizeof(track));
+    track* track_list = (track*)calloc(config.mpf_lines,sizeof(track));
     if (track_list == NULL) {
       fprintf(stderr, "Memory allocation of track list failed\n");
         exit(EXIT_FAILURE);

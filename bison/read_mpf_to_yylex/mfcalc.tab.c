@@ -515,16 +515,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   64
+#define YYLAST   74
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  16
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  17
+#define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  32
+#define YYNSTATES  34
 
 /* YYMAXUTOK -- Last valid token kind.  */
 #define YYMAXUTOK   261
@@ -575,7 +575,7 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    40,    40,    41,    46,    47,    50,    55,    56,    80,
-      86,    87,    88,    89,    90,    91,    92,    93
+      86,    97,    98,    99,   100,   101,   102,   103,   104
 };
 #endif
 
@@ -603,7 +603,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-13)
+#define YYPACT_NINF (-9)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -617,10 +617,10 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -13,    15,   -13,   -12,   -13,    -3,   -10,    20,   -13,    20,
-     -13,    41,   -13,    20,    20,    -4,    23,    20,    20,    20,
-      20,    20,   -13,    48,    32,   -13,    52,    52,    -4,    -4,
-      -4,   -13
+      -9,    17,    -9,    -4,    -9,    -1,    -3,    29,     2,    -9,
+      29,    -9,    55,    -9,    29,    29,    -2,    -9,    37,    29,
+      29,    29,    29,    29,    -9,    62,    46,    -9,    -8,    -8,
+      -2,    -2,    -2,    -9
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -628,22 +628,22 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,     0,     7,     8,     0,     0,     4,     0,
-       3,     0,     6,     0,     0,    15,     0,     0,     0,     0,
-       0,     0,     5,     9,     0,    17,    12,    11,    13,    14,
-      16,    10
+       2,     0,     1,     0,     7,     8,     0,     0,     0,     4,
+       0,     3,     0,     6,     0,     0,    16,    10,     0,     0,
+       0,     0,     0,     0,     5,     9,     0,    18,    13,    12,
+      14,    15,    17,    11
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -13,   -13,   -13,    -7
+      -9,    -9,    -9,    -7
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1,    10,    11
+       0,     1,    11,    12
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -651,48 +651,50 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      15,    12,    16,    13,    14,     0,    23,    24,    21,     0,
-      26,    27,    28,    29,    30,     2,     3,     0,     4,     5,
-       6,     0,     7,     4,     5,     6,     0,     7,     8,     9,
-      17,    18,    19,    20,     9,    21,     0,     0,    25,    17,
-      18,    19,    20,     0,    21,     0,     0,    31,    17,    18,
-      19,    20,     0,    21,    22,    17,    18,    19,    20,     0,
-      21,    19,    20,     0,    21
+      16,    21,    22,    18,    23,    14,    17,    25,    26,    13,
+      23,    15,    28,    29,    30,    31,    32,     2,     3,     0,
+       4,     5,     6,     0,     7,     0,     0,     8,     0,     0,
+       9,    10,     4,     5,     6,     0,     7,     0,     0,     8,
+       0,     0,     0,    10,    19,    20,    21,    22,     0,    23,
+       0,     0,    27,    19,    20,    21,    22,     0,    23,     0,
+       0,    33,    19,    20,    21,    22,     0,    23,    24,    19,
+      20,    21,    22,     0,    23
 };
 
 static const yytype_int8 yycheck[] =
 {
-       7,    13,     9,     6,    14,    -1,    13,    14,    12,    -1,
-      17,    18,    19,    20,    21,     0,     1,    -1,     3,     4,
-       5,    -1,     7,     3,     4,     5,    -1,     7,    13,    14,
-       7,     8,     9,    10,    14,    12,    -1,    -1,    15,     7,
-       8,     9,    10,    -1,    12,    -1,    -1,    15,     7,     8,
-       9,    10,    -1,    12,    13,     7,     8,     9,    10,    -1,
-      12,     9,    10,    -1,    12
+       7,     9,    10,    10,    12,     6,     4,    14,    15,    13,
+      12,    14,    19,    20,    21,    22,    23,     0,     1,    -1,
+       3,     4,     5,    -1,     7,    -1,    -1,    10,    -1,    -1,
+      13,    14,     3,     4,     5,    -1,     7,    -1,    -1,    10,
+      -1,    -1,    -1,    14,     7,     8,     9,    10,    -1,    12,
+      -1,    -1,    15,     7,     8,     9,    10,    -1,    12,    -1,
+      -1,    15,     7,     8,     9,    10,    -1,    12,    13,     7,
+       8,     9,    10,    -1,    12
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    17,     0,     1,     3,     4,     5,     7,    13,    14,
-      18,    19,    13,     6,    14,    19,    19,     7,     8,     9,
-      10,    12,    13,    19,    19,    15,    19,    19,    19,    19,
-      19,    15
+       0,    17,     0,     1,     3,     4,     5,     7,    10,    13,
+      14,    18,    19,    13,     6,    14,    19,     4,    19,     7,
+       8,     9,    10,    12,    13,    19,    19,    15,    19,    19,
+      19,    19,    19,    15
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
        0,    16,    17,    17,    18,    18,    18,    19,    19,    19,
-      19,    19,    19,    19,    19,    19,    19,    19
+      19,    19,    19,    19,    19,    19,    19,    19,    19
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     0,     2,     1,     2,     2,     1,     1,     3,
-       4,     3,     3,     3,     3,     2,     3,     3
+       2,     4,     3,     3,     3,     3,     2,     3,     3
 };
 
 
@@ -1160,13 +1162,13 @@ yyreduce:
              { printf ("%.10g\n", (yyvsp[-1].exp));
               print_hashmap(h,stdout);
              }
-#line 1164 "mfcalc.tab.c"
+#line 1166 "mfcalc.tab.c"
     break;
 
   case 6: /* line: error '\n'  */
 #line 50 "mfcalc.y"
              { yyerrok; }
-#line 1170 "mfcalc.tab.c"
+#line 1172 "mfcalc.tab.c"
     break;
 
   case 8: /* exp: VAR  */
@@ -1174,7 +1176,7 @@ yyreduce:
                      {
                       //variable
                       k = strfloat_get(h, (yyvsp[0].VAR));
-                      if (k < kh_end(h) && 0) {
+                      if ( kh_exist(h, k) ) {
                         (yyval.exp) = kh_val(h, k);
                       }
 
@@ -1195,7 +1197,7 @@ yyreduce:
                       }
 
                      }
-#line 1199 "mfcalc.tab.c"
+#line 1201 "mfcalc.tab.c"
     break;
 
   case 9: /* exp: VAR '=' exp  */
@@ -1206,59 +1208,75 @@ yyreduce:
                       kh_val(h, k) = (yyvsp[0].exp);
                       (yyval.exp) = (yyvsp[0].exp);
                      }
-#line 1210 "mfcalc.tab.c"
+#line 1212 "mfcalc.tab.c"
     break;
 
-  case 10: /* exp: FUN '(' exp ')'  */
+  case 10: /* exp: '/' VAR  */
 #line 86 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-3].FUN)->value.fun ((yyvsp[-1].exp));         }
-#line 1216 "mfcalc.tab.c"
-    break;
+                      {puts("SPECIAL CMD!");
+                       if(strcmp((yyvsp[0].VAR),"LASER_ON") == 0) {
+                         k = strfloat_put(h, "laser", &absent);
+                         kh_val(h, k) = 1;
+                       }
+                       else if(strcmp((yyvsp[0].VAR),"LASER_OFF") == 0) {
+                         k = strfloat_put(h, "laser", &absent);
+                         kh_val(h, k) = 0;
+                       }
 
-  case 11: /* exp: exp '+' exp  */
-#line 87 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-2].exp) + (yyvsp[0].exp);                    }
-#line 1222 "mfcalc.tab.c"
-    break;
-
-  case 12: /* exp: exp '-' exp  */
-#line 88 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-2].exp) - (yyvsp[0].exp);                    }
+                     }
 #line 1228 "mfcalc.tab.c"
     break;
 
-  case 13: /* exp: exp '*' exp  */
-#line 89 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-2].exp) * (yyvsp[0].exp);                    }
+  case 11: /* exp: FUN '(' exp ')'  */
+#line 97 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-3].FUN)->value.fun ((yyvsp[-1].exp));         }
 #line 1234 "mfcalc.tab.c"
     break;
 
-  case 14: /* exp: exp '/' exp  */
-#line 90 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-2].exp) / (yyvsp[0].exp);                    }
+  case 12: /* exp: exp '+' exp  */
+#line 98 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-2].exp) + (yyvsp[0].exp);                    }
 #line 1240 "mfcalc.tab.c"
     break;
 
-  case 15: /* exp: '-' exp  */
-#line 91 "mfcalc.y"
-                     { (yyval.exp) = -(yyvsp[0].exp);                        }
+  case 13: /* exp: exp '-' exp  */
+#line 99 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-2].exp) - (yyvsp[0].exp);                    }
 #line 1246 "mfcalc.tab.c"
     break;
 
-  case 16: /* exp: exp '^' exp  */
-#line 92 "mfcalc.y"
-                     { (yyval.exp) = pow ((yyvsp[-2].exp), (yyvsp[0].exp));               }
+  case 14: /* exp: exp '*' exp  */
+#line 100 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-2].exp) * (yyvsp[0].exp);                    }
 #line 1252 "mfcalc.tab.c"
     break;
 
-  case 17: /* exp: '(' exp ')'  */
-#line 93 "mfcalc.y"
-                     { (yyval.exp) = (yyvsp[-1].exp);                         }
+  case 15: /* exp: exp '/' exp  */
+#line 101 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-2].exp) / (yyvsp[0].exp);                    }
 #line 1258 "mfcalc.tab.c"
     break;
 
+  case 16: /* exp: '-' exp  */
+#line 102 "mfcalc.y"
+                     { (yyval.exp) = -(yyvsp[0].exp);                        }
+#line 1264 "mfcalc.tab.c"
+    break;
 
-#line 1262 "mfcalc.tab.c"
+  case 17: /* exp: exp '^' exp  */
+#line 103 "mfcalc.y"
+                     { (yyval.exp) = pow ((yyvsp[-2].exp), (yyvsp[0].exp));               }
+#line 1270 "mfcalc.tab.c"
+    break;
+
+  case 18: /* exp: '(' exp ')'  */
+#line 104 "mfcalc.y"
+                     { (yyval.exp) = (yyvsp[-1].exp);                         }
+#line 1276 "mfcalc.tab.c"
+    break;
+
+
+#line 1280 "mfcalc.tab.c"
 
       default: break;
     }
@@ -1451,5 +1469,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 96 "mfcalc.y"
+#line 108 "mfcalc.y"
 

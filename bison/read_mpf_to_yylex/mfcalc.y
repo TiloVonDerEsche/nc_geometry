@@ -25,7 +25,7 @@
 %token <double>  NUM     /* Double precision number. */
 %token <char*> VAR  /* Symbol table pointer: variable/function. */
 %token <symrec*> FUN
-%nterm <double>  exp
+%nterm <double> exp
 
 %precedence '='
 %left '-' '+'
@@ -56,7 +56,7 @@ exp:
 | VAR                {
                       //variable
                       k = strfloat_get(h, $1);
-                      if (k < kh_end(h) && 0) {
+                      if ( kh_exist(h, k) ) {
                         $$ = kh_val(h, k);
                       }
 
@@ -83,6 +83,17 @@ exp:
                       kh_val(h, k) = $3;
                       $$ = $3;
                      }
+| '/' VAR             {puts("SPECIAL CMD!");
+                       if(strcmp($2,"LASER_ON") == 0) {
+                         k = strfloat_put(h, "laser", &absent);
+                         kh_val(h, k) = 1;
+                       }
+                       else if(strcmp($2,"LASER_OFF") == 0) {
+                         k = strfloat_put(h, "laser", &absent);
+                         kh_val(h, k) = 0;
+                       }
+
+                     }
 | FUN '(' exp ')'    { $$ = $1->value.fun ($3);         }
 | exp '+' exp        { $$ = $1 + $3;                    }
 | exp '-' exp        { $$ = $1 - $3;                    }
@@ -91,6 +102,7 @@ exp:
 | '-' exp  %prec NEG { $$ = -$2;                        }
 | exp '^' exp        { $$ = pow ($1, $3);               }
 | '(' exp ')'        { $$ = $2;                         }
+
 ;
 
 %%

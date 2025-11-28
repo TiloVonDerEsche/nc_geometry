@@ -53,7 +53,7 @@ yylex (void)
           /* Get another character. */
           c = getchar ();
         }
-      while (isalnum (c));
+      while (isalnum (c) || c == '_');
 
       ungetc (c, stdin);
       symbuf[i] = '\0';

@@ -53,6 +53,14 @@ line:
 
 exp:
   NUM
+| VAR NUM            {
+                      puts("VAR NUM case!");
+                      if (strcmp($1,"PUIS_LASER") == 0) {
+                        printf("PUIS_LASER=%f",$2);
+                        k = strfloat_put(h, "laser_power", &absent);
+                        kh_val(h, k) = $2;
+                      }
+                     }
 | VAR                {
                       //variable
                       k = strfloat_get(h, $1);

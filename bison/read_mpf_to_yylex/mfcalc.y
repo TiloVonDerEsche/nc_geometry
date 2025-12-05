@@ -25,7 +25,7 @@
 %token <double>  NUM     /* Double precision number. */
 %token <char*> VAR  /* Symbol table pointer: variable/function. */
 %token <symrec*> FUN
-%nterm <double> exp
+%nterm <double> expr
 
 %precedence '='
 %left '-' '+'
@@ -44,14 +44,14 @@ input:
 
 line:
   '\n'
-| exp '\n'   { printf ("%.10g\n", $1);
+| expr '\n'   { printf ("%.10g\n", $1);
               print_hashmap(h,stdout);
              }
 | error '\n' { yyerrok; }
 ;
 
 
-exp:
+expr:
   NUM
 | VAR NUM            {
                       puts("VAR NUM case!");
@@ -85,7 +85,7 @@ exp:
                       }
 
                      }
-| VAR '=' exp        {k = strfloat_put(h, $1, &absent);
+| VAR '=' expr        {k = strfloat_put(h, $1, &absent);
                       if (absent) {
                         kh_key(h, k) = strdup($1);}
                       kh_val(h, k) = $3;
@@ -102,14 +102,14 @@ exp:
                        }
 
                      }
-| FUN '(' exp ')'    { $$ = $1->value.fun ($3);         }
-| exp '+' exp        { $$ = $1 + $3;                    }
-| exp '-' exp        { $$ = $1 - $3;                    }
-| exp '*' exp        { $$ = $1 * $3;                    }
-| exp '/' exp        { $$ = $1 / $3;                    }
-| '-' exp  %prec NEG { $$ = -$2;                        }
-| exp '^' exp        { $$ = pow ($1, $3);               }
-| '(' exp ')'        { $$ = $2;                         }
+| FUN '(' expr ')'    { $$ = $1->value.fun ($3);         }
+| expr '+' expr        { $$ = $1 + $3;                    }
+| expr '-' expr        { $$ = $1 - $3;                    }
+| expr '*' expr        { $$ = $1 * $3;                    }
+| expr '/' expr        { $$ = $1 / $3;                    }
+| '-' expr  %prec NEG { $$ = -$2;                        }
+| expr '^' expr        { $$ = pow ($1, $3);               }
+| '(' expr ')'        { $$ = $2;                         }
 
 ;
 

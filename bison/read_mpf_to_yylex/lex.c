@@ -7,6 +7,39 @@ extern strfloat_t* h;
 khint_t kl;
 extern int absent;
 
+//////////////////////////////////////////////////
+//------open files & read_mpf into program-----//
+/////////////////////////////////////////////////
+// printf("Opening: %s in read mode...\n",config->mpf_file);
+// FILE* mpf = fopen(config->mpf_file, "r");
+// if (mpf == NULL) {
+//     fprintf(stderr, "Error: Could not open %s (in read mode)!\n", config->mpf_file);
+//     return;
+// }
+//
+// printf("Opening: hmhis.json in write mode...\n");
+// FILE* hmhis = fopen("./data/hmhis.json", "w");
+// if (hmhis == NULL) {
+//     fprintf(stderr, "Error: Could not open hmhis.csv (in write mode)!\n");
+//     return;
+// }
+// fprintf(hmhis,"["); //JSON literal object list paranthesis
+//
+// //read mpf into program str_arr, each entry is a line of the mpf
+// char program[config->mpf_lines][config->max_line_len];
+// char line_buf[config->max_line_len];
+//
+// size_t mi = 0;
+// while ((fgets(line_buf, config->max_line_len, mpf) != NULL) && (mi < config->lines_to_read)) {
+//   strcpy(program[mi],line_buf);
+//   printf("Copied %s to program[%lu]\n",line_buf,mi);
+//   mi++;
+// }
+// fclose(mpf);
+//
+// printf("Reading %ld lines from %s...\n",config->mpf_lines,config->mpf_file);
+/////////////////////////////////////////////////
+
 int
 yylex (void)
 {

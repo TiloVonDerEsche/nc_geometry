@@ -78,7 +78,12 @@ assignment:
 ;
 
 val:
-  VAR            {printf("VAR=%s\n",$1); $$=666;}
+  VAR            {printf("VAR=%s\n",$1);
+                  k = strfloat_get(h, $1);
+                  if ( kh_exist(h, k) ) {
+                    $$ = kh_val(h, k);
+                  } else {$$=0;}
+                 }
   | INT          {printf("INT=%d\n",$1); $$=$1;}
   | FLOAT        {printf("FLOAT=%f\n",$1); $$=$1;}
 ;

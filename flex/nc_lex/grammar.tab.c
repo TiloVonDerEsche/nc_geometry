@@ -533,8 +533,8 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int8 yyrline[] =
 {
        0,    41,    41,    45,    46,    50,    55,    56,    57,    61,
-      62,    63,    64,    68,    77,    81,    82,    83,    87,    88,
-      89,    90,    91
+      62,    63,    64,    68,    77,    81,    87,    88,    92,    93,
+      94,    95,    96
 };
 #endif
 
@@ -1158,54 +1158,59 @@ yyreduce:
 
   case 15: /* val: VAR  */
 #line 81 "grammar.y"
-                 {printf("VAR=%s\n",(yyvsp[0].VAR)); (yyval.val)=666;}
-#line 1163 "grammar.tab.c"
+                 {printf("VAR=%s\n",(yyvsp[0].VAR));
+                  k = strfloat_get(h, (yyvsp[0].VAR));
+                  if ( kh_exist(h, k) ) {
+                    (yyval.val) = kh_val(h, k);
+                  } else {(yyval.val)=0;}
+                 }
+#line 1168 "grammar.tab.c"
     break;
 
   case 16: /* val: INT  */
-#line 82 "grammar.y"
+#line 87 "grammar.y"
                  {printf("INT=%d\n",(yyvsp[0].INT)); (yyval.val)=(yyvsp[0].INT);}
-#line 1169 "grammar.tab.c"
+#line 1174 "grammar.tab.c"
     break;
 
   case 17: /* val: FLOAT  */
-#line 83 "grammar.y"
+#line 88 "grammar.y"
                  {printf("FLOAT=%f\n",(yyvsp[0].FLOAT)); (yyval.val)=(yyvsp[0].FLOAT);}
-#line 1175 "grammar.tab.c"
+#line 1180 "grammar.tab.c"
     break;
 
   case 18: /* arith_expr: val  */
-#line 87 "grammar.y"
+#line 92 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
-#line 1181 "grammar.tab.c"
+#line 1186 "grammar.tab.c"
     break;
 
   case 19: /* arith_expr: arith_expr '+' arith_expr  */
-#line 88 "grammar.y"
+#line 93 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); printf("%f+%f=%f\n", (yyvsp[-2].arith_expr),(yyvsp[0].arith_expr),(yyval.arith_expr));}
-#line 1187 "grammar.tab.c"
+#line 1192 "grammar.tab.c"
     break;
 
   case 20: /* arith_expr: arith_expr '-' arith_expr  */
-#line 89 "grammar.y"
+#line 94 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
-#line 1193 "grammar.tab.c"
+#line 1198 "grammar.tab.c"
     break;
 
   case 21: /* arith_expr: arith_expr '*' arith_expr  */
-#line 90 "grammar.y"
+#line 95 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
-#line 1199 "grammar.tab.c"
+#line 1204 "grammar.tab.c"
     break;
 
   case 22: /* arith_expr: arith_expr '/' arith_expr  */
-#line 91 "grammar.y"
+#line 96 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
-#line 1205 "grammar.tab.c"
+#line 1210 "grammar.tab.c"
     break;
 
 
-#line 1209 "grammar.tab.c"
+#line 1214 "grammar.tab.c"
 
       default: break;
     }
@@ -1398,7 +1403,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 105 "grammar.y"
+#line 110 "grammar.y"
 
 
 int yyerror(char *s)

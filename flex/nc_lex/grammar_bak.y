@@ -16,18 +16,20 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-
 %token <int> INT
 %token <float> FLOAT
 
-%token EQ NEQ LTEQ GTEQ
-%token SPACE SEMICOLON NEWLINE OTHER
-%token IF GOTO
+%token <char*> EQ
+%token <char*> NEQ
+%token <char*> LTEQ
+%token <char*> GTEQ
+
 
 %token <char*> VAR
 %token <char*> CUSTOM_VAR
 %token <char*> CMD
 %token <char*> SPECIAL_CMD
+%token <char*> IF
 %token <char*> LABEL
 
 %nterm <float> val
@@ -38,35 +40,20 @@
 %left '*' '/'
 
 %%
-prog:
-  lines
+input:
+  %empty          {puts("%empty");}
+| input line      {puts("\ninput line!");}
 ;
 
-lines:
-  %empty
-  | line NEWLINE lines
-;
 
 line:
-  exprs                 {puts("Test!");}
-;
-
-
-exprs:
-  %empty
-  | expr
-  | expr SPACE exprs;
-;
-
-expr:
-  CMD INT                {printf("CMD: %s=%d\n",$1,$2);}
-  | CMD FLOAT            {printf("CMD: %s=%f\n",$1,$2);}
-  | assignment
-  | OTHER
-;
-
-assignment:
-  VAR '=' arith_expr     {
+  '\n'
+| arith_expr '\n'   {puts("arith!"); printf ("%f\n", $1);
+                      print_hashmap(h,stdout);
+                      fflush(stdout);
+                    }
+| bool_expr '\n'    { printf ("%d\n", $1); }
+| VAR '=' arith_expr '\n' {
                             // Logic to store $3 into the variable $1
                             printf("Assignment: %s = %f\n", $1, $3);
                             /*k = strfloat_put(h, $1, &absent);
@@ -75,12 +62,20 @@ assignment:
                             kh_val(h, k) = $3;
                             print_hashmap(h, stdout);*/
                           }
-  | CMD '=' arith_expr   { /* Handle simple commands */ }
+| CMD '=' arith_expr '\n' { /* Handle simple commands */ }
+| error '\n' { puts("An error has occured:"); }
 ;
 
 val:
-  VAR            {printf("VAR=%s\n",$1); }
-  | INT          {printf("INT=%d\n",$1);}
+  FLOAT  {$$ = $1;}
+  | INT  {$$ = $1;}
+  | VAR  { /*k = strfloat_get(h, $1);
+          if ( kh_exist(h, k) ) {
+            $$ = kh_val(h, k); }
+          else {
+            yyerrok;
+            }*/
+         }
 ;
 
 arith_expr:
@@ -89,6 +84,7 @@ arith_expr:
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
+
 ;
 
 bool_expr:

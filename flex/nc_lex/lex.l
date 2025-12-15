@@ -1,5 +1,5 @@
 %{
-  #include "grammar.tab.c"
+  #include "grammar.tab.h"
 %}
 
 
@@ -12,7 +12,7 @@ INT      {DIGIT}+
 FLOAT    ({DIGIT}+"."{DIGIT}*)|({DIGIT}*"."{DIGIT}+)
 NUM      {INT}|{FLOAT}
 
-ID       [A-Za-z][_|(A-Za-z0-9)]*
+ID       [A-Za-z][_A-Za-z0-9]*
 LETTER   [A-Z]
 
 
@@ -21,19 +21,19 @@ LETTER   [A-Z]
 
 
 {INT} {
-        yylval.ival = atoi(yytext);
+        yylval.INT = atoi(yytext);
         printf("An integer: %s\n", yytext);
         return INT;
 }
 
 {FLOAT} {
-        yylval.fval = atof(yytext);
+        yylval.FLOAT = atof(yytext);
         printf("A float: %s\n", yytext);
         return FLOAT;
 }
 
 R{INT} {
-        yylval.sval = yytext; //strdup(yytext);
+        yylval.VAR = strdup(yytext);
         printf("A variable: %s\n", yytext);
         return VAR;
 }
@@ -44,25 +44,25 @@ IF {
 }
 
 "/"{LETTER}{ID} {
-        yylval.sval = yytext;
+        yylval.SPECIAL_CMD = strdup(yytext);
         printf("A special command: %s\n", yytext);
         return SPECIAL_CMD;
 }
 
 {LETTER}{ID}":" {
-        yylval.sval = yytext;
+        yylval.LABEL = strdup(yytext);
         printf("A label: %s\n", yytext);
         return LABEL;
 }
 
 {LETTER}{ID} {
-        yylval.sval = yytext;
+        yylval.CUSTOM_VAR = strdup(yytext);
         printf("A custom Variable: %s\n", yytext);
         return CUSTOM_VAR;
 }
 
 {LETTER} {
-        yylval.sval = yytext;
+        yylval.CMD = strdup(yytext);
         printf("A command: %s\n", yytext);
         return CMD;
 }
@@ -78,12 +78,12 @@ IF {
 
 
 
-";"[^\n]* printf("A comment: %s\n", yytext);
+";"[^\n]* {printf("A comment: %s\n", yytext); return SEMICOLON;}
 
 "="   {printf("An assignment!\n");}
-" "   printf("A space\n");
+" "   {printf("A space\n"); return SPACE;}
 [\t\n]+
 
-.       printf("Unrecognized character: %s\n", yytext);
+.       {printf("Unrecognized character: %s\n", yytext); return OTHER;}
 
 %%

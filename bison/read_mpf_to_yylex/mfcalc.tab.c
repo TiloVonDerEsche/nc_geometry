@@ -522,7 +522,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  20
+#define YYNRULES  19
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  35
 
@@ -574,9 +574,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    40,    40,    41,    46,    47,    50,    55,    56,    57,
-      65,    89,    95,   106,   107,   108,   109,   110,   111,   112,
-     113
+       0,    40,    40,    41,    46,    47,    50,    55,    56,    64,
+      88,    94,   105,   106,   107,   108,   109,   110,   111,   112
 };
 #endif
 
@@ -629,10 +628,10 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,     0,     8,    10,     0,     0,     0,     4,
-       0,     3,     0,     6,     9,     0,     0,     7,    12,     0,
-       0,     0,     0,     0,     0,     5,     7,     0,    20,     7,
-       7,     7,     7,     7,    13
+       2,     0,     1,     0,     7,     9,     0,     0,     0,     4,
+       0,     3,     0,     6,     8,     0,     0,    17,    11,     0,
+       0,     0,     0,     0,     0,     5,    10,     0,    19,    14,
+      13,    15,    16,    18,    12
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -688,16 +687,14 @@ static const yytype_int8 yystos[] =
 static const yytype_int8 yyr1[] =
 {
        0,    16,    17,    17,    18,    18,    18,    19,    19,    19,
-      19,    19,    19,    19,    19,    19,    19,    19,    19,    19,
-      19
+      19,    19,    19,    19,    19,    19,    19,    19,    19,    19
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     2,     2,     1,     1,     2,
-       1,     3,     2,     4,     3,     3,     3,     3,     2,     3,
-       3
+       0,     2,     0,     2,     1,     2,     2,     1,     2,     1,
+       3,     2,     4,     3,     3,     3,     3,     2,     3,     3
 };
 
 
@@ -1160,22 +1157,34 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 2: /* input: %empty  */
+#line 40 "mfcalc.y"
+              {puts("%empty");}
+#line 1164 "mfcalc.tab.c"
+    break;
+
+  case 3: /* input: input line  */
+#line 41 "mfcalc.y"
+              {puts("\ninput line!");}
+#line 1170 "mfcalc.tab.c"
+    break;
+
   case 5: /* line: expr '\n'  */
 #line 47 "mfcalc.y"
               { printf ("%.10g\n", (yyvsp[-1].expr));
               print_hashmap(h,stdout);
              }
-#line 1169 "mfcalc.tab.c"
+#line 1178 "mfcalc.tab.c"
     break;
 
   case 6: /* line: error '\n'  */
 #line 50 "mfcalc.y"
              { yyerrok; }
-#line 1175 "mfcalc.tab.c"
+#line 1184 "mfcalc.tab.c"
     break;
 
-  case 9: /* expr: VAR NUM  */
-#line 57 "mfcalc.y"
+  case 8: /* expr: VAR NUM  */
+#line 56 "mfcalc.y"
                      {
                       puts("VAR NUM case!");
                       if (strcmp((yyvsp[-1].VAR),"PUIS_LASER") == 0) {
@@ -1184,11 +1193,11 @@ yyreduce:
                         kh_val(h, k) = (yyvsp[0].NUM);
                       }
                      }
-#line 1188 "mfcalc.tab.c"
+#line 1197 "mfcalc.tab.c"
     break;
 
-  case 10: /* expr: VAR  */
-#line 65 "mfcalc.y"
+  case 9: /* expr: VAR  */
+#line 64 "mfcalc.y"
                      {
                       //variable
                       k = strfloat_get(h, (yyvsp[0].VAR));
@@ -1213,22 +1222,22 @@ yyreduce:
                       }
 
                      }
-#line 1217 "mfcalc.tab.c"
+#line 1226 "mfcalc.tab.c"
     break;
 
-  case 11: /* expr: VAR '=' expr  */
-#line 89 "mfcalc.y"
+  case 10: /* expr: VAR '=' expr  */
+#line 88 "mfcalc.y"
                       {k = strfloat_put(h, (yyvsp[-2].VAR), &absent);
                       if (absent) {
                         kh_key(h, k) = strdup((yyvsp[-2].VAR));}
                       kh_val(h, k) = (yyvsp[0].expr);
                       (yyval.expr) = (yyvsp[0].expr);
                      }
-#line 1228 "mfcalc.tab.c"
+#line 1237 "mfcalc.tab.c"
     break;
 
-  case 12: /* expr: '/' VAR  */
-#line 95 "mfcalc.y"
+  case 11: /* expr: '/' VAR  */
+#line 94 "mfcalc.y"
                       {puts("SPECIAL CMD!");
                        if(strcmp((yyvsp[0].VAR),"LASER_ON") == 0) {
                          k = strfloat_put(h, "laser", &absent);
@@ -1240,59 +1249,59 @@ yyreduce:
                        }
 
                      }
-#line 1244 "mfcalc.tab.c"
+#line 1253 "mfcalc.tab.c"
     break;
 
-  case 13: /* expr: FUN '(' expr ')'  */
-#line 106 "mfcalc.y"
+  case 12: /* expr: FUN '(' expr ')'  */
+#line 105 "mfcalc.y"
                       { (yyval.expr) = (yyvsp[-3].FUN)->value.fun ((yyvsp[-1].expr));         }
-#line 1250 "mfcalc.tab.c"
+#line 1259 "mfcalc.tab.c"
     break;
 
-  case 14: /* expr: expr '+' expr  */
-#line 107 "mfcalc.y"
+  case 13: /* expr: expr '+' expr  */
+#line 106 "mfcalc.y"
                        { (yyval.expr) = (yyvsp[-2].expr) + (yyvsp[0].expr);                    }
-#line 1256 "mfcalc.tab.c"
+#line 1265 "mfcalc.tab.c"
     break;
 
-  case 15: /* expr: expr '-' expr  */
-#line 108 "mfcalc.y"
+  case 14: /* expr: expr '-' expr  */
+#line 107 "mfcalc.y"
                        { (yyval.expr) = (yyvsp[-2].expr) - (yyvsp[0].expr);                    }
-#line 1262 "mfcalc.tab.c"
+#line 1271 "mfcalc.tab.c"
     break;
 
-  case 16: /* expr: expr '*' expr  */
-#line 109 "mfcalc.y"
+  case 15: /* expr: expr '*' expr  */
+#line 108 "mfcalc.y"
                        { (yyval.expr) = (yyvsp[-2].expr) * (yyvsp[0].expr);                    }
-#line 1268 "mfcalc.tab.c"
+#line 1277 "mfcalc.tab.c"
     break;
 
-  case 17: /* expr: expr '/' expr  */
-#line 110 "mfcalc.y"
+  case 16: /* expr: expr '/' expr  */
+#line 109 "mfcalc.y"
                        { (yyval.expr) = (yyvsp[-2].expr) / (yyvsp[0].expr);                    }
-#line 1274 "mfcalc.tab.c"
+#line 1283 "mfcalc.tab.c"
     break;
 
-  case 18: /* expr: '-' expr  */
-#line 111 "mfcalc.y"
+  case 17: /* expr: '-' expr  */
+#line 110 "mfcalc.y"
                       { (yyval.expr) = -(yyvsp[0].expr);                        }
-#line 1280 "mfcalc.tab.c"
+#line 1289 "mfcalc.tab.c"
     break;
 
-  case 19: /* expr: expr '^' expr  */
-#line 112 "mfcalc.y"
+  case 18: /* expr: expr '^' expr  */
+#line 111 "mfcalc.y"
                        { (yyval.expr) = pow ((yyvsp[-2].expr), (yyvsp[0].expr));               }
-#line 1286 "mfcalc.tab.c"
+#line 1295 "mfcalc.tab.c"
     break;
 
-  case 20: /* expr: '(' expr ')'  */
-#line 113 "mfcalc.y"
+  case 19: /* expr: '(' expr ')'  */
+#line 112 "mfcalc.y"
                       { (yyval.expr) = (yyvsp[-1].expr);                         }
-#line 1292 "mfcalc.tab.c"
+#line 1301 "mfcalc.tab.c"
     break;
 
 
-#line 1296 "mfcalc.tab.c"
+#line 1305 "mfcalc.tab.c"
 
       default: break;
     }
@@ -1485,5 +1494,5 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 117 "mfcalc.y"
+#line 116 "mfcalc.y"
 

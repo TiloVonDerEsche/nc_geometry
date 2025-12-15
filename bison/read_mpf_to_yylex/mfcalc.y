@@ -37,8 +37,8 @@
 %%
 
 input:
-  %empty
-| input line
+  %empty      {puts("%empty");}
+| input line  {puts("\ninput line!");}
 ;
 
 

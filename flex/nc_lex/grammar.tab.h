@@ -54,23 +54,24 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    INT = 258,                     /* INT  */
-    FLOAT = 259,                   /* FLOAT  */
-    EQ = 260,                      /* EQ  */
-    NEQ = 261,                     /* NEQ  */
-    LTEQ = 262,                    /* LTEQ  */
-    GTEQ = 263,                    /* GTEQ  */
-    SPACE = 264,                   /* SPACE  */
-    SEMICOLON = 265,               /* SEMICOLON  */
-    NEWLINE = 266,                 /* NEWLINE  */
-    OTHER = 267,                   /* OTHER  */
-    IF = 268,                      /* IF  */
-    GOTO = 269,                    /* GOTO  */
-    VAR = 270,                     /* VAR  */
-    CUSTOM_VAR = 271,              /* CUSTOM_VAR  */
+    SPACE = 258,                   /* SPACE  */
+    NEWLINE = 259,                 /* NEWLINE  */
+    SET = 260,                     /* SET  */
+    SEMICOLON = 261,               /* SEMICOLON  */
+    OTHER = 262,                   /* OTHER  */
+    INT = 263,                     /* INT  */
+    FLOAT = 264,                   /* FLOAT  */
+    EQ = 265,                      /* EQ  */
+    NEQ = 266,                     /* NEQ  */
+    LTEQ = 267,                    /* LTEQ  */
+    GTEQ = 268,                    /* GTEQ  */
+    IF = 269,                      /* IF  */
+    GOTO = 270,                    /* GOTO  */
+    VAR = 271,                     /* VAR  */
     CMD = 272,                     /* CMD  */
     SPECIAL_CMD = 273,             /* SPECIAL_CMD  */
-    LABEL = 274                    /* LABEL  */
+    CUSTOM_VAR = 274,              /* CUSTOM_VAR  */
+    LABEL = 275                    /* LABEL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -80,16 +81,16 @@ extern int yydebug;
 union YYSTYPE
 {
   char* VAR;                               /* VAR  */
-  char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
   char* CMD;                               /* CMD  */
   char* SPECIAL_CMD;                       /* SPECIAL_CMD  */
+  char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
   char* LABEL;                             /* LABEL  */
   float FLOAT;                             /* FLOAT  */
   float val;                               /* val  */
   float arith_expr;                        /* arith_expr  */
   int INT;                                 /* INT  */
 
-#line 93 "grammar.tab.h"
+#line 94 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

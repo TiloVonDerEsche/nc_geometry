@@ -5,7 +5,7 @@
   #include "khashl_helper.h"
 
   int yylex (void);
-  void yyerror (char const *);
+  int yyerror(char *s);
 
   extern strfloat_t* h;
   extern khint_t k;
@@ -16,23 +16,22 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-
+%token SPACE NEWLINE SET SEMICOLON OTHER
 %token <int> INT
 %token <float> FLOAT
 
 %token EQ NEQ LTEQ GTEQ
-%token SPACE SEMICOLON NEWLINE OTHER
 %token IF GOTO
 
 %token <char*> VAR
-%token <char*> CUSTOM_VAR
 %token <char*> CMD
 %token <char*> SPECIAL_CMD
+%token <char*> CUSTOM_VAR
 %token <char*> LABEL
 
 %nterm <float> val
 %nterm <float> arith_expr
-%nterm <float> bool_expr
+%nterm <int> bool_expr
 
 %left '+' '-'
 %left '*' '/'
@@ -62,11 +61,11 @@ expr:
   CMD INT                {printf("CMD: %s=%d\n",$1,$2);}
   | CMD FLOAT            {printf("CMD: %s=%f\n",$1,$2);}
   | assignment
-  | OTHER
+  | arith_expr           {printf("arith_expr=%f\n",$1);}
 ;
 
 assignment:
-  VAR '=' arith_expr     {
+  VAR SET arith_expr     {
                             // Logic to store $3 into the variable $1
                             printf("Assignment: %s = %f\n", $1, $3);
                             /*k = strfloat_put(h, $1, &absent);
@@ -75,17 +74,18 @@ assignment:
                             kh_val(h, k) = $3;
                             print_hashmap(h, stdout);*/
                           }
-  | CMD '=' arith_expr   { /* Handle simple commands */ }
+  | CMD SET arith_expr   { /* Handle simple commands */ }
 ;
 
 val:
-  VAR            {printf("VAR=%s\n",$1); }
-  | INT          {printf("INT=%d\n",$1);}
+  VAR            {printf("VAR=%s\n",$1); $$=666;}
+  | INT          {printf("INT=%d\n",$1); $$=$1;}
+  | FLOAT        {printf("FLOAT=%f\n",$1); $$=$1;}
 ;
 
 arith_expr:
   val         {$$=$1;}
-  | arith_expr '+' arith_expr {puts("SUM!");$$=$1+$3;printf("%f+%f=%f\n", $1,$3,$$);fflush(stdout);}
+  | arith_expr '+' arith_expr {$$=$1+$3; printf("%f+%f=%f\n", $1,$3,$$);}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
@@ -103,3 +103,9 @@ bool_expr:
 
 
 %%
+
+int yyerror(char *s)
+{
+	printf("Syntax Error on line %s\n", s);
+	return 0;
+}

@@ -1,14 +1,6 @@
 #include "lex.yy.c"
 #include "grammar.tab.c"
 
-void
-yyerror (char const *s)
-{
-  fprintf (stderr, "err: %s\n", s);
-}
-
-int yywrap() {return 1;}
-
 strfloat_t* h;
 khint_t k;
 int absent;

@@ -22,7 +22,7 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
   fprintf(destination,"},\n"); //replace last comma
 }
 
-void init_hashmap(strfloat_t* h) {
+void init_hashmap_ng(strfloat_t* h) {
   khint_t k;
   int absent;
 

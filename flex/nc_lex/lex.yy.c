@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -477,8 +477,8 @@ char *yytext_ptr;
 
 #include "grammar.tab.h"
 void showError();
-#line 480 "lex.yy.c"
 #line 481 "lex.yy.c"
+#line 482 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -699,7 +699,7 @@ YY_DECL
 
 
 
-#line 702 "lex.yy.c"
+#line 703 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -828,7 +828,7 @@ YY_RULE_SETUP
 #line 47 "test.l"
 ECHO;
 	YY_BREAK
-#line 831 "lex.yy.c"
+#line 832 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

@@ -7,12 +7,11 @@
   int yylex (void);
   int yyerror(char *s);
 
-  extern strfloat_t* h;
-  extern khint_t k;
-  extern int absent;
+  strfloat_t* h;
+  khint_t k;
+  int absent;
+
 %}
-
-
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
@@ -47,7 +46,7 @@ lines:
 ;
 
 line:
-  exprs                 {puts("Test!");}
+  exprs                 {print_hashmap(h, stdout);}
 ;
 
 
@@ -68,20 +67,22 @@ assignment:
   VAR SET arith_expr     {
                             // Logic to store $3 into the variable $1
                             printf("Assignment: %s = %f\n", $1, $3);
-                            /*k = strfloat_put(h, $1, &absent);
+                            k = strfloat_put(h, $1, &absent);
                             if (absent) {
                               kh_key(h, k) = strdup($1);}
                             kh_val(h, k) = $3;
-                            print_hashmap(h, stdout);*/
+                            printf("Set %s to %f\n", $1, $3);
                           }
   | CMD SET arith_expr   { /* Handle simple commands */ }
 ;
 
 val:
-  VAR            {printf("VAR=%s\n",$1);
+  VAR            {
+                  printf("Getting VAR=%s\n",$1);
                   k = strfloat_get(h, $1);
                   if ( kh_exist(h, k) ) {
                     $$ = kh_val(h, k);
+                    printf("'%s'=%f\n",$1,$$);
                   } else {$$=0;}
                  }
   | INT          {printf("INT=%d\n",$1); $$=$1;}
@@ -113,4 +114,30 @@ int yyerror(char *s)
 {
 	printf("Syntax Error on line %s\n", s);
 	return 0;
+}
+
+
+void init_hashmap() {
+  khint_t k;
+  int absent;
+
+  h = strfloat_init();
+
+  k = strfloat_put(h, "line", &absent);
+  kh_key(h, k) = strdup("line");
+  kh_val(h, k) = 123;
+
+  k = strfloat_put(h, "laser", &absent);
+  kh_key(h, k) = strdup("laser");
+
+  kh_val(h, k) = -1.2;
+  k = strfloat_put(h, "laser_power", &absent);
+  kh_key(h, k) = strdup("laser_power");
+  kh_val(h, k) = 3500;
+
+  k = strfloat_put(h, "R1", &absent);
+  kh_key(h, k) = strdup("R1");
+  kh_val(h, k) = 456;
+
+  print_hashmap(h, stdout);
 }

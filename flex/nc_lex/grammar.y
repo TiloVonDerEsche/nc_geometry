@@ -90,6 +90,7 @@ expr:
 assignment:
   VAR SET arith_expr     {set_var($1,$3);}
   | CMD SET arith_expr   {set_var($1,$3);}
+  | CUSTOM_VAR SET arith_expr {set_var($1,$3);}
 ;
 
 

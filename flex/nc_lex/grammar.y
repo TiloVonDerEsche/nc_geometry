@@ -49,7 +49,10 @@ lines:
 ;
 
 line:
-  exprs                 {print_hashmap(h, stdout);}
+  exprs                 {
+                         set_var("line",get_var_val("line")+1);
+                         print_hashmap(h, stdout);
+                        }
 ;
 
 

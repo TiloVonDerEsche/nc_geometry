@@ -536,9 +536,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    43,    43,    47,    48,    52,    57,    58,    59,    63,
-      64,    65,    66,    74,    79,    87,    88,    93,    97,    98,
-     102,   103,   104,   105,   106
+       0,    43,    43,    47,    48,    52,    60,    61,    62,    66,
+      67,    68,    69,    77,    82,    90,    91,    96,   100,   101,
+     105,   106,   107,   108,   109
 };
 #endif
 
@@ -1118,24 +1118,27 @@ yyreduce:
     {
   case 5: /* line: exprs  */
 #line 52 "grammar.y"
-                        {print_hashmap(h, stdout);}
-#line 1123 "grammar.tab.c"
+                        {
+                         set_var("line",get_var_val("line")+1);
+                         print_hashmap(h, stdout);
+                        }
+#line 1126 "grammar.tab.c"
     break;
 
   case 9: /* expr: CMD INT  */
-#line 63 "grammar.y"
+#line 66 "grammar.y"
                          {set_var((yyvsp[-1].CMD),(float)(yyvsp[0].INT));}
-#line 1129 "grammar.tab.c"
+#line 1132 "grammar.tab.c"
     break;
 
   case 10: /* expr: CMD FLOAT  */
-#line 64 "grammar.y"
+#line 67 "grammar.y"
                          {set_var((yyvsp[-1].CMD),(yyvsp[0].FLOAT));}
-#line 1135 "grammar.tab.c"
+#line 1138 "grammar.tab.c"
     break;
 
   case 12: /* expr: SPECIAL_CMD  */
-#line 66 "grammar.y"
+#line 69 "grammar.y"
                          {
                           if(strcmp((yyvsp[0].SPECIAL_CMD),"/LASER_ON") == 0) {
                             set_var("laser",1);
@@ -1144,94 +1147,94 @@ yyreduce:
                             set_var("laser",0);
                           }
                          }
-#line 1148 "grammar.tab.c"
+#line 1151 "grammar.tab.c"
     break;
 
   case 13: /* expr: CUSTOM_VAR SPACE INT  */
-#line 74 "grammar.y"
+#line 77 "grammar.y"
                          {
                            if(strcmp((yyvsp[-2].CUSTOM_VAR),"PUIS_LASER") == 0) {
                              set_var("laser_power",(float)(yyvsp[0].INT));
                            }
                           }
-#line 1158 "grammar.tab.c"
+#line 1161 "grammar.tab.c"
     break;
 
   case 14: /* expr: CUSTOM_VAR SPACE FLOAT  */
-#line 79 "grammar.y"
+#line 82 "grammar.y"
                            {
                             if(strcmp((yyvsp[-2].CUSTOM_VAR),"PUIS_LASER") == 0) {
                               set_var("laser_power",(yyvsp[0].FLOAT));
                             }
                            }
-#line 1168 "grammar.tab.c"
+#line 1171 "grammar.tab.c"
     break;
 
   case 15: /* assignment: VAR SET arith_expr  */
-#line 87 "grammar.y"
+#line 90 "grammar.y"
                          {set_var((yyvsp[-2].VAR),(yyvsp[0].arith_expr));}
-#line 1174 "grammar.tab.c"
+#line 1177 "grammar.tab.c"
     break;
 
   case 16: /* assignment: CMD SET arith_expr  */
-#line 88 "grammar.y"
+#line 91 "grammar.y"
                          {set_var((yyvsp[-2].CMD),(yyvsp[0].arith_expr));}
-#line 1180 "grammar.tab.c"
+#line 1183 "grammar.tab.c"
     break;
 
   case 17: /* val: VAR  */
-#line 93 "grammar.y"
+#line 96 "grammar.y"
                  {
                   printf("Getting VAR=%s\n",(yyvsp[0].VAR));
                   (yyval.val) = get_var_val((yyvsp[0].VAR));
                  }
-#line 1189 "grammar.tab.c"
+#line 1192 "grammar.tab.c"
     break;
 
   case 18: /* val: INT  */
-#line 97 "grammar.y"
+#line 100 "grammar.y"
                  {printf("INT=%d\n",(yyvsp[0].INT)); (yyval.val)=(yyvsp[0].INT);}
-#line 1195 "grammar.tab.c"
+#line 1198 "grammar.tab.c"
     break;
 
   case 19: /* val: FLOAT  */
-#line 98 "grammar.y"
+#line 101 "grammar.y"
                  {printf("FLOAT=%f\n",(yyvsp[0].FLOAT)); (yyval.val)=(yyvsp[0].FLOAT);}
-#line 1201 "grammar.tab.c"
+#line 1204 "grammar.tab.c"
     break;
 
   case 20: /* arith_expr: val  */
-#line 102 "grammar.y"
+#line 105 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
-#line 1207 "grammar.tab.c"
+#line 1210 "grammar.tab.c"
     break;
 
   case 21: /* arith_expr: arith_expr '+' arith_expr  */
-#line 103 "grammar.y"
+#line 106 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); printf("%f+%f=%f\n", (yyvsp[-2].arith_expr),(yyvsp[0].arith_expr),(yyval.arith_expr));}
-#line 1213 "grammar.tab.c"
+#line 1216 "grammar.tab.c"
     break;
 
   case 22: /* arith_expr: arith_expr '-' arith_expr  */
-#line 104 "grammar.y"
+#line 107 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
-#line 1219 "grammar.tab.c"
+#line 1222 "grammar.tab.c"
     break;
 
   case 23: /* arith_expr: arith_expr '*' arith_expr  */
-#line 105 "grammar.y"
+#line 108 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
-#line 1225 "grammar.tab.c"
+#line 1228 "grammar.tab.c"
     break;
 
   case 24: /* arith_expr: arith_expr '/' arith_expr  */
-#line 106 "grammar.y"
+#line 109 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
-#line 1231 "grammar.tab.c"
+#line 1234 "grammar.tab.c"
     break;
 
 
-#line 1235 "grammar.tab.c"
+#line 1238 "grammar.tab.c"
 
       default: break;
     }
@@ -1424,7 +1427,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 120 "grammar.y"
+#line 123 "grammar.y"
 
 
 int yyerror(char *s)
@@ -1459,19 +1462,15 @@ void init_hashmap() {
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 123;
+  kh_val(h, k) = 1;
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
+  kh_val(h, k) = 0;
 
-  kh_val(h, k) = -1.2;
   k = strfloat_put(h, "laser_power", &absent);
   kh_key(h, k) = strdup("laser_power");
-  kh_val(h, k) = 3500;
-
-  k = strfloat_put(h, "R1", &absent);
-  kh_key(h, k) = strdup("R1");
-  kh_val(h, k) = 456;
+  kh_val(h, k) = 0;
 
   print_hashmap(h, stdout);
 }

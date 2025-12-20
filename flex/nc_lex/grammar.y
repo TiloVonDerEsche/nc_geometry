@@ -71,6 +71,16 @@ expr:
                             set_var("laser",0);
                           }
                          }
+  | CUSTOM_VAR SPACE INT {
+                           if(strcmp($1,"PUIS_LASER") == 0) {
+                             set_var("laser_power",(float)$3);
+                           }
+                          }
+  | CUSTOM_VAR SPACE FLOAT {
+                            if(strcmp($1,"PUIS_LASER") == 0) {
+                              set_var("laser_power",$3);
+                            }
+                           }
 ;
 
 assignment:
@@ -141,19 +151,15 @@ void init_hashmap() {
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 123;
+  kh_val(h, k) = 1;
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
+  kh_val(h, k) = 0;
 
-  kh_val(h, k) = -1.2;
   k = strfloat_put(h, "laser_power", &absent);
   kh_key(h, k) = strdup("laser_power");
-  kh_val(h, k) = 3500;
-
-  k = strfloat_put(h, "R1", &absent);
-  kh_key(h, k) = strdup("R1");
-  kh_val(h, k) = 456;
+  kh_val(h, k) = 0;
 
   print_hashmap(h, stdout);
 }

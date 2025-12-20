@@ -11,7 +11,8 @@
   khint_t k;
   int absent;
 
-  void set_var_in_h(char*, float);
+  void set_var(char*, float);
+  float get_var_val(char*);
   void init_hashmap();
 %}
 
@@ -59,28 +60,21 @@ exprs:
 ;
 
 expr:
-  CMD INT                {set_var_in_h($1,(float)$2);}
-  | CMD FLOAT            {set_var_in_h($1,$2);}
+  CMD INT                {set_var($1,(float)$2);}
+  | CMD FLOAT            {set_var($1,$2);}
   | assignment
   | arith_expr           {printf("arith_expr=%f\n",$1);}
 ;
 
 assignment:
-  VAR SET arith_expr     {
-                            printf("Assignment: %s = %f\n", $1, $3);
-                            set_var_in_h($1,$3);
-                          }
-  | CMD SET arith_expr   { set_var_in_h($1,$3); }
+  VAR SET arith_expr     {set_var($1,$3);}
+  | CMD SET arith_expr   {set_var($1,$3);}
 ;
 
 val:
   VAR            {
                   printf("Getting VAR=%s\n",$1);
-                  k = strfloat_get(h, $1);
-                  if ( kh_exist(h, k) ) {
-                    $$ = kh_val(h, k);
-                    printf("'%s'=%f\n",$1,$$);
-                  } else {$$=0;}
+                  $$ = get_var_val($1);
                  }
   | INT          {printf("INT=%d\n",$1); $$=$1;}
   | FLOAT        {printf("FLOAT=%f\n",$1); $$=$1;}
@@ -113,12 +107,21 @@ int yyerror(char *s)
 	return 0;
 }
 
-void set_var_in_h(char* varname, float fnum) {
+void set_var(char* varname, float fnum) {
   k = strfloat_put(h, varname, &absent);
   if (absent) {
     kh_key(h, k) = strdup(varname);}
   kh_val(h, k) = fnum;
   printf("Set %s to %f\n", varname, fnum);
+}
+
+float get_var_val(char* varname) {
+  k = strfloat_get(h, varname);
+  if ( kh_exist(h, k) ) {
+    return kh_val(h, k);
+  }
+
+  return 0;
 }
 
 

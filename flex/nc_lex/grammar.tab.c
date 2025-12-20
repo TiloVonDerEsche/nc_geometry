@@ -81,10 +81,11 @@
   khint_t k;
   int absent;
 
-  void set_var_in_h(char*, float);
+  void set_var(char*, float);
+  float get_var_val(char*);
   void init_hashmap();
 
-#line 88 "grammar.tab.c"
+#line 89 "grammar.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -535,9 +536,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    42,    42,    46,    47,    51,    56,    57,    58,    62,
-      63,    64,    65,    69,    73,    77,    85,    86,    90,    91,
-      92,    93,    94
+       0,    43,    43,    47,    48,    52,    57,    58,    59,    63,
+      64,    65,    66,    70,    71,    75,    79,    80,    84,    85,
+      86,    87,    88
 };
 #endif
 
@@ -1116,101 +1117,94 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* line: exprs  */
-#line 51 "grammar.y"
+#line 52 "grammar.y"
                         {print_hashmap(h, stdout);}
-#line 1122 "grammar.tab.c"
+#line 1123 "grammar.tab.c"
     break;
 
   case 9: /* expr: CMD INT  */
-#line 62 "grammar.y"
-                         {set_var_in_h((yyvsp[-1].CMD),(float)(yyvsp[0].INT));}
-#line 1128 "grammar.tab.c"
+#line 63 "grammar.y"
+                         {set_var((yyvsp[-1].CMD),(float)(yyvsp[0].INT));}
+#line 1129 "grammar.tab.c"
     break;
 
   case 10: /* expr: CMD FLOAT  */
-#line 63 "grammar.y"
-                         {set_var_in_h((yyvsp[-1].CMD),(yyvsp[0].FLOAT));}
-#line 1134 "grammar.tab.c"
+#line 64 "grammar.y"
+                         {set_var((yyvsp[-1].CMD),(yyvsp[0].FLOAT));}
+#line 1135 "grammar.tab.c"
     break;
 
   case 12: /* expr: arith_expr  */
-#line 65 "grammar.y"
+#line 66 "grammar.y"
                          {printf("arith_expr=%f\n",(yyvsp[0].arith_expr));}
-#line 1140 "grammar.tab.c"
+#line 1141 "grammar.tab.c"
     break;
 
   case 13: /* assignment: VAR SET arith_expr  */
-#line 69 "grammar.y"
-                         {
-                            printf("Assignment: %s = %f\n", (yyvsp[-2].VAR), (yyvsp[0].arith_expr));
-                            set_var_in_h((yyvsp[-2].VAR),(yyvsp[0].arith_expr));
-                          }
-#line 1149 "grammar.tab.c"
+#line 70 "grammar.y"
+                         {set_var((yyvsp[-2].VAR),(yyvsp[0].arith_expr));}
+#line 1147 "grammar.tab.c"
     break;
 
   case 14: /* assignment: CMD SET arith_expr  */
-#line 73 "grammar.y"
-                         { set_var_in_h((yyvsp[-2].CMD),(yyvsp[0].arith_expr)); }
-#line 1155 "grammar.tab.c"
+#line 71 "grammar.y"
+                         {set_var((yyvsp[-2].CMD),(yyvsp[0].arith_expr));}
+#line 1153 "grammar.tab.c"
     break;
 
   case 15: /* val: VAR  */
-#line 77 "grammar.y"
+#line 75 "grammar.y"
                  {
                   printf("Getting VAR=%s\n",(yyvsp[0].VAR));
-                  k = strfloat_get(h, (yyvsp[0].VAR));
-                  if ( kh_exist(h, k) ) {
-                    (yyval.val) = kh_val(h, k);
-                    printf("'%s'=%f\n",(yyvsp[0].VAR),(yyval.val));
-                  } else {(yyval.val)=0;}
+                  (yyval.val) = get_var_val((yyvsp[0].VAR));
                  }
-#line 1168 "grammar.tab.c"
+#line 1162 "grammar.tab.c"
     break;
 
   case 16: /* val: INT  */
-#line 85 "grammar.y"
+#line 79 "grammar.y"
                  {printf("INT=%d\n",(yyvsp[0].INT)); (yyval.val)=(yyvsp[0].INT);}
-#line 1174 "grammar.tab.c"
+#line 1168 "grammar.tab.c"
     break;
 
   case 17: /* val: FLOAT  */
-#line 86 "grammar.y"
+#line 80 "grammar.y"
                  {printf("FLOAT=%f\n",(yyvsp[0].FLOAT)); (yyval.val)=(yyvsp[0].FLOAT);}
-#line 1180 "grammar.tab.c"
+#line 1174 "grammar.tab.c"
     break;
 
   case 18: /* arith_expr: val  */
-#line 90 "grammar.y"
+#line 84 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
-#line 1186 "grammar.tab.c"
+#line 1180 "grammar.tab.c"
     break;
 
   case 19: /* arith_expr: arith_expr '+' arith_expr  */
-#line 91 "grammar.y"
+#line 85 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); printf("%f+%f=%f\n", (yyvsp[-2].arith_expr),(yyvsp[0].arith_expr),(yyval.arith_expr));}
-#line 1192 "grammar.tab.c"
+#line 1186 "grammar.tab.c"
     break;
 
   case 20: /* arith_expr: arith_expr '-' arith_expr  */
-#line 92 "grammar.y"
+#line 86 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
-#line 1198 "grammar.tab.c"
+#line 1192 "grammar.tab.c"
     break;
 
   case 21: /* arith_expr: arith_expr '*' arith_expr  */
-#line 93 "grammar.y"
+#line 87 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
-#line 1204 "grammar.tab.c"
+#line 1198 "grammar.tab.c"
     break;
 
   case 22: /* arith_expr: arith_expr '/' arith_expr  */
-#line 94 "grammar.y"
+#line 88 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
-#line 1210 "grammar.tab.c"
+#line 1204 "grammar.tab.c"
     break;
 
 
-#line 1214 "grammar.tab.c"
+#line 1208 "grammar.tab.c"
 
       default: break;
     }
@@ -1403,7 +1397,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 108 "grammar.y"
+#line 102 "grammar.y"
 
 
 int yyerror(char *s)
@@ -1412,12 +1406,21 @@ int yyerror(char *s)
 	return 0;
 }
 
-void set_var_in_h(char* varname, float fnum) {
+void set_var(char* varname, float fnum) {
   k = strfloat_put(h, varname, &absent);
   if (absent) {
     kh_key(h, k) = strdup(varname);}
   kh_val(h, k) = fnum;
   printf("Set %s to %f\n", varname, fnum);
+}
+
+float get_var_val(char* varname) {
+  k = strfloat_get(h, varname);
+  if ( kh_exist(h, k) ) {
+    return kh_val(h, k);
+  }
+
+  return 0;
 }
 
 

@@ -13,7 +13,6 @@ Terminals unused in grammar
     GTEQ
     IF
     GOTO
-    SPECIAL_CMD
     CUSTOM_VAR
     LABEL
     '<'
@@ -48,7 +47,7 @@ Grammar
     8 expr: CMD INT
     9     | CMD FLOAT
    10     | assignment
-   11     | arith_expr
+   11     | SPECIAL_CMD
 
    12 assignment: VAR SET arith_expr
    13           | CMD SET arith_expr
@@ -89,7 +88,7 @@ Terminals, with rules where they appear
     GOTO (270)
     VAR <char*> (271) 12 14
     CMD <char*> (272) 8 9 13
-    SPECIAL_CMD <char*> (273)
+    SPECIAL_CMD <char*> (273) 11
     CUSTOM_VAR <char*> (274)
     LABEL <char*> (275)
 
@@ -121,274 +120,205 @@ Nonterminals, with rules where they appear
         on right: 17
     arith_expr <float> (35)
         on left: 17 18 19 20 21
-        on right: 11 12 13 18 19 20 21
+        on right: 12 13 18 19 20 21
 
 
 State 0
 
     0 $accept: • prog $end
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 3
-    CMD    shift, and go to state 4
+    VAR          shift, and go to state 1
+    CMD          shift, and go to state 2
+    SPECIAL_CMD  shift, and go to state 3
 
     NEWLINE   reduce using rule 5 (exprs)
     $default  reduce using rule 2 (lines)
 
-    prog        go to state 5
-    lines       go to state 6
-    line        go to state 7
-    exprs       go to state 8
-    expr        go to state 9
-    assignment  go to state 10
-    val         go to state 11
-    arith_expr  go to state 12
+    prog        go to state 4
+    lines       go to state 5
+    line        go to state 6
+    exprs       go to state 7
+    expr        go to state 8
+    assignment  go to state 9
 
 
 State 1
 
-   15 val: INT •
+   12 assignment: VAR • SET arith_expr
 
-    $default  reduce using rule 15 (val)
+    SET  shift, and go to state 10
 
 
 State 2
-
-   16 val: FLOAT •
-
-    $default  reduce using rule 16 (val)
-
-
-State 3
-
-   12 assignment: VAR • SET arith_expr
-   14 val: VAR •
-
-    SET  shift, and go to state 13
-
-    $default  reduce using rule 14 (val)
-
-
-State 4
 
     8 expr: CMD • INT
     9     | CMD • FLOAT
    13 assignment: CMD • SET arith_expr
 
-    SET    shift, and go to state 14
-    INT    shift, and go to state 15
-    FLOAT  shift, and go to state 16
+    SET    shift, and go to state 11
+    INT    shift, and go to state 12
+    FLOAT  shift, and go to state 13
 
 
-State 5
+State 3
+
+   11 expr: SPECIAL_CMD •
+
+    $default  reduce using rule 11 (expr)
+
+
+State 4
 
     0 $accept: prog • $end
 
-    $end  shift, and go to state 17
+    $end  shift, and go to state 14
 
 
-State 6
+State 5
 
     1 prog: lines •
 
     $default  reduce using rule 1 (prog)
 
 
-State 7
+State 6
 
     3 lines: line • NEWLINE lines
 
-    NEWLINE  shift, and go to state 18
+    NEWLINE  shift, and go to state 15
 
 
-State 8
+State 7
 
     4 line: exprs •
 
     $default  reduce using rule 4 (line)
 
 
-State 9
+State 8
 
     6 exprs: expr •
     7      | expr • SPACE exprs
 
-    SPACE  shift, and go to state 19
+    SPACE  shift, and go to state 16
 
     $default  reduce using rule 6 (exprs)
 
 
-State 10
+State 9
 
    10 expr: assignment •
 
     $default  reduce using rule 10 (expr)
 
 
-State 11
-
-   17 arith_expr: val •
-
-    $default  reduce using rule 17 (arith_expr)
-
-
-State 12
-
-   11 expr: arith_expr •
-   18 arith_expr: arith_expr • '+' arith_expr
-   19           | arith_expr • '-' arith_expr
-   20           | arith_expr • '*' arith_expr
-   21           | arith_expr • '/' arith_expr
-
-    '+'  shift, and go to state 20
-    '-'  shift, and go to state 21
-    '*'  shift, and go to state 22
-    '/'  shift, and go to state 23
-
-    $default  reduce using rule 11 (expr)
-
-
-State 13
+State 10
 
    12 assignment: VAR SET • arith_expr
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
 
-    val         go to state 11
-    arith_expr  go to state 25
+    val         go to state 20
+    arith_expr  go to state 21
 
 
-State 14
+State 11
 
    13 assignment: CMD SET • arith_expr
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
 
-    val         go to state 11
-    arith_expr  go to state 26
+    val         go to state 20
+    arith_expr  go to state 22
 
 
-State 15
+State 12
 
     8 expr: CMD INT •
 
     $default  reduce using rule 8 (expr)
 
 
-State 16
+State 13
 
     9 expr: CMD FLOAT •
 
     $default  reduce using rule 9 (expr)
 
 
-State 17
+State 14
 
     0 $accept: prog $end •
 
     $default  accept
 
 
-State 18
+State 15
 
     3 lines: line NEWLINE • lines
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 3
-    CMD    shift, and go to state 4
+    VAR          shift, and go to state 1
+    CMD          shift, and go to state 2
+    SPECIAL_CMD  shift, and go to state 3
 
     NEWLINE   reduce using rule 5 (exprs)
     $default  reduce using rule 2 (lines)
 
-    lines       go to state 27
-    line        go to state 7
-    exprs       go to state 8
-    expr        go to state 9
-    assignment  go to state 10
-    val         go to state 11
-    arith_expr  go to state 12
+    lines       go to state 23
+    line        go to state 6
+    exprs       go to state 7
+    expr        go to state 8
+    assignment  go to state 9
 
 
-State 19
+State 16
 
     7 exprs: expr SPACE • exprs
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 3
-    CMD    shift, and go to state 4
+    VAR          shift, and go to state 1
+    CMD          shift, and go to state 2
+    SPECIAL_CMD  shift, and go to state 3
 
     $default  reduce using rule 5 (exprs)
 
-    exprs       go to state 28
-    expr        go to state 9
-    assignment  go to state 10
-    val         go to state 11
-    arith_expr  go to state 12
+    exprs       go to state 24
+    expr        go to state 8
+    assignment  go to state 9
 
 
-State 20
+State 17
 
-   18 arith_expr: arith_expr '+' • arith_expr
+   15 val: INT •
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
-
-    val         go to state 11
-    arith_expr  go to state 29
+    $default  reduce using rule 15 (val)
 
 
-State 21
+State 18
 
-   19 arith_expr: arith_expr '-' • arith_expr
+   16 val: FLOAT •
 
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
-
-    val         go to state 11
-    arith_expr  go to state 30
+    $default  reduce using rule 16 (val)
 
 
-State 22
-
-   20 arith_expr: arith_expr '*' • arith_expr
-
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
-
-    val         go to state 11
-    arith_expr  go to state 31
-
-
-State 23
-
-   21 arith_expr: arith_expr '/' • arith_expr
-
-    INT    shift, and go to state 1
-    FLOAT  shift, and go to state 2
-    VAR    shift, and go to state 24
-
-    val         go to state 11
-    arith_expr  go to state 32
-
-
-State 24
+State 19
 
    14 val: VAR •
 
     $default  reduce using rule 14 (val)
 
 
-State 25
+State 20
+
+   17 arith_expr: val •
+
+    $default  reduce using rule 17 (arith_expr)
+
+
+State 21
 
    12 assignment: VAR SET arith_expr •
    18 arith_expr: arith_expr • '+' arith_expr
@@ -396,15 +326,15 @@ State 25
    20           | arith_expr • '*' arith_expr
    21           | arith_expr • '/' arith_expr
 
-    '+'  shift, and go to state 20
-    '-'  shift, and go to state 21
-    '*'  shift, and go to state 22
-    '/'  shift, and go to state 23
+    '+'  shift, and go to state 25
+    '-'  shift, and go to state 26
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
 
     $default  reduce using rule 12 (assignment)
 
 
-State 26
+State 22
 
    13 assignment: CMD SET arith_expr •
    18 arith_expr: arith_expr • '+' arith_expr
@@ -412,26 +342,74 @@ State 26
    20           | arith_expr • '*' arith_expr
    21           | arith_expr • '/' arith_expr
 
-    '+'  shift, and go to state 20
-    '-'  shift, and go to state 21
-    '*'  shift, and go to state 22
-    '/'  shift, and go to state 23
+    '+'  shift, and go to state 25
+    '-'  shift, and go to state 26
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
 
     $default  reduce using rule 13 (assignment)
 
 
-State 27
+State 23
 
     3 lines: line NEWLINE lines •
 
     $default  reduce using rule 3 (lines)
 
 
-State 28
+State 24
 
     7 exprs: expr SPACE exprs •
 
     $default  reduce using rule 7 (exprs)
+
+
+State 25
+
+   18 arith_expr: arith_expr '+' • arith_expr
+
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
+
+    val         go to state 20
+    arith_expr  go to state 29
+
+
+State 26
+
+   19 arith_expr: arith_expr '-' • arith_expr
+
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
+
+    val         go to state 20
+    arith_expr  go to state 30
+
+
+State 27
+
+   20 arith_expr: arith_expr '*' • arith_expr
+
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
+
+    val         go to state 20
+    arith_expr  go to state 31
+
+
+State 28
+
+   21 arith_expr: arith_expr '/' • arith_expr
+
+    INT    shift, and go to state 17
+    FLOAT  shift, and go to state 18
+    VAR    shift, and go to state 19
+
+    val         go to state 20
+    arith_expr  go to state 32
 
 
 State 29
@@ -442,8 +420,8 @@ State 29
    20           | arith_expr • '*' arith_expr
    21           | arith_expr • '/' arith_expr
 
-    '*'  shift, and go to state 22
-    '/'  shift, and go to state 23
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
 
     $default  reduce using rule 18 (arith_expr)
 
@@ -456,8 +434,8 @@ State 30
    20           | arith_expr • '*' arith_expr
    21           | arith_expr • '/' arith_expr
 
-    '*'  shift, and go to state 22
-    '/'  shift, and go to state 23
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
 
     $default  reduce using rule 19 (arith_expr)
 

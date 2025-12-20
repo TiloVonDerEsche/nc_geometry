@@ -63,13 +63,21 @@ expr:
   CMD INT                {set_var($1,(float)$2);}
   | CMD FLOAT            {set_var($1,$2);}
   | assignment
-  | arith_expr           {printf("arith_expr=%f\n",$1);}
+  | SPECIAL_CMD          {
+                          if(strcmp($1,"/LASER_ON") == 0) {
+                            set_var("laser",1);
+                          }
+                          else if(strcmp($1,"/LASER_OFF") == 0) {
+                            set_var("laser",0);
+                          }
+                         }
 ;
 
 assignment:
   VAR SET arith_expr     {set_var($1,$3);}
   | CMD SET arith_expr   {set_var($1,$3);}
 ;
+
 
 val:
   VAR            {

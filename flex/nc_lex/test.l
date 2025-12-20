@@ -59,6 +59,8 @@ R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 [+\-*/]   { printf("An arithmetic operator: %s\n", yytext); return yytext[0]; }
 
+";"[^\n]* {printf("A comment: %s\n", yytext); return COMMENT;}
+
 " "      		   {return SPACE;}
 "\n"           {return NEWLINE;}
 "="            {puts("SET");return SET;}

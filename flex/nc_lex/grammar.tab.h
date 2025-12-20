@@ -58,20 +58,21 @@ extern int yydebug;
     NEWLINE = 259,                 /* NEWLINE  */
     SET = 260,                     /* SET  */
     SEMICOLON = 261,               /* SEMICOLON  */
-    OTHER = 262,                   /* OTHER  */
-    INT = 263,                     /* INT  */
-    FLOAT = 264,                   /* FLOAT  */
-    EQ = 265,                      /* EQ  */
-    NEQ = 266,                     /* NEQ  */
-    LTEQ = 267,                    /* LTEQ  */
-    GTEQ = 268,                    /* GTEQ  */
-    IF = 269,                      /* IF  */
-    GOTO = 270,                    /* GOTO  */
-    VAR = 271,                     /* VAR  */
-    CMD = 272,                     /* CMD  */
-    SPECIAL_CMD = 273,             /* SPECIAL_CMD  */
-    CUSTOM_VAR = 274,              /* CUSTOM_VAR  */
-    LABEL = 275                    /* LABEL  */
+    COMMENT = 262,                 /* COMMENT  */
+    OTHER = 263,                   /* OTHER  */
+    INT = 264,                     /* INT  */
+    FLOAT = 265,                   /* FLOAT  */
+    EQ = 266,                      /* EQ  */
+    NEQ = 267,                     /* NEQ  */
+    LTEQ = 268,                    /* LTEQ  */
+    GTEQ = 269,                    /* GTEQ  */
+    IF = 270,                      /* IF  */
+    GOTO = 271,                    /* GOTO  */
+    VAR = 272,                     /* VAR  */
+    CMD = 273,                     /* CMD  */
+    SPECIAL_CMD = 274,             /* SPECIAL_CMD  */
+    CUSTOM_VAR = 275,              /* CUSTOM_VAR  */
+    LABEL = 276                    /* LABEL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -90,7 +91,7 @@ union YYSTYPE
   float arith_expr;                        /* arith_expr  */
   int INT;                                 /* INT  */
 
-#line 94 "grammar.tab.h"
+#line 95 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

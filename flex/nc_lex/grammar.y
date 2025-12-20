@@ -18,7 +18,7 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-%token SPACE NEWLINE SET SEMICOLON OTHER
+%token SPACE NEWLINE SET SEMICOLON COMMENT OTHER
 %token <int> INT
 %token <float> FLOAT
 
@@ -84,6 +84,7 @@ expr:
                               set_var("laser_power",$3);
                             }
                            }
+  | COMMENT
 ;
 
 assignment:

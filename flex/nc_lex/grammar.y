@@ -63,8 +63,7 @@ exprs:
 ;
 
 expr:
-  CMD INT                {set_var($1,(float)$2);}
-  | CMD FLOAT            {set_var($1,$2);}
+  CMD arith_expr       {set_var($1,$2);}
   | assignment
   | SPECIAL_CMD          {
                           if(strcmp($1,"/LASER_ON") == 0) {
@@ -109,6 +108,8 @@ arith_expr:
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
+  | '(' arith_expr ')'        {$$=$2;}
+  | '-' arith_expr            {$$=-$2;}
 ;
 
 bool_expr:

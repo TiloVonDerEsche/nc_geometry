@@ -1,1 +1,0 @@
-./test.exe ./../../data/dummy2_nc.mpf

@@ -11,6 +11,8 @@
   khint_t k;
   int absent;
 
+  void set_var_in_h(char*, float);
+  void init_hashmap();
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -57,23 +59,18 @@ exprs:
 ;
 
 expr:
-  CMD INT                {printf("CMD: %s=%d\n",$1,$2);}
-  | CMD FLOAT            {printf("CMD: %s=%f\n",$1,$2);}
+  CMD INT                {set_var_in_h($1,(float)$2);}
+  | CMD FLOAT            {set_var_in_h($1,$2);}
   | assignment
   | arith_expr           {printf("arith_expr=%f\n",$1);}
 ;
 
 assignment:
   VAR SET arith_expr     {
-                            // Logic to store $3 into the variable $1
                             printf("Assignment: %s = %f\n", $1, $3);
-                            k = strfloat_put(h, $1, &absent);
-                            if (absent) {
-                              kh_key(h, k) = strdup($1);}
-                            kh_val(h, k) = $3;
-                            printf("Set %s to %f\n", $1, $3);
+                            set_var_in_h($1,$3);
                           }
-  | CMD SET arith_expr   { /* Handle simple commands */ }
+  | CMD SET arith_expr   { set_var_in_h($1,$3); }
 ;
 
 val:
@@ -114,6 +111,14 @@ int yyerror(char *s)
 {
 	printf("Syntax Error on line %s\n", s);
 	return 0;
+}
+
+void set_var_in_h(char* varname, float fnum) {
+  k = strfloat_put(h, varname, &absent);
+  if (absent) {
+    kh_key(h, k) = strdup(varname);}
+  kh_val(h, k) = fnum;
+  printf("Set %s to %f\n", varname, fnum);
 }
 
 

@@ -5,7 +5,7 @@
   #include "khashl_helper.h"
 
   int yylex (void);
-  int yyerror(char *s);
+  int yyerror(char* s);
 
   strfloat_t* h;
   khint_t k;
@@ -53,6 +53,7 @@ line:
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, stdout);
                         }
+  | error              {yyerrok;yyclearin;}
 ;
 
 
@@ -73,16 +74,11 @@ expr:
                             set_var("laser",0);
                           }
                          }
-  | CUSTOM_VAR SPACE INT {
+  | CUSTOM_VAR SPACE arith_expr {
                            if(strcmp($1,"PUIS_LASER") == 0) {
-                             set_var("laser_power",(float)$3);
+                             set_var("laser_power",$3);
                            }
                           }
-  | CUSTOM_VAR SPACE FLOAT {
-                            if(strcmp($1,"PUIS_LASER") == 0) {
-                              set_var("laser_power",$3);
-                            }
-                           }
   | COMMENT
 ;
 
@@ -125,9 +121,9 @@ bool_expr:
 
 %%
 
-int yyerror(char *s)
+int yyerror(char* s)
 {
-	printf("Syntax Error on line %s\n", s);
+	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
 	return 0;
 }
 

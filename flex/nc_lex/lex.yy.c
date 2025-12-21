@@ -870,7 +870,7 @@ YY_RULE_SETUP
 case 14:
 YY_RULE_SETUP
 #line 69 "test.l"
-{showError(); return OTHER;}
+{return YYUNDEF;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
@@ -1898,9 +1898,6 @@ void yyfree (void * ptr )
 
 
 
-void showError(){
-    printf("Other input");
-}
 int yywrap(){
     return 1;
 }

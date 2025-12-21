@@ -66,14 +66,11 @@ R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 " "      		   {return SPACE;}
 "\n"           {return NEWLINE;}
 "="            {puts("SET");return SET;}
-.      		     {showError(); return OTHER;}
+.      		     {return YYUNDEF;}
 
 %%
 
 
-void showError(){
-    printf("Other input");
-}
 int yywrap(){
     return 1;
 }

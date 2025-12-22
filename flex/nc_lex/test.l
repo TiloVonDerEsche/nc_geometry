@@ -1,6 +1,5 @@
 %{
 #include "grammar.tab.h"
-void showError();
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -20,20 +19,20 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 {inum} {
         yylval.INT = atoi(yytext);
-        printf("An integer: %s->%d\n", yytext, yylval.INT);
+        printf("An integer: %d\n", yylval.INT);
         return INT;
         }
 
 {fnum} {
         yylval.FLOAT = atof(yytext);
-        printf("A float: %s->%f\n", yytext, yylval.FLOAT);
+        printf("A float: %f\n", yylval.FLOAT);
         return FLOAT;
         }
 
 R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 
-"/"{letter}{id} {
+"/"{id}         {
                 yylval.SPECIAL_CMD = strdup(yytext);
                 printf("A special command: %s\n", yytext);
                 return SPECIAL_CMD;
@@ -46,27 +45,44 @@ R{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 }
 
 {letter}{id} {
-              yylval.CUSTOM_VAR = strdup(yytext);
-              printf("A custom Variable: %s\n", yytext);
-              return CUSTOM_VAR;
+              if(strcmp(yytext,"PUIS_LASER") == 0 || strcmp(yytext,"VIT_TIR") == 0) {
+                yylval.CUSTOM_VAR = strdup(yytext);
+                printf("A custom Variable: %s\n", yytext);
+                return CUSTOM_VAR;
               }
+              else if(strcmp(yytext,"CALL") == 0) {
+                return CALL;
+              }
+              else {
+                printf("A MISC_ID: %s\n",yytext);
+                return MISC_ID;
+              }
+
+             }
 
 {letter}       {yylval.CMD = strdup(yytext);
                 printf("A command: %s\n", yytext);
                 return CMD;
                }
 
+"_"{id}   {
+        printf("A hidden MISC_ID: %s\n",yytext);
+        return MISC_ID;
+       }
+
 
 [+\-*/]   { printf("An arithmetic operator: %s\n", yytext); return yytext[0]; }
 
 [()]      {return yytext[0];}
+
+"\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
 
 ";"[^\n]* {printf("A comment: %s\n", yytext); return COMMENT;}
 
 " "      		   {return SPACE;}
 "\n"           {return NEWLINE;}
 "="            {puts("SET");return SET;}
-.      		     {return YYUNDEF;}
+.      		     {return OTHER;}
 
 %%
 

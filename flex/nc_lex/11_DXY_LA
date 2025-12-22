@@ -1,0 +1,11 @@
+; created by hyperMILL 2025, Datum: 21.8.2025, Laufzeit 0:16:52
+;Programmlaufzeit Start
+CALL "//LOCAL_DRIVE:/EffiDED/PROGRAMMLAUFZEIT/ZEIT_START.MPF"
+; Program begin
+G90 G17 G40
+TRAFOOF
+TRANS
+; Safe pos. program begin
+G00 SUPA D0 Z459.
+G00 SUPA D0 X69. Y249.
+G00 B0. C=DC(0.)

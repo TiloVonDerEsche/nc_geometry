@@ -19,6 +19,7 @@
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
 %token SPACE NEWLINE SET SEMICOLON COMMENT OTHER
+%token <char*> STRING
 %token <int> INT
 %token <float> FLOAT
 
@@ -29,9 +30,11 @@
 %token <char*> CMD
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
+%token CALL MISC_ID
 %token <char*> LABEL
 
 %nterm <float> val
+%nterm <float> fn
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 
@@ -52,8 +55,8 @@ line:
   exprs                 {
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, stdout);
+                         puts("");
                         }
-  | error              {yyerrok;yyclearin;}
 ;
 
 
@@ -66,6 +69,9 @@ exprs:
 expr:
   CMD arith_expr       {set_var($1,$2);}
   | assignment
+  | LABEL                {
+                          set_var($1,get_var_val("line"));
+                         }
   | SPECIAL_CMD          {
                           if(strcmp($1,"/LASER_ON") == 0) {
                             set_var("laser",1);
@@ -75,11 +81,15 @@ expr:
                           }
                          }
   | CUSTOM_VAR SPACE arith_expr {
-                           if(strcmp($1,"PUIS_LASER") == 0) {
-                             set_var("laser_power",$3);
-                           }
-                          }
+                                 if(strcmp($1,"PUIS_LASER") == 0) {
+                                   set_var("laser_power",$3);
+                                 }
+                                }
+  | CALL SPACE STRING
+  | MISC_ID
+  | fn
   | COMMENT
+  | error   {}
 ;
 
 assignment:
@@ -98,8 +108,19 @@ val:
   | FLOAT        {printf("FLOAT=%f\n",$1); $$=$1;}
 ;
 
+fn:
+  MISC_ID '(' params ')' {$$=0;}
+;
+
+params:
+  arith_expr
+  | MISC_ID
+  | arith_expr ',' params
+  | MISC_ID ',' params
+
 arith_expr:
   val         {$$=$1;}
+  | fn        {$$=$1;}
   | arith_expr '+' arith_expr {$$=$1+$3; printf("%f+%f=%f\n", $1,$3,$$);}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}

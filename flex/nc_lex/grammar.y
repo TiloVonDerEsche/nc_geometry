@@ -80,11 +80,6 @@ expr:
                             set_var("laser",0);
                           }
                          }
-  | CUSTOM_VAR SPACE arith_expr {
-                                 if(strcmp($1,"PUIS_LASER") == 0) {
-                                   set_var("laser_power",$3);
-                                 }
-                                }
   | CALL SPACE STRING
   | MISC_ID
   | fn
@@ -96,12 +91,17 @@ assignment:
   VAR SET arith_expr     {set_var($1,$3);}
   | CMD SET arith_expr   {set_var($1,$3);}
   | CUSTOM_VAR SET arith_expr {set_var($1,$3);}
+  | CUSTOM_VAR SPACE arith_expr {set_var($1,$3);}
 ;
 
 
 val:
   VAR            {
                   printf("Getting VAR=%s\n",$1);
+                  $$ = get_var_val($1);
+                 }
+  | CUSTOM_VAR   {
+                  printf("Getting CUSTOM_VAR=%s\n",$1);
                   $$ = get_var_val($1);
                  }
   | INT          {printf("INT=%d\n",$1); $$=$1;}
@@ -180,10 +180,6 @@ void init_hashmap() {
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
-  kh_val(h, k) = 0;
-
-  k = strfloat_put(h, "laser_power", &absent);
-  kh_key(h, k) = strdup("laser_power");
   kh_val(h, k) = 0;
 
   print_hashmap(h, stdout);

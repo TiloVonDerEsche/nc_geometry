@@ -30,19 +30,12 @@ void init_hashmap_ng(strfloat_t* h) {
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 123;
+  kh_val(h, k) = 1;
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
+  kh_val(h, k) = 0;
 
-  kh_val(h, k) = -1.2;
-  k = strfloat_put(h, "laser_power", &absent);
-  kh_key(h, k) = strdup("laser_power");
-  kh_val(h, k) = 3500;
-
-  k = strfloat_put(h, "R1", &absent);
-  kh_key(h, k) = strdup("R1");
-  kh_val(h, k) = 456;
 
   print_hashmap(h, stdout);
 }

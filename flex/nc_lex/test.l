@@ -30,6 +30,7 @@ id       [A-Za-z][_A-Za-z0-9]*
         }
 
 R{inum} {yylval.VAR = strdup(yytext); return VAR;}
+H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 
 "/"{id}         {
@@ -45,7 +46,9 @@ R{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 }
 
 {letter}{id} {
-              if(strcmp(yytext,"PUIS_LASER") == 0 || strcmp(yytext,"VIT_TIR") == 0) {
+              if(strcmp(yytext,"PUIS_LASER") == 0 ||
+                 strcmp(yytext,"MODE_LASER") == 0 ||
+                 strcmp(yytext,"VIT_TIR") == 0) {
                 yylval.CUSTOM_VAR = strdup(yytext);
                 printf("A custom Variable: %s\n", yytext);
                 return CUSTOM_VAR;

@@ -113,10 +113,12 @@ fn:
 ;
 
 params:
-  arith_expr
+  %empty
+  | arith_expr
   | MISC_ID
   | arith_expr ',' params
   | MISC_ID ',' params
+;
 
 arith_expr:
   val         {$$=$1;}

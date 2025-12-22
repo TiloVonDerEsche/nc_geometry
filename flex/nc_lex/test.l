@@ -82,6 +82,7 @@ R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 " "      		   {return SPACE;}
 "\n"           {return NEWLINE;}
 "="            {puts("SET");return SET;}
+","            {return yytext[0];}
 .      		     {return OTHER;}
 
 %%

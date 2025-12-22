@@ -492,7 +492,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  37
+#define YYNRULES  38
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  61
 
@@ -548,7 +548,7 @@ static const yytype_uint8 yyrline[] =
        0,    46,    46,    50,    51,    55,    64,    65,    66,    70,
       71,    72,    75,    83,    88,    89,    90,    91,    92,    96,
       97,    98,   103,   107,   108,   112,   116,   117,   118,   119,
-     122,   123,   124,   125,   126,   127,   128,   129
+     120,   124,   125,   126,   127,   128,   129,   130,   131
 };
 #endif
 
@@ -609,11 +609,11 @@ static const yytype_int8 yydefact[] =
 {
        0,    18,    17,     0,     0,    12,     0,     0,    15,    11,
        0,     2,     0,     5,     7,    10,    16,     0,     0,    23,
-      24,    22,     0,     0,     0,    30,    31,     9,     0,     0,
-       0,     0,     1,     0,     0,    19,    20,    37,     0,     0,
-       0,     0,     0,    13,    21,    14,    27,     0,    26,     4,
-       8,    36,    32,    33,    34,    35,     0,    25,     0,    29,
-      28
+      24,    22,     0,     0,     0,    31,    32,     9,     0,     0,
+       0,    26,     1,     0,     0,    19,    20,    38,     0,     0,
+       0,     0,     0,    13,    21,    14,    28,     0,    27,     4,
+       8,    37,    33,    34,    35,    36,    26,    25,    26,    30,
+      29
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -680,7 +680,7 @@ static const yytype_int8 yyr1[] =
        0,    34,    35,    36,    36,    37,    38,    38,    38,    39,
       39,    39,    39,    39,    39,    39,    39,    39,    39,    40,
       40,    40,    41,    41,    41,    42,    43,    43,    43,    43,
-      44,    44,    44,    44,    44,    44,    44,    44
+      43,    44,    44,    44,    44,    44,    44,    44,    44
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
@@ -688,8 +688,8 @@ static const yytype_int8 yyr2[] =
 {
        0,     2,     1,     0,     3,     1,     0,     1,     3,     2,
        1,     1,     1,     3,     3,     1,     1,     1,     1,     3,
-       3,     3,     1,     1,     1,     4,     1,     1,     3,     3,
-       1,     1,     3,     3,     3,     3,     3,     2
+       3,     3,     1,     1,     1,     4,     0,     1,     1,     3,
+       3,     1,     1,     3,     3,     3,     3,     3,     2
 };
 
 
@@ -1250,50 +1250,50 @@ yyreduce:
 #line 1251 "grammar.tab.c"
     break;
 
-  case 30: /* arith_expr: val  */
-#line 122 "grammar.y"
+  case 31: /* arith_expr: val  */
+#line 124 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
 #line 1257 "grammar.tab.c"
     break;
 
-  case 31: /* arith_expr: fn  */
-#line 123 "grammar.y"
+  case 32: /* arith_expr: fn  */
+#line 125 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].fn);}
 #line 1263 "grammar.tab.c"
     break;
 
-  case 32: /* arith_expr: arith_expr '+' arith_expr  */
-#line 124 "grammar.y"
+  case 33: /* arith_expr: arith_expr '+' arith_expr  */
+#line 126 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); printf("%f+%f=%f\n", (yyvsp[-2].arith_expr),(yyvsp[0].arith_expr),(yyval.arith_expr));}
 #line 1269 "grammar.tab.c"
     break;
 
-  case 33: /* arith_expr: arith_expr '-' arith_expr  */
-#line 125 "grammar.y"
+  case 34: /* arith_expr: arith_expr '-' arith_expr  */
+#line 127 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
 #line 1275 "grammar.tab.c"
     break;
 
-  case 34: /* arith_expr: arith_expr '*' arith_expr  */
-#line 126 "grammar.y"
+  case 35: /* arith_expr: arith_expr '*' arith_expr  */
+#line 128 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
 #line 1281 "grammar.tab.c"
     break;
 
-  case 35: /* arith_expr: arith_expr '/' arith_expr  */
-#line 127 "grammar.y"
+  case 36: /* arith_expr: arith_expr '/' arith_expr  */
+#line 129 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
 #line 1287 "grammar.tab.c"
     break;
 
-  case 36: /* arith_expr: '(' arith_expr ')'  */
-#line 128 "grammar.y"
+  case 37: /* arith_expr: '(' arith_expr ')'  */
+#line 130 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-1].arith_expr);}
 #line 1293 "grammar.tab.c"
     break;
 
-  case 37: /* arith_expr: '-' arith_expr  */
-#line 129 "grammar.y"
+  case 38: /* arith_expr: '-' arith_expr  */
+#line 131 "grammar.y"
                               {(yyval.arith_expr)=-(yyvsp[0].arith_expr);}
 #line 1299 "grammar.tab.c"
     break;
@@ -1492,7 +1492,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 143 "grammar.y"
+#line 145 "grammar.y"
 
 
 int yyerror(char* s)

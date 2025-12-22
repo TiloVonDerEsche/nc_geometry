@@ -34,13 +34,13 @@ Grammar
     1 prog: lines
 
     2 lines: ε
-    3      | line NEWLINE lines
+    3      | lines line NEWLINE
 
     4 line: exprs
 
     5 exprs: ε
     6      | expr
-    7      | expr SPACE exprs
+    7      | exprs SPACE expr
 
     8 expr: CMD arith_expr
     9     | assignment
@@ -67,8 +67,8 @@ Grammar
    26 params: ε
    27       | arith_expr
    28       | MISC_ID
-   29       | arith_expr ',' params
-   30       | MISC_ID ',' params
+   29       | params ',' arith_expr
+   30       | params ',' MISC_ID
 
    31 arith_expr: val
    32           | fn
@@ -157,278 +157,288 @@ State 0
 
     0 $accept: • prog $end
 
-    error        shift, and go to state 1
-    COMMENT      shift, and go to state 2
-    VAR          shift, and go to state 3
-    CMD          shift, and go to state 4
-    SPECIAL_CMD  shift, and go to state 5
-    CUSTOM_VAR   shift, and go to state 6
-    CALL         shift, and go to state 7
-    MISC_ID      shift, and go to state 8
-    LABEL        shift, and go to state 9
+    $default  reduce using rule 2 (lines)
 
-    $end     reduce using rule 2 (lines)
-    NEWLINE  reduce using rule 5 (exprs)
-
-    prog        go to state 10
-    lines       go to state 11
-    line        go to state 12
-    exprs       go to state 13
-    expr        go to state 14
-    assignment  go to state 15
-    fn          go to state 16
+    prog   go to state 1
+    lines  go to state 2
 
 
 State 1
+
+    0 $accept: prog • $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 prog: lines •
+    3 lines: lines • line NEWLINE
+
+    error        shift, and go to state 4
+    COMMENT      shift, and go to state 5
+    VAR          shift, and go to state 6
+    CMD          shift, and go to state 7
+    SPECIAL_CMD  shift, and go to state 8
+    CUSTOM_VAR   shift, and go to state 9
+    CALL         shift, and go to state 10
+    MISC_ID      shift, and go to state 11
+    LABEL        shift, and go to state 12
+
+    $end     reduce using rule 1 (prog)
+    SPACE    reduce using rule 5 (exprs)
+    NEWLINE  reduce using rule 5 (exprs)
+
+    line        go to state 13
+    exprs       go to state 14
+    expr        go to state 15
+    assignment  go to state 16
+    fn          go to state 17
+
+
+State 3
+
+    0 $accept: prog $end •
+
+    $default  accept
+
+
+State 4
 
    16 expr: error •
 
     $default  reduce using rule 16 (expr)
 
 
-State 2
+State 5
 
    15 expr: COMMENT •
 
     $default  reduce using rule 15 (expr)
 
 
-State 3
+State 6
 
    17 assignment: VAR • SET arith_expr
 
-    SET  shift, and go to state 17
+    SET  shift, and go to state 18
 
 
-State 4
+State 7
 
     8 expr: CMD • arith_expr
    18 assignment: CMD • SET arith_expr
 
-    SET         shift, and go to state 18
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    SET         shift, and go to state 19
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 28
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 29
 
 
-State 5
+State 8
 
    11 expr: SPECIAL_CMD •
 
     $default  reduce using rule 11 (expr)
 
 
-State 6
+State 9
 
    19 assignment: CUSTOM_VAR • SET arith_expr
    20           | CUSTOM_VAR • SPACE arith_expr
 
-    SPACE  shift, and go to state 29
-    SET    shift, and go to state 30
+    SPACE  shift, and go to state 30
+    SET    shift, and go to state 31
 
 
-State 7
+State 10
 
    12 expr: CALL • SPACE STRING
 
-    SPACE  shift, and go to state 31
+    SPACE  shift, and go to state 32
 
 
-State 8
+State 11
 
    13 expr: MISC_ID •
    25 fn: MISC_ID • '(' params ')'
 
-    '('  shift, and go to state 32
+    '('  shift, and go to state 33
 
     $default  reduce using rule 13 (expr)
 
 
-State 9
+State 12
 
    10 expr: LABEL •
 
     $default  reduce using rule 10 (expr)
 
 
-State 10
+State 13
 
-    0 $accept: prog • $end
-
-    $end  shift, and go to state 33
-
-
-State 11
-
-    1 prog: lines •
-
-    $default  reduce using rule 1 (prog)
-
-
-State 12
-
-    3 lines: line • NEWLINE lines
+    3 lines: lines line • NEWLINE
 
     NEWLINE  shift, and go to state 34
 
 
-State 13
+State 14
 
     4 line: exprs •
+    7 exprs: exprs • SPACE expr
+
+    SPACE  shift, and go to state 35
 
     $default  reduce using rule 4 (line)
 
 
-State 14
+State 15
 
     6 exprs: expr •
-    7      | expr • SPACE exprs
-
-    SPACE  shift, and go to state 35
 
     $default  reduce using rule 6 (exprs)
 
 
-State 15
+State 16
 
     9 expr: assignment •
 
     $default  reduce using rule 9 (expr)
 
 
-State 16
+State 17
 
    14 expr: fn •
 
     $default  reduce using rule 14 (expr)
 
 
-State 17
+State 18
 
    17 assignment: VAR SET • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
+    val         go to state 27
+    fn          go to state 28
     arith_expr  go to state 36
 
 
-State 18
+State 19
 
    18 assignment: CMD SET • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
+    val         go to state 27
+    fn          go to state 28
     arith_expr  go to state 37
 
 
-State 19
+State 20
 
    23 val: INT •
 
     $default  reduce using rule 23 (val)
 
 
-State 20
+State 21
 
    24 val: FLOAT •
 
     $default  reduce using rule 24 (val)
 
 
-State 21
+State 22
 
    21 val: VAR •
 
     $default  reduce using rule 21 (val)
 
 
-State 22
+State 23
 
    22 val: CUSTOM_VAR •
 
     $default  reduce using rule 22 (val)
 
 
-State 23
+State 24
 
    25 fn: MISC_ID • '(' params ')'
 
-    '('  shift, and go to state 32
-
-
-State 24
-
-   38 arith_expr: '-' • arith_expr
-
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
-
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 38
+    '('  shift, and go to state 33
 
 
 State 25
 
-   37 arith_expr: '(' • arith_expr ')'
+   38 arith_expr: '-' • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 39
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 38
 
 
 State 26
+
+   37 arith_expr: '(' • arith_expr ')'
+
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
+
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 39
+
+
+State 27
 
    31 arith_expr: val •
 
     $default  reduce using rule 31 (arith_expr)
 
 
-State 27
+State 28
 
    32 arith_expr: fn •
 
     $default  reduce using rule 32 (arith_expr)
 
 
-State 28
+State 29
 
     8 expr: CMD arith_expr •
    33 arith_expr: arith_expr • '+' arith_expr
@@ -444,119 +454,91 @@ State 28
     $default  reduce using rule 8 (expr)
 
 
-State 29
+State 30
 
    20 assignment: CUSTOM_VAR SPACE • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
+    val         go to state 27
+    fn          go to state 28
     arith_expr  go to state 44
 
 
-State 30
+State 31
 
    19 assignment: CUSTOM_VAR SET • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
+    val         go to state 27
+    fn          go to state 28
     arith_expr  go to state 45
 
 
-State 31
+State 32
 
    12 expr: CALL SPACE • STRING
 
     STRING  shift, and go to state 46
 
 
-State 32
+State 33
 
    25 fn: MISC_ID '(' • params ')'
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
     MISC_ID     shift, and go to state 47
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
     $default  reduce using rule 26 (params)
 
-    val         go to state 26
-    fn          go to state 27
+    val         go to state 27
+    fn          go to state 28
     params      go to state 48
     arith_expr  go to state 49
 
 
-State 33
-
-    0 $accept: prog $end •
-
-    $default  accept
-
-
 State 34
 
-    3 lines: line NEWLINE • lines
+    3 lines: lines line NEWLINE •
 
-    error        shift, and go to state 1
-    COMMENT      shift, and go to state 2
-    VAR          shift, and go to state 3
-    CMD          shift, and go to state 4
-    SPECIAL_CMD  shift, and go to state 5
-    CUSTOM_VAR   shift, and go to state 6
-    CALL         shift, and go to state 7
-    MISC_ID      shift, and go to state 8
-    LABEL        shift, and go to state 9
-
-    $end     reduce using rule 2 (lines)
-    NEWLINE  reduce using rule 5 (exprs)
-
-    lines       go to state 50
-    line        go to state 12
-    exprs       go to state 13
-    expr        go to state 14
-    assignment  go to state 15
-    fn          go to state 16
+    $default  reduce using rule 3 (lines)
 
 
 State 35
 
-    7 exprs: expr SPACE • exprs
+    7 exprs: exprs SPACE • expr
 
-    error        shift, and go to state 1
-    COMMENT      shift, and go to state 2
-    VAR          shift, and go to state 3
-    CMD          shift, and go to state 4
-    SPECIAL_CMD  shift, and go to state 5
-    CUSTOM_VAR   shift, and go to state 6
-    CALL         shift, and go to state 7
-    MISC_ID      shift, and go to state 8
-    LABEL        shift, and go to state 9
+    error        shift, and go to state 4
+    COMMENT      shift, and go to state 5
+    VAR          shift, and go to state 6
+    CMD          shift, and go to state 7
+    SPECIAL_CMD  shift, and go to state 8
+    CUSTOM_VAR   shift, and go to state 9
+    CALL         shift, and go to state 10
+    MISC_ID      shift, and go to state 11
+    LABEL        shift, and go to state 12
 
-    NEWLINE  reduce using rule 5 (exprs)
-
-    exprs       go to state 51
-    expr        go to state 14
-    assignment  go to state 15
-    fn          go to state 16
+    expr        go to state 50
+    assignment  go to state 16
+    fn          go to state 17
 
 
 State 36
@@ -617,75 +599,75 @@ State 39
     '-'  shift, and go to state 41
     '*'  shift, and go to state 42
     '/'  shift, and go to state 43
-    ')'  shift, and go to state 52
+    ')'  shift, and go to state 51
 
 
 State 40
 
    33 arith_expr: arith_expr '+' • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 53
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 52
 
 
 State 41
 
    34 arith_expr: arith_expr '-' • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 54
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 53
 
 
 State 42
 
    35 arith_expr: arith_expr '*' • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 55
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 54
 
 
 State 43
 
    36 arith_expr: arith_expr '/' • arith_expr
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 23
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 24
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    val         go to state 26
-    fn          go to state 27
-    arith_expr  go to state 56
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 55
 
 
 State 44
@@ -731,10 +713,8 @@ State 47
 
    25 fn: MISC_ID • '(' params ')'
    28 params: MISC_ID •
-   30       | MISC_ID • ',' params
 
-    '('  shift, and go to state 32
-    ','  shift, and go to state 57
+    '('  shift, and go to state 33
 
     $default  reduce using rule 28 (params)
 
@@ -742,14 +722,16 @@ State 47
 State 48
 
    25 fn: MISC_ID '(' params • ')'
+   29 params: params • ',' arith_expr
+   30       | params • ',' MISC_ID
 
-    ')'  shift, and go to state 58
+    ')'  shift, and go to state 56
+    ','  shift, and go to state 57
 
 
 State 49
 
    27 params: arith_expr •
-   29       | arith_expr • ',' params
    33 arith_expr: arith_expr • '+' arith_expr
    34           | arith_expr • '-' arith_expr
    35           | arith_expr • '*' arith_expr
@@ -759,33 +741,25 @@ State 49
     '-'  shift, and go to state 41
     '*'  shift, and go to state 42
     '/'  shift, and go to state 43
-    ','  shift, and go to state 59
 
     $default  reduce using rule 27 (params)
 
 
 State 50
 
-    3 lines: line NEWLINE lines •
-
-    $default  reduce using rule 3 (lines)
-
-
-State 51
-
-    7 exprs: expr SPACE exprs •
+    7 exprs: exprs SPACE expr •
 
     $default  reduce using rule 7 (exprs)
 
 
-State 52
+State 51
 
    37 arith_expr: '(' arith_expr ')' •
 
     $default  reduce using rule 37 (arith_expr)
 
 
-State 53
+State 52
 
    33 arith_expr: arith_expr • '+' arith_expr
    33           | arith_expr '+' arith_expr •
@@ -799,7 +773,7 @@ State 53
     $default  reduce using rule 33 (arith_expr)
 
 
-State 54
+State 53
 
    33 arith_expr: arith_expr • '+' arith_expr
    34           | arith_expr • '-' arith_expr
@@ -813,7 +787,7 @@ State 54
     $default  reduce using rule 34 (arith_expr)
 
 
-State 55
+State 54
 
    33 arith_expr: arith_expr • '+' arith_expr
    34           | arith_expr • '-' arith_expr
@@ -824,7 +798,7 @@ State 55
     $default  reduce using rule 35 (arith_expr)
 
 
-State 56
+State 55
 
    33 arith_expr: arith_expr • '+' arith_expr
    34           | arith_expr • '-' arith_expr
@@ -835,62 +809,52 @@ State 56
     $default  reduce using rule 36 (arith_expr)
 
 
-State 57
-
-   30 params: MISC_ID ',' • params
-
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 47
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
-
-    $default  reduce using rule 26 (params)
-
-    val         go to state 26
-    fn          go to state 27
-    params      go to state 60
-    arith_expr  go to state 49
-
-
-State 58
+State 56
 
    25 fn: MISC_ID '(' params ')' •
 
     $default  reduce using rule 25 (fn)
 
 
-State 59
+State 57
 
-   29 params: arith_expr ',' • params
+   29 params: params ',' • arith_expr
+   30       | params ',' • MISC_ID
 
-    INT         shift, and go to state 19
-    FLOAT       shift, and go to state 20
-    VAR         shift, and go to state 21
-    CUSTOM_VAR  shift, and go to state 22
-    MISC_ID     shift, and go to state 47
-    '-'         shift, and go to state 24
-    '('         shift, and go to state 25
+    INT         shift, and go to state 20
+    FLOAT       shift, and go to state 21
+    VAR         shift, and go to state 22
+    CUSTOM_VAR  shift, and go to state 23
+    MISC_ID     shift, and go to state 58
+    '-'         shift, and go to state 25
+    '('         shift, and go to state 26
 
-    $default  reduce using rule 26 (params)
-
-    val         go to state 26
-    fn          go to state 27
-    params      go to state 61
-    arith_expr  go to state 49
+    val         go to state 27
+    fn          go to state 28
+    arith_expr  go to state 59
 
 
-State 60
+State 58
 
-   30 params: MISC_ID ',' params •
+   25 fn: MISC_ID • '(' params ')'
+   30 params: params ',' MISC_ID •
+
+    '('  shift, and go to state 33
 
     $default  reduce using rule 30 (params)
 
 
-State 61
+State 59
 
-   29 params: arith_expr ',' params •
+   29 params: params ',' arith_expr •
+   33 arith_expr: arith_expr • '+' arith_expr
+   34           | arith_expr • '-' arith_expr
+   35           | arith_expr • '*' arith_expr
+   36           | arith_expr • '/' arith_expr
+
+    '+'  shift, and go to state 40
+    '-'  shift, and go to state 41
+    '*'  shift, and go to state 42
+    '/'  shift, and go to state 43
 
     $default  reduce using rule 29 (params)

@@ -48,7 +48,7 @@ prog:
 
 lines:
   %empty
-  | line NEWLINE lines
+  | lines line NEWLINE
 ;
 
 line:
@@ -63,7 +63,7 @@ line:
 exprs:
   %empty
   | expr
-  | expr SPACE exprs;
+  | exprs SPACE expr;
 ;
 
 expr:
@@ -116,8 +116,8 @@ params:
   %empty
   | arith_expr
   | MISC_ID
-  | arith_expr ',' params
-  | MISC_ID ',' params
+  | params ',' arith_expr
+  | params ',' MISC_ID
 ;
 
 arith_expr:

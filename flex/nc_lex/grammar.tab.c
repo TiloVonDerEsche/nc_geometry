@@ -81,11 +81,14 @@
   khint_t k;
   int absent;
 
+  FILE* hmhis;
+
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
+  void init_hmhis();
 
-#line 89 "grammar.tab.c"
+#line 92 "grammar.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -545,10 +548,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    50,    51,    55,    64,    65,    66,    70,
-      71,    72,    75,    83,    84,    85,    86,    87,    91,    92,
-      93,    94,    99,   103,   107,   108,   112,   116,   117,   118,
-     119,   120,   124,   125,   126,   127,   128,   129,   130,   131
+       0,    49,    49,    53,    54,    58,    67,    68,    69,    73,
+      74,    75,    78,    86,    87,    88,    89,    90,    94,    95,
+      96,    97,   102,   106,   110,   111,   115,   119,   120,   121,
+     122,   123,   127,   128,   129,   130,   131,   132,   133,   134
 };
 #endif
 
@@ -1156,31 +1159,31 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* line: exprs  */
-#line 55 "grammar.y"
+#line 58 "grammar.y"
                         {
                          set_var("line",get_var_val("line")+1);
-                         print_hashmap(h, stdout);
-                         puts("");
+                         print_hashmap(h, hmhis);
+
                         }
-#line 1166 "grammar.tab.c"
+#line 1169 "grammar.tab.c"
     break;
 
   case 9: /* expr: CMD arith_expr  */
-#line 70 "grammar.y"
+#line 73 "grammar.y"
                        {set_var((yyvsp[-1].CMD),(yyvsp[0].arith_expr));}
-#line 1172 "grammar.tab.c"
+#line 1175 "grammar.tab.c"
     break;
 
   case 11: /* expr: LABEL  */
-#line 72 "grammar.y"
+#line 75 "grammar.y"
                          {
                           set_var((yyvsp[0].LABEL),get_var_val("line"));
                          }
-#line 1180 "grammar.tab.c"
+#line 1183 "grammar.tab.c"
     break;
 
   case 12: /* expr: SPECIAL_CMD  */
-#line 75 "grammar.y"
+#line 78 "grammar.y"
                          {
                           if(strcmp((yyvsp[0].SPECIAL_CMD),"/LASER_ON") == 0) {
                             set_var("laser",1);
@@ -1189,125 +1192,125 @@ yyreduce:
                             set_var("laser",0);
                           }
                          }
-#line 1193 "grammar.tab.c"
+#line 1196 "grammar.tab.c"
     break;
 
   case 17: /* expr: error  */
-#line 87 "grammar.y"
+#line 90 "grammar.y"
             {}
-#line 1199 "grammar.tab.c"
+#line 1202 "grammar.tab.c"
     break;
 
   case 18: /* assignment: VAR SET arith_expr  */
-#line 91 "grammar.y"
+#line 94 "grammar.y"
                          {set_var((yyvsp[-2].VAR),(yyvsp[0].arith_expr));}
-#line 1205 "grammar.tab.c"
+#line 1208 "grammar.tab.c"
     break;
 
   case 19: /* assignment: CMD SET arith_expr  */
-#line 92 "grammar.y"
+#line 95 "grammar.y"
                          {set_var((yyvsp[-2].CMD),(yyvsp[0].arith_expr));}
-#line 1211 "grammar.tab.c"
+#line 1214 "grammar.tab.c"
     break;
 
   case 20: /* assignment: CUSTOM_VAR SET arith_expr  */
-#line 93 "grammar.y"
+#line 96 "grammar.y"
                               {set_var((yyvsp[-2].CUSTOM_VAR),(yyvsp[0].arith_expr));}
-#line 1217 "grammar.tab.c"
+#line 1220 "grammar.tab.c"
     break;
 
   case 21: /* assignment: CUSTOM_VAR SPACE arith_expr  */
-#line 94 "grammar.y"
+#line 97 "grammar.y"
                                 {set_var((yyvsp[-2].CUSTOM_VAR),(yyvsp[0].arith_expr));}
-#line 1223 "grammar.tab.c"
+#line 1226 "grammar.tab.c"
     break;
 
   case 22: /* val: VAR  */
-#line 99 "grammar.y"
+#line 102 "grammar.y"
                  {
-                  printf("Getting VAR=%s\n",(yyvsp[0].VAR));
+                  /*printf("Getting VAR=%s\n",$1);*/
                   (yyval.val) = get_var_val((yyvsp[0].VAR));
                  }
-#line 1232 "grammar.tab.c"
+#line 1235 "grammar.tab.c"
     break;
 
   case 23: /* val: CUSTOM_VAR  */
-#line 103 "grammar.y"
+#line 106 "grammar.y"
                  {
-                  printf("Getting CUSTOM_VAR=%s\n",(yyvsp[0].CUSTOM_VAR));
+                  /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
                   (yyval.val) = get_var_val((yyvsp[0].CUSTOM_VAR));
                  }
-#line 1241 "grammar.tab.c"
+#line 1244 "grammar.tab.c"
     break;
 
   case 24: /* val: INT  */
-#line 107 "grammar.y"
-                 {printf("INT=%d\n",(yyvsp[0].INT)); (yyval.val)=(yyvsp[0].INT);}
-#line 1247 "grammar.tab.c"
+#line 110 "grammar.y"
+                 {(yyval.val)=(yyvsp[0].INT);}
+#line 1250 "grammar.tab.c"
     break;
 
   case 25: /* val: FLOAT  */
-#line 108 "grammar.y"
-                 {printf("FLOAT=%f\n",(yyvsp[0].FLOAT)); (yyval.val)=(yyvsp[0].FLOAT);}
-#line 1253 "grammar.tab.c"
+#line 111 "grammar.y"
+                 {(yyval.val)=(yyvsp[0].FLOAT);}
+#line 1256 "grammar.tab.c"
     break;
 
   case 26: /* fn: MISC_ID '(' params ')'  */
-#line 112 "grammar.y"
+#line 115 "grammar.y"
                          {(yyval.fn)=0;}
-#line 1259 "grammar.tab.c"
+#line 1262 "grammar.tab.c"
     break;
 
   case 32: /* arith_expr: val  */
-#line 124 "grammar.y"
+#line 127 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
-#line 1265 "grammar.tab.c"
+#line 1268 "grammar.tab.c"
     break;
 
   case 33: /* arith_expr: fn  */
-#line 125 "grammar.y"
+#line 128 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].fn);}
-#line 1271 "grammar.tab.c"
+#line 1274 "grammar.tab.c"
     break;
 
   case 34: /* arith_expr: arith_expr '+' arith_expr  */
-#line 126 "grammar.y"
-                              {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); printf("%f+%f=%f\n", (yyvsp[-2].arith_expr),(yyvsp[0].arith_expr),(yyval.arith_expr));}
-#line 1277 "grammar.tab.c"
+#line 129 "grammar.y"
+                              {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); /*printf("%f+%f=%f\n", $1,$3,$$);*/}
+#line 1280 "grammar.tab.c"
     break;
 
   case 35: /* arith_expr: arith_expr '-' arith_expr  */
-#line 127 "grammar.y"
+#line 130 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
-#line 1283 "grammar.tab.c"
+#line 1286 "grammar.tab.c"
     break;
 
   case 36: /* arith_expr: arith_expr '*' arith_expr  */
-#line 128 "grammar.y"
+#line 131 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
-#line 1289 "grammar.tab.c"
+#line 1292 "grammar.tab.c"
     break;
 
   case 37: /* arith_expr: arith_expr '/' arith_expr  */
-#line 129 "grammar.y"
+#line 132 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
-#line 1295 "grammar.tab.c"
+#line 1298 "grammar.tab.c"
     break;
 
   case 38: /* arith_expr: '(' arith_expr ')'  */
-#line 130 "grammar.y"
+#line 133 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-1].arith_expr);}
-#line 1301 "grammar.tab.c"
+#line 1304 "grammar.tab.c"
     break;
 
   case 39: /* arith_expr: '-' arith_expr  */
-#line 131 "grammar.y"
+#line 134 "grammar.y"
                               {(yyval.arith_expr)=-(yyvsp[0].arith_expr);}
-#line 1307 "grammar.tab.c"
+#line 1310 "grammar.tab.c"
     break;
 
 
-#line 1311 "grammar.tab.c"
+#line 1314 "grammar.tab.c"
 
       default: break;
     }
@@ -1500,7 +1503,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 145 "grammar.y"
+#line 148 "grammar.y"
 
 
 int yyerror(char* s)
@@ -1514,7 +1517,7 @@ void set_var(char* varname, float fnum) {
   if (absent) {
     kh_key(h, k) = strdup(varname);}
   kh_val(h, k) = fnum;
-  printf("Set %s to %f\n", varname, fnum);
+  //printf("Set %s to %f\n", varname, fnum);
 }
 
 float get_var_val(char* varname) {
@@ -1542,4 +1545,21 @@ void init_hashmap() {
   kh_val(h, k) = 0;
 
   print_hashmap(h, stdout);
+}
+
+void init_hmhis() {
+  printf("Opening: hmhis.json in write mode...\n");
+  hmhis = fopen("./data/hmhis.json", "w");
+  if (hmhis == NULL) {
+      fprintf(stderr, "Error: Could not open hmhis.json (in write mode)!\n");
+      return;
+  }
+  fprintf(hmhis,"[");
+
+}
+
+void close_hmhis() {
+  fseek(hmhis, -2, SEEK_CUR);
+  fprintf(hmhis,"]");
+  fclose(hmhis);
 }

@@ -11,9 +11,12 @@
   khint_t k;
   int absent;
 
+  FILE* hmhis;
+
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
+  void init_hmhis();
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -54,8 +57,8 @@ lines:
 line:
   exprs                 {
                          set_var("line",get_var_val("line")+1);
-                         print_hashmap(h, stdout);
-                         puts("");
+                         print_hashmap(h, hmhis);
+
                         }
 ;
 
@@ -97,15 +100,15 @@ assignment:
 
 val:
   VAR            {
-                  printf("Getting VAR=%s\n",$1);
+                  /*printf("Getting VAR=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
   | CUSTOM_VAR   {
-                  printf("Getting CUSTOM_VAR=%s\n",$1);
+                  /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
-  | INT          {printf("INT=%d\n",$1); $$=$1;}
-  | FLOAT        {printf("FLOAT=%f\n",$1); $$=$1;}
+  | INT          {$$=$1;}
+  | FLOAT        {$$=$1;}
 ;
 
 fn:
@@ -123,7 +126,7 @@ params:
 arith_expr:
   val         {$$=$1;}
   | fn        {$$=$1;}
-  | arith_expr '+' arith_expr {$$=$1+$3; printf("%f+%f=%f\n", $1,$3,$$);}
+  | arith_expr '+' arith_expr {$$=$1+$3; /*printf("%f+%f=%f\n", $1,$3,$$);*/}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
@@ -155,7 +158,7 @@ void set_var(char* varname, float fnum) {
   if (absent) {
     kh_key(h, k) = strdup(varname);}
   kh_val(h, k) = fnum;
-  printf("Set %s to %f\n", varname, fnum);
+  //printf("Set %s to %f\n", varname, fnum);
 }
 
 float get_var_val(char* varname) {
@@ -183,4 +186,21 @@ void init_hashmap() {
   kh_val(h, k) = 0;
 
   print_hashmap(h, stdout);
+}
+
+void init_hmhis() {
+  printf("Opening: hmhis.json in write mode...\n");
+  hmhis = fopen("./data/hmhis.json", "w");
+  if (hmhis == NULL) {
+      fprintf(stderr, "Error: Could not open hmhis.json (in write mode)!\n");
+      return;
+  }
+  fprintf(hmhis,"[");
+
+}
+
+void close_hmhis() {
+  fseek(hmhis, -2, SEEK_CUR);
+  fprintf(hmhis,"]");
+  fclose(hmhis);
 }

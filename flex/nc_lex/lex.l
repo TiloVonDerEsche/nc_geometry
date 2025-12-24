@@ -1,89 +1,96 @@
 %{
-  #include "grammar.tab.h"
+#include "grammar.tab.h"
 %}
-
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
 
-DIGIT    [0-9]
-INT      {DIGIT}+
+digit    [0-9]
+inum     {digit}+
+fnum    ({digit}+"."{digit}*)|({digit}*"."{digit}+)
 
-/* "1." and ".5" possible */
-FLOAT    ({DIGIT}+"."{DIGIT}*)|({DIGIT}*"."{DIGIT}+)
-NUM      {INT}|{FLOAT}
 
-ID       [A-Za-z][_A-Za-z0-9]*
-LETTER   [A-Z]
+alnum       ([a-zA-Z0-9])+
+letter      [A-Z]
 
+id       [A-Za-z][_A-Za-z0-9]*
 
 %%
 
 
-
-{INT} {
+{inum} {
         yylval.INT = atoi(yytext);
-        printf("An integer: %s\n", yytext);
+        /*printf("An integer: %d\n", yylval.INT);*/
         return INT;
-}
+        }
 
-{FLOAT} {
+{fnum} {
         yylval.FLOAT = atof(yytext);
-        printf("A float: %s\n", yytext);
+        /*printf("A float: %f\n", yylval.FLOAT);*/
         return FLOAT;
-}
+        }
 
-R{INT} {
-        yylval.VAR = strdup(yytext);
-        printf("A variable: %s\n", yytext);
-        return VAR;
-}
-
-IF {
-        printf("A keyword: %s\n", yytext);
-        return IF;
-}
-
-"/"{LETTER}{ID} {
-        yylval.SPECIAL_CMD = strdup(yytext);
-        printf("A special command: %s\n", yytext);
-        return SPECIAL_CMD;
-}
-
-{LETTER}{ID}":" {
-        yylval.LABEL = strdup(yytext);
-        printf("A label: %s\n", yytext);
-        return LABEL;
-}
-
-{LETTER}{ID} {
-        yylval.CUSTOM_VAR = strdup(yytext);
-        printf("A custom Variable: %s\n", yytext);
-        return CUSTOM_VAR;
-}
-
-{LETTER} {
-        yylval.CMD = strdup(yytext);
-        printf("A command: %s\n", yytext);
-        return CMD;
-}
+R{inum} {yylval.VAR = strdup(yytext); return VAR;}
+H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 
-"=="  {return EQ;}
-"!="  {return NEQ;}
-"<="  {return LTEQ;}
-">="  {return GTEQ;}
+"/"{id}         {
+                yylval.SPECIAL_CMD = strdup(yytext);
+                /*printf("A special command: %s\n", yytext);*/
+                return SPECIAL_CMD;
+                }
 
-[+\-*/]   { printf("An arithmetic operator: %s\n", yytext); return yytext[0]; }
-[<>!]     { printf("A boolean operator: %s\n", yytext); return yytext[0]; }
+{letter}{id}":" {
+                yylval.LABEL = strdup(yytext);
+                /*printf("A label: %s\n", yytext);*/
+                return LABEL;
+                }
+
+{letter}{id} {
+              if(strcmp(yytext,"PUIS_LASER") == 0 ||
+                 strcmp(yytext,"MODE_LASER") == 0 ||
+                 strcmp(yytext,"VIT_TIR") == 0) {
+                yylval.CUSTOM_VAR = strdup(yytext);
+                /*printf("A custom Variable: %s\n", yytext);*/
+                return CUSTOM_VAR;
+              }
+              else if(strcmp(yytext,"CALL") == 0) {
+                return CALL;
+              }
+              else {
+                /*printf("A MISC_ID: %s\n",yytext);*/
+                return MISC_ID;
+              }
+
+             }
+
+{letter}       {yylval.CMD = strdup(yytext);
+                /*printf("A command: %s\n", yytext);*/
+                return CMD;
+               }
+
+"_"{id}   {
+        /*printf("A hidden MISC_ID: %s\n",yytext);*/
+        return MISC_ID;
+       }
 
 
+[+\-*/]   { /*printf("An arithmetic operator: %s\n", yytext);*/ return yytext[0]; }
 
-";"[^\n]* {printf("A comment: %s\n", yytext); return SEMICOLON;}
+[()]      {return yytext[0];}
 
-"="   {printf("An assignment!\n");}
-" "   {printf("A space\n"); return SPACE;}
-[\t\n]+
+"\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
 
-.       {printf("Unrecognized character: %s\n", yytext); return OTHER;}
+";"[^\n]* {/*printf("A comment: %s\n", yytext);*/ return COMMENT;}
+
+" "      		   {return SPACE;}
+"\n"           {return NEWLINE;}
+"="            {return SET;}
+","            {return yytext[0];}
+.      		     {return OTHER;}
 
 %%
+
+
+int yywrap(){
+    return 1;
+}

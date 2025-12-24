@@ -1,5 +1,5 @@
 default:
 	clear
-	flex -l test.l
+	flex -l lex.l
 	bison -dv grammar.y
-	gcc -o test main.c
+	gcc -o nc_to_json main.c

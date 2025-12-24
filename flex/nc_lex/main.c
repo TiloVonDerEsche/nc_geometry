@@ -13,5 +13,10 @@ main(int argc, char *argv[])
                 yyin = stdin;
 
         init_hashmap();
-        return yyparse ();
+        init_hmhis();
+
+        yyparse ();
+
+        close_hmhis();
+        return 0;
 }

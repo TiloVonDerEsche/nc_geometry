@@ -7,7 +7,7 @@ import json
 import os
 
 # === CONFIG ===
-filename = "./../data/hmhis.json"  # Change this to your actual file path
+filename = "./hmhis.json"  # Change this to your actual file path
 
 # === STEP 1: Check if file exists and has content ===
 if not os.path.exists(filename):

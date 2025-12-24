@@ -2,11 +2,11 @@ import json
 import csv
 
 # --- User Configuration ---
-filename = "./../data/hmhis.json"
+filename = "./hmhis.json"
 
 # User specifies the desired attributes (keys) here:
 desired_attributes = [
-    "line", "G", "X", "Y", "Z", "laser", "laser_power", "VIT_TIR"
+    "line", "G", "X", "Y", "Z", "laser", "PUIS_LASER", "VIT_TIR"
 ]
 
 # Output CSV file

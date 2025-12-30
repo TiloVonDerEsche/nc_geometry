@@ -22,25 +22,6 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
   fprintf(destination,"},\n"); //replace last comma
 }
 
-void init_hashmap_ng(strfloat_t* h) {
-  khint_t k;
-  int absent;
-
-  h = strfloat_init();
-
-  k = strfloat_put(h, "line", &absent);
-  kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 1;
-
-  k = strfloat_put(h, "laser", &absent);
-  kh_key(h, k) = strdup("laser");
-  kh_val(h, k) = 0;
-
-
-  print_hashmap(h, stdout);
-}
-
-
 
 
 

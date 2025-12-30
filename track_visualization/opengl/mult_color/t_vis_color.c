@@ -57,6 +57,8 @@ void read_csv(const char* filename) {
         sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
                &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
                &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
+        tracks[i].hradius = 0.5;
+        tracks[i].vradius = 0.5;
         i++;
     }
     fclose(file);

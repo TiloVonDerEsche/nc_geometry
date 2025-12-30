@@ -191,7 +191,7 @@ void init_hashmap() {
   kh_key(h, k) = strdup("laser");
   kh_val(h, k) = 0;
 
-  print_hashmap(h, stdout);
+  //print_hashmap(h, stdout);
 }
 
 void init_hmhis() {
@@ -206,7 +206,28 @@ void init_hmhis() {
 }
 
 void close_hmhis() {
+  //delete last redundant comma
+
+  /*
+  fseek(hmhis, -10, SEEK_CUR);
+  int c = fgetc(hmhis);
+
+  c = fgetc(hmhis);
+  printf("c=%d\n",c);
   fseek(hmhis, -2, SEEK_CUR);
+  c = fgetc(hmhis);
+  printf("c=%d\n",c);
+  fseek(hmhis, -2, SEEK_CUR);
+  c = fgetc(hmhis);
+  printf("c=%d\n",c);
+  fseek(hmhis, -2, SEEK_CUR);
+  c = fgetc(hmhis);
+  printf("c=%d\n",c);
+  fseek(hmhis, -2, SEEK_CUR);
+  while(c != ',') {
+
+  }*/
+  fseek(hmhis, -3, SEEK_CUR);
   fprintf(hmhis,"]");
   fclose(hmhis);
 }

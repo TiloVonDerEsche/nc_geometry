@@ -16,7 +16,7 @@ track_accel_margin=0.02;
 step_distance = 1; //step distance of interpolation in mm
 
 //only used by 3d_track_visualizer
-tracks_to_plot = "./data/track_lists/01_MMProben_track_list.csv";
+tracks_to_plot = "./data/track_list.csv";
 
 
 enable_debug_prints = 1;

@@ -1,0 +1,17 @@
+; First line
+STOPRE
+W500 S300
+; Line four
+
+
+STOPRE
+X123 Z13
+PUIS_LASER 500
+/LASER_ON
+G01 X5
+G01 X6
+G01 X7
+/LASER_OFF
+STOPRE
+
+; Goodbye

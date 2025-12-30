@@ -1,3 +1,3 @@
 default:
 	clear
-	gcc gen_track_list_from_json.c -o test
+	gcc hmhis_json_to_track_list.c -o ./../../hmhis_json_to_track_list.bin

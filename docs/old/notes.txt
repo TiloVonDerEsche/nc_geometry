@@ -1,0 +1,59 @@
+Maybe implement "Eilmodus". So switch between two different speeds
+depending on the Eilmodus boolean value.
+
+Precision of 1000 yields a ridiculous amount of csv lines.
+For 10 mpf_lines -> 300.000 lines of csv -> 70.4 MB
+For 2500 mpf_lines -> ???.???.??? lines of csv -> 27.5 GB
+
+
+Precision 10:
+2500 mpf lines -> 13376 csv lines -> 2.94 MB
+25000 mpf lines -> 130949 csv lines -> 29.023MB -> 4482.7 seconds
+250000 mpf lines -> more than 1048576 csv lines -> 257.163 MB ->  36402 seconds
+
+
+Generated CSV vs ElGeo_5_V2_1.csv
+Generated CSV has more than 1048576 lines (Excel gives up after that)
+36402 seconds
+Point ElGeo Endpoint (7.661810,33.299599,2.160000) found in line 258462
+in generated csv, at 8841.063 seconds
+
+ElGeo_5_V2_1.csv has 1017006 lines
+(the next lines are empty, implying that https://dfncloud.fh-kiel.de can handle
+to display all of the lines)
+2033.982 seconds
+
+
+
+
+Do we need data_tuples.csv ?
+Not really but we need the cords array for the historic 3D points.
+Writing to data_tuples.csv is only one fprintf line more.
+(Could be commented out, if inference time goes above 1 second)
+
+
+-flto flag to trim unused code for compiling with static linking
+
+hyperMill / hyperCAD wird verwendet
+
+STOPRE command?
+
+supports parametric programming (e.g., Siemens or Heidenhain)
+
+Siemens 840D: Siemens uses DC in some contexts to specify “direct control” of rotary axes,
+ensuring the shortest path or normalized angle.
+For example, C=DC(359.6191) commands the C-axis to 359.6191° via the shortest path.
+
+
+Laser-specific commands: LASER_OFF and STOPRE indicate this is a laser machining program.
+STOPRE is often used in Siemens controllers to stop preprocessing (buffering) of NC blocks,
+ensuring precise synchronization.
+
+
+The NC Code that my organization uses seemed quite strange to me aswell,
+since PUIS_LASER uses a space as delimiter, as the only command,
+most the commands use the change from char to number as delimiter,
+and only machine_speed and the angle of the working table: A,B,C commands,
+use a '=' as delimiter. I am not sure why the nc code is so inconsistent,
+since they are using a CNC program to generate it. But I saw people programming by hand,
+so perhaps it is a mix of CNC generation and hand programming, which produces this discrepancy.

@@ -1,5 +1,8 @@
 %{
-#include "grammar.tab.h"
+  #include "grammar.tab.h"
+  
+  long byte_counter = 0;
+  #define YY_USER_ACTION byte_counter += yyleng;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -49,7 +52,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
               if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
                 yylval.SPECIAL_CMD = strdup(yytext);
-                return SPECIAL_CMD;              
+                return SPECIAL_CMD;
               }
               else if(strcmp(yytext,"PUIS_LASER") == 0 ||
                  strcmp(yytext,"MODE_LASER") == 0 ||

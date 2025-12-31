@@ -45,8 +45,10 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 }
 
 {letter}{id}":" {
-                yylval.LABEL = strdup(yytext);
-                if(debug){ printf("A label: %s\n", yytext); }
+                char* s = yytext;
+                s[strlen(s) - 1] = '\0';
+                yylval.LABEL = strdup(s);
+                if(debug){ printf("A label: %s\n", s); }
                 return LABEL;
                 }
 

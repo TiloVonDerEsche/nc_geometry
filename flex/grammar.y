@@ -62,6 +62,7 @@ line:
   exprs                 {
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, hmhis);
+                         print_hashmap(h, stdout);
                         }
 ;
 
@@ -160,7 +161,23 @@ bool_expr:
 %%
 
 void jump(char* label_name) {
-    float offset = get_var_val(label_name)-1;
+    float offset = get_var_val(label_name) + 5;
+
+    //float offset=34;
+    k = strfloat_get(h, label_name);
+    if ( kh_exist(h, k) ) {
+      printf("Found in hm: label_name=%s\n",label_name);
+      //offset = kh_val(h, k);
+    }
+    else {
+    printf("NOT found in hm: label_name=%s\n",label_name);
+    }
+
+    printf("Jump offset=%d\n\n",(long)offset);
+
+
+
+
     if (offset >= 0) {
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again

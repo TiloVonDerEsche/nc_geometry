@@ -831,14 +831,16 @@ case 6:
 YY_RULE_SETUP
 #line 47 "lex.l"
 {
-                yylval.LABEL = strdup(yytext);
-                if(debug){ printf("A label: %s\n", yytext); }
+                char* s = yytext;
+                s[strlen(s) - 1] = '\0';
+                yylval.LABEL = strdup(s);
+                if(debug){ printf("A label: %s\n", s); }
                 return LABEL;
                 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 53 "lex.l"
+#line 55 "lex.l"
 {
               if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
@@ -869,7 +871,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 81 "lex.l"
+#line 83 "lex.l"
 {yylval.CMD = strdup(yytext);
                 if(debug){ printf("A command: %s\n", yytext); }
                 return CMD;
@@ -877,7 +879,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 86 "lex.l"
+#line 88 "lex.l"
 {
         if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
         return MISC_ID;
@@ -885,57 +887,57 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 92 "lex.l"
+#line 94 "lex.l"
 { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 94 "lex.l"
+#line 96 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 96 "lex.l"
+#line 98 "lex.l"
 {printf("A string: %s\n",yytext); return STRING;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 98 "lex.l"
+#line 100 "lex.l"
 {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 100 "lex.l"
+#line 102 "lex.l"
 {return SPACE;}
 	YY_BREAK
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 101 "lex.l"
+#line 103 "lex.l"
 {return NEWLINE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 102 "lex.l"
+#line 104 "lex.l"
 {return SET;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 103 "lex.l"
+#line 105 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 104 "lex.l"
+#line 106 "lex.l"
 {return OTHER;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 106 "lex.l"
+#line 108 "lex.l"
 ECHO;
 	YY_BREAK
-#line 938 "lex.yy.c"
+#line 940 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1952,7 +1954,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 106 "lex.l"
+#line 108 "lex.l"
 
 
 

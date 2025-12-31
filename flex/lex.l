@@ -1,6 +1,6 @@
 %{
   #include "grammar.tab.h"
-  
+
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 %}

@@ -13,6 +13,8 @@
 
   FILE* hmhis;
 
+  extern long byte_counter;
+
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
@@ -73,7 +75,7 @@ expr:
   CMD arith_expr       {set_var($1,$2);}
   | assignment
   | LABEL                {
-                          set_var($1,get_var_val("line"));
+                          set_var($1, (float)byte_counter);
                          }
   | SPECIAL_CMD          {
                           if(strcmp($1,"/LASER_ON") == 0) {

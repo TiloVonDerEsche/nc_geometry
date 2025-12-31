@@ -498,9 +498,11 @@ char *yytext_ptr;
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
-#line 501 "lex.yy.c"
-/* scanner for a simplified numeric control (NC from CNC machining) language */
+
+  int debug = 1;
 #line 503 "lex.yy.c"
+/* scanner for a simplified numeric control (NC from CNC machining) language */
+#line 505 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -717,11 +719,11 @@ YY_DECL
 		}
 
 	{
-#line 20 "lex.l"
+#line 22 "lex.l"
 
 
 
-#line 724 "lex.yy.c"
+#line 726 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -790,53 +792,53 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 23 "lex.l"
+#line 25 "lex.l"
 {
         yylval.INT = atoi(yytext);
-        /*printf("An integer: %d\n", yylval.INT);*/
+        if(debug){ printf("An integer: %d\n", yylval.INT); }
         return INT;
         }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 29 "lex.l"
+#line 31 "lex.l"
 {
         yylval.FLOAT = atof(yytext);
-        /*printf("A float: %f\n", yylval.FLOAT);*/
+        if(debug){ printf("A float: %f\n", yylval.FLOAT); }
         return FLOAT;
         }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "lex.l"
+#line 37 "lex.l"
 {yylval.VAR = strdup(yytext); return VAR;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "lex.l"
+#line 38 "lex.l"
 {yylval.VAR = strdup(yytext); return VAR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "lex.l"
+#line 41 "lex.l"
 {
                 yylval.SPECIAL_CMD = strdup(yytext);
-                /*printf("A special command: %s\n", yytext);*/
+                if(debug){ printf("A special command: %s\n", yytext); }
                 return SPECIAL_CMD;
                 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 45 "lex.l"
+#line 47 "lex.l"
 {
                 yylval.LABEL = strdup(yytext);
-                /*printf("A label: %s\n", yytext);*/
+                if(debug){ printf("A label: %s\n", yytext); }
                 return LABEL;
                 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 51 "lex.l"
+#line 53 "lex.l"
 {
               if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
@@ -847,14 +849,19 @@ YY_RULE_SETUP
                  strcmp(yytext,"MODE_LASER") == 0 ||
                  strcmp(yytext,"VIT_TIR") == 0) {
                 yylval.CUSTOM_VAR = strdup(yytext);
-                /*printf("A custom Variable: %s\n", yytext);*/
+                if(debug){ printf("A custom Variable: %s\n", yytext); }
                 return CUSTOM_VAR;
               }
               else if(strcmp(yytext,"CALL") == 0) {
                 return CALL;
               }
+              else if(strcmp(yytext,"GOTOB") == 0) {
+                puts("A GOTO!");
+                return GOTO;
+              }
               else {
-                /*printf("A MISC_ID: %s\n",yytext);*/
+                if(debug){ printf("A MISC_ID: %s\n",yytext); }
+                yylval.MISC_ID = strdup(yytext);
                 return MISC_ID;
               }
 
@@ -862,73 +869,73 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "lex.l"
+#line 81 "lex.l"
 {yylval.CMD = strdup(yytext);
-                /*printf("A command: %s\n", yytext);*/
+                if(debug){ printf("A command: %s\n", yytext); }
                 return CMD;
                }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 79 "lex.l"
+#line 86 "lex.l"
 {
-        /*printf("A hidden MISC_ID: %s\n",yytext);*/
+        if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
         return MISC_ID;
        }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 85 "lex.l"
-{ /*printf("An arithmetic operator: %s\n", yytext);*/ return yytext[0]; }
+#line 92 "lex.l"
+{ if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 94 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 89 "lex.l"
+#line 96 "lex.l"
 {printf("A string: %s\n",yytext); return STRING;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 91 "lex.l"
-{/*printf("A comment: %s\n", yytext);*/ return COMMENT;}
+#line 98 "lex.l"
+{if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 93 "lex.l"
+#line 100 "lex.l"
 {return SPACE;}
 	YY_BREAK
 case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
-#line 94 "lex.l"
+#line 101 "lex.l"
 {return NEWLINE;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 95 "lex.l"
+#line 102 "lex.l"
 {return SET;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 96 "lex.l"
+#line 103 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 97 "lex.l"
+#line 104 "lex.l"
 {return OTHER;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 99 "lex.l"
+#line 106 "lex.l"
 ECHO;
 	YY_BREAK
-#line 931 "lex.yy.c"
+#line 938 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1945,7 +1952,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 99 "lex.l"
+#line 106 "lex.l"
 
 
 

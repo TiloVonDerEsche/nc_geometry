@@ -3,6 +3,8 @@
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
+
+  int debug = 1;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -22,13 +24,13 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 {inum} {
         yylval.INT = atoi(yytext);
-        /*printf("An integer: %d\n", yylval.INT);*/
+        if(debug){ printf("An integer: %d\n", yylval.INT); }
         return INT;
         }
 
 {fnum} {
         yylval.FLOAT = atof(yytext);
-        /*printf("A float: %f\n", yylval.FLOAT);*/
+        if(debug){ printf("A float: %f\n", yylval.FLOAT); }
         return FLOAT;
         }
 
@@ -38,13 +40,13 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 "/"{id}         {
                 yylval.SPECIAL_CMD = strdup(yytext);
-                /*printf("A special command: %s\n", yytext);*/
+                if(debug){ printf("A special command: %s\n", yytext); }
                 return SPECIAL_CMD;
                 }
 
 {letter}{id}":" {
                 yylval.LABEL = strdup(yytext);
-                /*printf("A label: %s\n", yytext);*/
+                if(debug){ printf("A label: %s\n", yytext); }
                 return LABEL;
                 }
 
@@ -58,37 +60,42 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                  strcmp(yytext,"MODE_LASER") == 0 ||
                  strcmp(yytext,"VIT_TIR") == 0) {
                 yylval.CUSTOM_VAR = strdup(yytext);
-                /*printf("A custom Variable: %s\n", yytext);*/
+                if(debug){ printf("A custom Variable: %s\n", yytext); }
                 return CUSTOM_VAR;
               }
               else if(strcmp(yytext,"CALL") == 0) {
                 return CALL;
               }
+              else if(strcmp(yytext,"GOTOB") == 0) {
+                puts("A GOTO!");
+                return GOTO;
+              }
               else {
-                /*printf("A MISC_ID: %s\n",yytext);*/
+                if(debug){ printf("A MISC_ID: %s\n",yytext); }
+                yylval.MISC_ID = strdup(yytext);
                 return MISC_ID;
               }
 
              }
 
 {letter}       {yylval.CMD = strdup(yytext);
-                /*printf("A command: %s\n", yytext);*/
+                if(debug){ printf("A command: %s\n", yytext); }
                 return CMD;
                }
 
 "_"{id}   {
-        /*printf("A hidden MISC_ID: %s\n",yytext);*/
+        if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
         return MISC_ID;
        }
 
 
-[+\-*/]   { /*printf("An arithmetic operator: %s\n", yytext);*/ return yytext[0]; }
+[+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 
 [()]      {return yytext[0];}
 
 "\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
 
-";"[^\n]* {/*printf("A comment: %s\n", yytext);*/ return COMMENT;}
+";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
 " "      		   {return SPACE;}
 "\n"           {return NEWLINE;}

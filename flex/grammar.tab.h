@@ -89,6 +89,7 @@ union YYSTYPE
   char* CMD;                               /* CMD  */
   char* SPECIAL_CMD;                       /* SPECIAL_CMD  */
   char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
+  char* MISC_ID;                           /* MISC_ID  */
   char* LABEL;                             /* LABEL  */
   float FLOAT;                             /* FLOAT  */
   float val;                               /* val  */
@@ -96,7 +97,7 @@ union YYSTYPE
   float arith_expr;                        /* arith_expr  */
   int INT;                                 /* INT  */
 
-#line 100 "grammar.tab.h"
+#line 101 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -15,6 +15,7 @@
 
   extern long byte_counter;
 
+  void jump(char*);
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
@@ -35,7 +36,8 @@
 %token <char*> CMD
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
-%token CALL MISC_ID
+%token CALL
+%token <char*> MISC_ID
 %token <char*> LABEL
 
 %nterm <float> val
@@ -60,7 +62,6 @@ line:
   exprs                 {
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, hmhis);
-
                         }
 ;
 
@@ -76,6 +77,9 @@ expr:
   | assignment
   | LABEL                {
                           set_var($1, (float)byte_counter);
+                         }
+  | GOTO SPACE MISC_ID   {
+                          jump($3);
                          }
   | SPECIAL_CMD          {
                           if(strcmp($1,"/LASER_ON") == 0) {
@@ -155,11 +159,16 @@ bool_expr:
 
 %%
 
-int yyerror(char* s)
-{
-	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
-	return 0;
+void jump(char* label_name) {
+    float offset = get_var_val(label_name)-1;
+    if (offset >= 0) {
+        fseek(yyin, (long)offset, SEEK_SET);
+        yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
+    }
 }
+
+
+//hashmap fns
 
 void set_var(char* varname, float fnum) {
   k = strfloat_put(h, varname, &absent);
@@ -189,6 +198,10 @@ void init_hashmap() {
   kh_key(h, k) = strdup("line");
   kh_val(h, k) = 1;
 
+  k = strfloat_put(h, "yyline", &absent);
+  kh_key(h, k) = strdup("yyline");
+  kh_val(h, k) = 1;
+
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
   kh_val(h, k) = 0;
@@ -209,27 +222,17 @@ void init_hmhis() {
 
 void close_hmhis() {
   //delete last redundant comma
-
-  /*
-  fseek(hmhis, -10, SEEK_CUR);
-  int c = fgetc(hmhis);
-
-  c = fgetc(hmhis);
-  printf("c=%d\n",c);
-  fseek(hmhis, -2, SEEK_CUR);
-  c = fgetc(hmhis);
-  printf("c=%d\n",c);
-  fseek(hmhis, -2, SEEK_CUR);
-  c = fgetc(hmhis);
-  printf("c=%d\n",c);
-  fseek(hmhis, -2, SEEK_CUR);
-  c = fgetc(hmhis);
-  printf("c=%d\n",c);
-  fseek(hmhis, -2, SEEK_CUR);
-  while(c != ',') {
-
-  }*/
   fseek(hmhis, -3, SEEK_CUR);
   fprintf(hmhis,"]");
   fclose(hmhis);
+}
+
+//bison fns
+
+int yyerror(char* s)
+{
+	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
+  printf("yyline=%d\n",yylineno);
+  printf("yytext=%s\n",yytext);
+	return 0;
 }

@@ -16,6 +16,7 @@
   extern long byte_counter;
 
   void jump(char*);
+  void fast_forward_to_endif();
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
@@ -24,13 +25,13 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-%token SPACE NEWLINE SET SEMICOLON COMMENT OTHER
+%token SEP NEWLINE SEMICOLON COMMENT OTHER
 %token <char*> STRING
 %token <int> INT
 %token <float> FLOAT
 
 %token EQ NEQ LTEQ GTEQ
-%token IF GOTO
+%token IF ENDIF GOTO
 
 %token <char*> VAR
 %token <char*> CMD
@@ -59,27 +60,38 @@ lines:
 ;
 
 line:
-  exprs                 {
+  seps                  {set_var("line",get_var_val("line")+1);}
+  | seps exprs          {
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);
                         }
 ;
 
+seps:
+  %empty
+  | seps SEP
+;
+
+
 
 exprs:
-  %empty
-  | expr
-  | exprs SPACE expr;
+  expr
+  | exprs SEP expr;
 ;
 
 expr:
-  CMD arith_expr       {set_var($1,$2);}
+  IF SEP bool_expr {
+      if (!$3) {
+          fast_forward_to_endif();
+      }
+  } exprs ENDIF
+  | CMD arith_expr       {set_var($1,$2);}
   | assignment
   | LABEL                {
                           set_var($1, (float)byte_counter);
                          }
-  | GOTO SPACE MISC_ID   {
+  | GOTO SEP MISC_ID   {
                           jump($3);
                          }
   | SPECIAL_CMD          {
@@ -96,18 +108,19 @@ expr:
                             set_var("laser",0);
                           }
                          }
-  | CALL SPACE STRING
+  | CALL SEP STRING
   | MISC_ID
   | fn
   | COMMENT
-  | error   {}
+  | error   {/*  | ',' SEP bool_expr {printf("bool_expr=%d",$3);}*/}
+
 ;
 
 assignment:
-  VAR SET arith_expr     {set_var($1,$3);}
-  | CMD SET arith_expr   {set_var($1,$3);}
-  | CUSTOM_VAR SET arith_expr {set_var($1,$3);}
-  | CUSTOM_VAR SPACE arith_expr {set_var($1,$3);}
+  VAR '=' arith_expr     {set_var($1,$3);}
+  | CMD '=' arith_expr   {set_var($1,$3);}
+  | CUSTOM_VAR '=' arith_expr {set_var($1,$3);}
+  | CUSTOM_VAR SEP arith_expr {set_var($1,$3);}
 ;
 
 
@@ -150,10 +163,13 @@ arith_expr:
 bool_expr:
   arith_expr '<' arith_expr {$$=$1<$3;}
   | arith_expr '>' arith_expr {$$=$1>$3;}
-  | arith_expr EQ arith_expr {$$=$1==$3;}
-  | arith_expr NEQ arith_expr {$$=$1!=$3;}
-  | arith_expr LTEQ arith_expr {$$=$1<=$3;}
-  | arith_expr GTEQ arith_expr {$$=$1>=$3;}
+  | arith_expr '=' '=' arith_expr {$$=$1==$4;}
+  | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
+  | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
+  | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
+  | '!' bool_expr                 {$$=!$2;}
+  | '(' bool_expr ')'             {$$=$2;}
+
 
 ;
 
@@ -181,6 +197,26 @@ void jump(char* label_name) {
     if (offset >= 0) {
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
+    }
+}
+
+void fast_forward_to_endif() {
+    int nesting = 1;
+    while (nesting > 0) {
+        int token = yylex();
+
+        // If we hit End Of File, stop to prevent infinite loop
+        if (token == 0) {
+            fprintf(stderr, "Error: IF without matching ENDIF\n");
+            break;
+        }
+
+        if (token == IF) {
+            nesting++;
+        } else if (token == ENDIF) {
+            nesting--;
+        }
+        // All other tokens are simply consumed and ignored
     }
 }
 

@@ -54,20 +54,20 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    SPACE = 258,                   /* SPACE  */
+    SEP = 258,                     /* SEP  */
     NEWLINE = 259,                 /* NEWLINE  */
-    SET = 260,                     /* SET  */
-    SEMICOLON = 261,               /* SEMICOLON  */
-    COMMENT = 262,                 /* COMMENT  */
-    OTHER = 263,                   /* OTHER  */
-    STRING = 264,                  /* STRING  */
-    INT = 265,                     /* INT  */
-    FLOAT = 266,                   /* FLOAT  */
-    EQ = 267,                      /* EQ  */
-    NEQ = 268,                     /* NEQ  */
-    LTEQ = 269,                    /* LTEQ  */
-    GTEQ = 270,                    /* GTEQ  */
-    IF = 271,                      /* IF  */
+    SEMICOLON = 260,               /* SEMICOLON  */
+    COMMENT = 261,                 /* COMMENT  */
+    OTHER = 262,                   /* OTHER  */
+    STRING = 263,                  /* STRING  */
+    INT = 264,                     /* INT  */
+    FLOAT = 265,                   /* FLOAT  */
+    EQ = 266,                      /* EQ  */
+    NEQ = 267,                     /* NEQ  */
+    LTEQ = 268,                    /* LTEQ  */
+    GTEQ = 269,                    /* GTEQ  */
+    IF = 270,                      /* IF  */
+    ENDIF = 271,                   /* ENDIF  */
     GOTO = 272,                    /* GOTO  */
     VAR = 273,                     /* VAR  */
     CMD = 274,                     /* CMD  */
@@ -96,8 +96,9 @@ union YYSTYPE
   float fn;                                /* fn  */
   float arith_expr;                        /* arith_expr  */
   int INT;                                 /* INT  */
+  int bool_expr;                           /* bool_expr  */
 
-#line 101 "grammar.tab.h"
+#line 102 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -69,8 +69,16 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 return CALL;
               }
               else if(strcmp(yytext,"GOTOB") == 0) {
-                puts("A GOTO!");
+                if(debug){ puts("A GOTO!"); }
                 return GOTO;
+              }
+              else if(strcmp(yytext,"IF") == 0) {
+                if(debug){ puts("An IF!"); }
+                return IF;
+              }
+              else if(strcmp(yytext,"ENDIF") == 0) {
+                if(debug){ puts("An ENDIF!"); }
+                return ENDIF;
               }
               else {
                 if(debug){ printf("A MISC_ID: %s\n",yytext); }
@@ -92,6 +100,8 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 
 [+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
+[<>!]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
+"="            {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0];}
 
 [()]      {return yytext[0];}
 
@@ -99,9 +109,8 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
-" "      		   {return SPACE;}
+[ \t]      		 {return SEP;}
 "\n"           {return NEWLINE;}
-"="            {return SET;}
 ","            {return yytext[0];}
 .      		     {return OTHER;}
 

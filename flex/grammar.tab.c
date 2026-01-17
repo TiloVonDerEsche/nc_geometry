@@ -1664,18 +1664,19 @@ yyreturnlab:
 
 void jump(char* label_name) {
     float offset = get_var_val(label_name) + 6;
-
-    //float offset=34;
     k = strfloat_get(h, label_name);
-    if ( kh_exist(h, k) ) {
-      printf("Found in hm: label_name=%s\n",label_name);
-      //offset = kh_val(h, k);
-    }
-    else {
-      printf("NOT found in hm: label_name=%s\n",label_name);
+
+    if (debug) {
+      if ( kh_exist(h, k) ) {
+        printf("Found in hm: label_name=%s\n",label_name);
+        //offset = kh_val(h, k);
+      }
+      else {
+        printf("NOT found in hm: label_name=%s\n",label_name);
+      }
     }
 
-    printf("Jumping to offset=%d\n\n",(long)offset);
+    if(debug){ printf("Jumping to offset=%d\n\n",(long)offset); }
 
 
     if (offset >= 0) {
@@ -1683,7 +1684,7 @@ void jump(char* label_name) {
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
 
-    printf("fgetc=%c\n\n",fgetc(yyin));
+    if(debug){ printf("fgetc=%c\n\n",fgetc(yyin)); }
 
 }
 

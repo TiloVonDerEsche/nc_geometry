@@ -216,8 +216,7 @@ void jump(char* label_name) {
 
     if (offset >= 0) {
         fseek(yyin, (long)offset, SEEK_SET);
-        //fseek(yyin, 0, SEEK_SET);
-        //yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
+        yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
 
     printf("fgetc=%c\n\n",fgetc(yyin));

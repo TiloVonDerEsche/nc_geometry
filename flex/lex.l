@@ -5,6 +5,7 @@
   #define YY_USER_ACTION byte_counter += yyleng;
 
   int debug = 1;
+  int skip = 0;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -36,7 +37,6 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 H{inum} {yylval.VAR = strdup(yytext); return VAR;}
-
 
 "/"{id}         {
                 yylval.SPECIAL_CMD = strdup(yytext);

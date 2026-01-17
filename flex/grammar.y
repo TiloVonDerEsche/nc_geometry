@@ -14,13 +14,16 @@
   FILE* hmhis;
 
   extern long byte_counter;
+  extern int skip;
+  char* pending_jump_label = NULL;
+  int jump_requested = 0;
 
   void jump(char*);
-  void fast_forward_to_endif();
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
   void init_hmhis();
+
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -65,6 +68,15 @@ line:
                          set_var("line",get_var_val("line")+1);
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);
+
+                         if (jump_requested) {
+                              jump_requested = 0;
+                              skip = 0; // Reset skip before jumping
+                              char* target = pending_jump_label;
+                              pending_jump_label = NULL;
+                              jump(target);
+                              free(target);
+                         }
                         }
 ;
 
@@ -81,19 +93,31 @@ exprs:
 ;
 
 expr:
-  IF SEP bool_expr {
+  IF SEP bool_expr SEP {
       if (!$3) {
-          fast_forward_to_endif();
+          skip++;
+          printf("Skip=%d\n",skip);
       }
-  } exprs ENDIF
-  | CMD arith_expr       {set_var($1,$2);}
+  } exprs SEP ENDIF {
+      if (skip > 0) {
+        skip--;
+        printf("Skip=%d\n",skip);
+      }
+    }
+  | CMD arith_expr       {if(!skip){ set_var($1,$2);}}
   | assignment
   | LABEL                {
-                          set_var($1, (float)byte_counter);
+                          if(!skip){ set_var($1, (float)byte_counter); }
                          }
-  | GOTO SEP MISC_ID   {
-                          jump($3);
-                         }
+  | GOTO SEP MISC_ID   {if(!skip){
+                          pending_jump_label = strdup($3);
+                          jump_requested = 1;
+
+                          // Increment skip so the parser ignores everything
+                          // until it reaches the end of the current IF or line
+                          skip = 1;
+                          }
+                        }
   | SPECIAL_CMD          {
                           if(strcmp($1,"/LASER_ON") == 0) {
                             set_var("laser",1);
@@ -117,10 +141,10 @@ expr:
 ;
 
 assignment:
-  VAR '=' arith_expr     {set_var($1,$3);}
-  | CMD '=' arith_expr   {set_var($1,$3);}
-  | CUSTOM_VAR '=' arith_expr {set_var($1,$3);}
-  | CUSTOM_VAR SEP arith_expr {set_var($1,$3);}
+  VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}
+  | CMD '=' arith_expr        {if(!skip){set_var($1,$3);}}
+  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var($1,$3);}}
+  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -169,15 +193,13 @@ bool_expr:
   | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
-
-
 ;
 
 
 %%
 
 void jump(char* label_name) {
-    float offset = get_var_val(label_name) + 5;
+    float offset = get_var_val(label_name) + 6;
 
     //float offset=34;
     k = strfloat_get(h, label_name);
@@ -186,38 +208,20 @@ void jump(char* label_name) {
       //offset = kh_val(h, k);
     }
     else {
-    printf("NOT found in hm: label_name=%s\n",label_name);
+      printf("NOT found in hm: label_name=%s\n",label_name);
     }
 
-    printf("Jump offset=%d\n\n",(long)offset);
-
-
+    printf("Jumping to offset=%d\n\n",(long)offset);
 
 
     if (offset >= 0) {
         fseek(yyin, (long)offset, SEEK_SET);
-        yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
+        //fseek(yyin, 0, SEEK_SET);
+        //yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
-}
 
-void fast_forward_to_endif() {
-    int nesting = 1;
-    while (nesting > 0) {
-        int token = yylex();
+    printf("fgetc=%c\n\n",fgetc(yyin));
 
-        // If we hit End Of File, stop to prevent infinite loop
-        if (token == 0) {
-            fprintf(stderr, "Error: IF without matching ENDIF\n");
-            break;
-        }
-
-        if (token == IF) {
-            nesting++;
-        } else if (token == ENDIF) {
-            nesting--;
-        }
-        // All other tokens are simply consumed and ignored
-    }
 }
 
 
@@ -251,10 +255,6 @@ void init_hashmap() {
   kh_key(h, k) = strdup("line");
   kh_val(h, k) = 1;
 
-  k = strfloat_put(h, "yyline", &absent);
-  kh_key(h, k) = strdup("yyline");
-  kh_val(h, k) = 1;
-
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");
   kh_val(h, k) = 0;
@@ -285,7 +285,5 @@ void close_hmhis() {
 int yyerror(char* s)
 {
 	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
-  printf("yyline=%d\n",yylineno);
-  printf("yytext=%s\n",yytext);
 	return 0;
 }

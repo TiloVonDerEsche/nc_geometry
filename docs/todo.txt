@@ -40,3 +40,12 @@ assignment: VAR SET arith_expr {
 
 Why do we need to copy paste the .mpf files into a fresh file to avoid syntax errs?
 Look for residual tokens, which our lexer can't handle. Perhaps tabs instead of spaces
+
+
+Do we need to jump ahead with a gotob?
+
+"
+gotob LOOP1
+
+LOOP1:
+"

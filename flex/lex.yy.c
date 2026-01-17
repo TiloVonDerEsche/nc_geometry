@@ -500,9 +500,10 @@ char *yytext_ptr;
   #define YY_USER_ACTION byte_counter += yyleng;
 
   int debug = 1;
-#line 503 "lex.yy.c"
+  int skip = 0;
+#line 504 "lex.yy.c"
 /* scanner for a simplified numeric control (NC from CNC machining) language */
-#line 505 "lex.yy.c"
+#line 506 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -719,11 +720,11 @@ YY_DECL
 		}
 
 	{
-#line 22 "lex.l"
+#line 23 "lex.l"
 
 
 
-#line 726 "lex.yy.c"
+#line 727 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -792,7 +793,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 25 "lex.l"
+#line 26 "lex.l"
 {
         yylval.INT = atoi(yytext);
         if(debug){ printf("An integer: %d\n", yylval.INT); }
@@ -801,7 +802,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 31 "lex.l"
+#line 32 "lex.l"
 {
         yylval.FLOAT = atof(yytext);
         if(debug){ printf("A float: %f\n", yylval.FLOAT); }
@@ -810,12 +811,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 37 "lex.l"
+#line 38 "lex.l"
 {yylval.VAR = strdup(yytext); return VAR;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 38 "lex.l"
+#line 39 "lex.l"
 {yylval.VAR = strdup(yytext); return VAR;}
 	YY_BREAK
 case 5:
@@ -950,7 +951,7 @@ YY_RULE_SETUP
 #line 117 "lex.l"
 ECHO;
 	YY_BREAK
-#line 953 "lex.yy.c"
+#line 954 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

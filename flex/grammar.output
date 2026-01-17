@@ -28,7 +28,7 @@ Grammar
 
    10 $@1: ε
 
-   11 expr: IF SEP bool_expr $@1 exprs ENDIF
+   11 expr: IF SEP bool_expr SEP $@1 exprs SEP ENDIF
    12     | CMD arith_expr
    13     | assignment
    14     | LABEL
@@ -261,7 +261,7 @@ State 9
 
 State 10
 
-   11 expr: IF • SEP bool_expr $@1 exprs ENDIF
+   11 expr: IF • SEP bool_expr SEP $@1 exprs SEP ENDIF
 
     SEP  shift, and go to state 23
 
@@ -372,7 +372,7 @@ State 22
 
 State 23
 
-   11 expr: IF SEP • bool_expr $@1 exprs ENDIF
+   11 expr: IF SEP • bool_expr SEP $@1 exprs SEP ENDIF
 
     INT         shift, and go to state 26
     FLOAT       shift, and go to state 27
@@ -675,11 +675,9 @@ State 44
 
 State 45
 
-   11 expr: IF SEP bool_expr • $@1 exprs ENDIF
+   11 expr: IF SEP bool_expr • SEP $@1 exprs SEP ENDIF
 
-    $default  reduce using rule 10 ($@1)
-
-    $@1  go to state 69
+    SEP  shift, and go to state 69
 
 
 State 46
@@ -993,24 +991,11 @@ State 68
 
 State 69
 
-   11 expr: IF SEP bool_expr $@1 • exprs ENDIF
+   11 expr: IF SEP bool_expr SEP • $@1 exprs SEP ENDIF
 
-    error        shift, and go to state 7
-    COMMENT      shift, and go to state 9
-    IF           shift, and go to state 10
-    GOTO         shift, and go to state 11
-    VAR          shift, and go to state 12
-    CMD          shift, and go to state 13
-    SPECIAL_CMD  shift, and go to state 14
-    CUSTOM_VAR   shift, and go to state 15
-    CALL         shift, and go to state 16
-    MISC_ID      shift, and go to state 17
-    LABEL        shift, and go to state 18
+    $default  reduce using rule 10 ($@1)
 
-    exprs       go to state 84
-    expr        go to state 20
-    assignment  go to state 21
-    fn          go to state 22
+    $@1  go to state 84
 
 
 State 70
@@ -1204,11 +1189,24 @@ State 83
 
 State 84
 
-    9 exprs: exprs • SEP expr
-   11 expr: IF SEP bool_expr $@1 exprs • ENDIF
+   11 expr: IF SEP bool_expr SEP $@1 • exprs SEP ENDIF
 
-    SEP    shift, and go to state 41
-    ENDIF  shift, and go to state 91
+    error        shift, and go to state 7
+    COMMENT      shift, and go to state 9
+    IF           shift, and go to state 10
+    GOTO         shift, and go to state 11
+    VAR          shift, and go to state 12
+    CMD          shift, and go to state 13
+    SPECIAL_CMD  shift, and go to state 14
+    CUSTOM_VAR   shift, and go to state 15
+    CALL         shift, and go to state 16
+    MISC_ID      shift, and go to state 17
+    LABEL        shift, and go to state 18
+
+    exprs       go to state 91
+    expr        go to state 20
+    assignment  go to state 21
+    fn          go to state 22
 
 
 State 85
@@ -1303,6 +1301,37 @@ State 90
 
 State 91
 
-   11 expr: IF SEP bool_expr $@1 exprs ENDIF •
+    9 exprs: exprs • SEP expr
+   11 expr: IF SEP bool_expr SEP $@1 exprs • SEP ENDIF
+
+    SEP  shift, and go to state 92
+
+
+State 92
+
+    9 exprs: exprs SEP • expr
+   11 expr: IF SEP bool_expr SEP $@1 exprs SEP • ENDIF
+
+    error        shift, and go to state 7
+    COMMENT      shift, and go to state 9
+    IF           shift, and go to state 10
+    ENDIF        shift, and go to state 93
+    GOTO         shift, and go to state 11
+    VAR          shift, and go to state 12
+    CMD          shift, and go to state 13
+    SPECIAL_CMD  shift, and go to state 14
+    CUSTOM_VAR   shift, and go to state 15
+    CALL         shift, and go to state 16
+    MISC_ID      shift, and go to state 17
+    LABEL        shift, and go to state 18
+
+    expr        go to state 61
+    assignment  go to state 21
+    fn          go to state 22
+
+
+State 93
+
+   11 expr: IF SEP bool_expr SEP $@1 exprs SEP ENDIF •
 
     $default  reduce using rule 11 (expr)

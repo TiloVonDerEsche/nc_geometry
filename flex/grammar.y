@@ -59,13 +59,12 @@ prog:
 
 lines:
   %empty
-  | lines line NEWLINE
+  | lines line NEWLINE {set_var("line",get_var_val("line")+1);}
 ;
 
 line:
-  seps                  {set_var("line",get_var_val("line")+1);}
+  seps
   | seps exprs          {
-                         set_var("line",get_var_val("line")+1);
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);
 
@@ -199,10 +198,14 @@ bool_expr:
 %%
 
 void jump(char* label_name) {
-    float offset = get_var_val(label_name) + 7;
-    k = strfloat_get(h, label_name);
+    //size_t llen = strlen(label_name);
+    //printf("\nlabel_len=%zu\n",llen);
+
+    float offset = get_var_val(label_name) + strlen(label_name) + 2;
+
 
     if (debug) {
+      k = strfloat_get(h, label_name);
       if ( kh_exist(h, k) ) {
         printf("Found in hm: label_name=%s\n",label_name);
         //offset = kh_val(h, k);

@@ -4,7 +4,7 @@
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
-  int debug = 1;
+  int debug = 0;
   int skip = 0;
 %}
 
@@ -101,7 +101,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 [+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 [<>!]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
-"="            {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0];}
+"="            {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
 
 [()]      {return yytext[0];}
 

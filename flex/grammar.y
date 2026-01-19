@@ -199,7 +199,7 @@ bool_expr:
 %%
 
 void jump(char* label_name) {
-    float offset = get_var_val(label_name) + 6;
+    float offset = get_var_val(label_name) + 7;
     k = strfloat_get(h, label_name);
 
     if (debug) {
@@ -220,7 +220,7 @@ void jump(char* label_name) {
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
 
-    if(debug){ printf("fgetc=%c\n\n",fgetc(yyin)); }
+    //printf("fgetc=%c\n\n",fgetc(yyin));
 
 }
 

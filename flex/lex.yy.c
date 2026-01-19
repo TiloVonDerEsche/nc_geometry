@@ -907,7 +907,7 @@ YY_RULE_SETUP
 case 12:
 YY_RULE_SETUP
 #line 104 "lex.l"
-{if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0];}
+{if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP

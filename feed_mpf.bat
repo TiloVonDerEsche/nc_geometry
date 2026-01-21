@@ -1,2 +1,2 @@
 cls
-.\mpf_to_hmhis_json.exe "./data/nc_code/dummy2_nc.mpf"
+.\mpf_to_hmhis_json.exe "./data/nc_code/misc_custom_vars.mpf"

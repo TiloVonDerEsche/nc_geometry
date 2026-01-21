@@ -49,3 +49,13 @@ gotob LOOP1
 
 LOOP1:
 "
+
+Win Linux SEP error
+
+Write grammar to accept:
+N550 IF R22<R2 GOTOB BOUCLE2
+N560 ENDIF
+
+Without syntax error -> allow exprs before ENDIF
+
+"/" is like if(!debug), ~uncomments a line when in testing mode~

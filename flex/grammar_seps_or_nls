@@ -63,9 +63,8 @@ lines:
 ;
 
 line:
-  opt_seps
-  | opt_seps exprs opt_seps
-                        {
+  seps
+  | seps exprs          {
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);
 
@@ -80,33 +79,24 @@ line:
                         }
 ;
 
-opt_seps:
-  %empty
-  | seps
-;
-
 seps:
-  SEP
+  %empty
   | seps SEP
 ;
 
-sep_or_nl:
-  SEP
-  | NEWLINE
-;
 
 exprs:
   expr
-  | exprs seps expr;
+  | exprs SEP expr;
 ;
 
 expr:
-  IF SEP bool_expr SEP {
+  IF seps bool_expr seps {
       if (!$3) {
           skip++;
           printf("Skip=%d\n",skip);
       }
-  } exprs sep_or_nl ENDIF {
+  } exprs seps ENDIF {
       if (skip > 0) {
         skip--;
         printf("Skip=%d\n",skip);

@@ -499,7 +499,7 @@ char *yytext_ptr;
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
-  int debug = 0;
+  int debug = 1;
   int skip = 0;
 #line 504 "lex.yy.c"
 /* scanner for a simplified numeric control (NC from CNC machining) language */

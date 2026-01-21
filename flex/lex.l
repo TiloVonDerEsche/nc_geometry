@@ -4,7 +4,7 @@
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
-  int debug = 0;
+  int debug = 1;
   int skip = 0;
 %}
 

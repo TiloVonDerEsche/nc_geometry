@@ -2,10 +2,9 @@ Terminals unused in grammar
 
     SEMICOLON
     OTHER
-    EQ
-    NEQ
-    LTEQ
-    GTEQ
+
+
+State 14 conflicts: 1 shift/reduce
 
 
 Grammar
@@ -34,143 +33,134 @@ Grammar
 
    14 $@1: ε
 
-   15 expr: IF SEP bool_expr SEP $@1 exprs sep_or_nl ENDIF
-   16     | CMD arith_expr
-   17     | assignment
-   18     | LABEL
-   19     | GOTO SEP MISC_ID
-   20     | SPECIAL_CMD
-   21     | CALL SEP STRING
-   22     | MISC_ID
-   23     | fn
-   24     | COMMENT
-   25     | error
+   15 expr: IF seps bool_expr seps $@1 exprs sep_or_nl ENDIF
+   16     | LABEL
+   17     | GOTO SEP ID
+   18     | CMD arith_expr
+   19     | assignment
+   20     | CALL SEP STRING
+   21     | fn
+   22     | COMMENT
+   23     | error
 
-   26 assignment: VAR '=' arith_expr
-   27           | CMD '=' arith_expr
-   28           | CUSTOM_VAR '=' arith_expr
-   29           | CUSTOM_VAR SEP arith_expr
+   24 assignment: VAR opt_seps '=' opt_seps arith_expr
+   25           | CMD opt_seps '=' opt_seps arith_expr
+   26           | ID opt_seps '=' opt_seps arith_expr
+   27           | ID seps arith_expr
+   28           | ID
 
-   30 val: VAR
-   31    | CUSTOM_VAR
-   32    | INT
-   33    | FLOAT
+   29 val: VAR
+   30    | ID
+   31    | INT
+   32    | FLOAT
 
-   34 fn: MISC_ID '(' params ')'
+   33 fn: ID '(' params ')'
 
-   35 params: ε
-   36       | arith_expr
-   37       | MISC_ID
-   38       | params ',' arith_expr
-   39       | params ',' MISC_ID
+   34 params: ε
+   35       | arith_expr
+   36       | params ',' arith_expr
 
-   40 arith_expr: val
-   41           | fn
-   42           | arith_expr '+' arith_expr
-   43           | arith_expr '-' arith_expr
-   44           | arith_expr '*' arith_expr
-   45           | arith_expr '/' arith_expr
-   46           | '(' arith_expr ')'
-   47           | '-' arith_expr
+   37 arith_expr: val
+   38           | fn
+   39           | arith_expr '+' arith_expr
+   40           | arith_expr '-' arith_expr
+   41           | arith_expr '*' arith_expr
+   42           | arith_expr '/' arith_expr
+   43           | '(' arith_expr ')'
+   44           | '-' arith_expr
 
-   48 bool_expr: arith_expr '<' arith_expr
-   49          | arith_expr '>' arith_expr
-   50          | arith_expr '=' '=' arith_expr
-   51          | arith_expr '!' '=' arith_expr
-   52          | arith_expr '<' '=' arith_expr
-   53          | arith_expr '>' '=' arith_expr
-   54          | '!' bool_expr
-   55          | '(' bool_expr ')'
+   45 bool_expr: arith_expr '<' arith_expr
+   46          | arith_expr '>' arith_expr
+   47          | arith_expr '=' '=' arith_expr
+   48          | arith_expr '!' '=' arith_expr
+   49          | arith_expr '<' '=' arith_expr
+   50          | arith_expr '>' '=' arith_expr
+   51          | '!' bool_expr
+   52          | '(' bool_expr ')'
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '!' (33) 51 54
-    '(' (40) 34 46 55
-    ')' (41) 34 46 55
-    '*' (42) 44
-    '+' (43) 42
-    ',' (44) 38 39
-    '-' (45) 43 47
-    '/' (47) 45
-    '<' (60) 48 52
-    '=' (61) 26 27 28 50 51 52 53
-    '>' (62) 49 53
-    error (256) 25
-    SEP (258) 8 9 10 15 19 21 29
+    '!' (33) 48 51
+    '(' (40) 33 43 52
+    ')' (41) 33 43 52
+    '*' (42) 41
+    '+' (43) 39
+    ',' (44) 36
+    '-' (45) 40 44
+    '/' (47) 42
+    '<' (60) 45 49
+    '=' (61) 24 25 26 47 48 49 50
+    '>' (62) 46 50
+    error (256) 23
+    SEP (258) 8 9 10 17 20
     NEWLINE (259) 3 11
     SEMICOLON (260)
-    COMMENT (261) 24
+    COMMENT (261) 22
     OTHER (262)
-    STRING <char*> (263) 21
-    INT <int> (264) 32
-    FLOAT <float> (265) 33
-    EQ (266)
-    NEQ (267)
-    LTEQ (268)
-    GTEQ (269)
-    IF (270) 15
-    ENDIF (271) 15
-    GOTO (272) 19
-    VAR <char*> (273) 26 30
-    CMD <char*> (274) 16 27
-    SPECIAL_CMD <char*> (275) 20
-    CUSTOM_VAR <char*> (276) 28 29 31
-    CALL (277) 21
-    MISC_ID <char*> (278) 19 22 34 37 39
-    LABEL <char*> (279) 18
+    INT <int> (263) 31
+    FLOAT <float> (264) 32
+    STRING <char*> (265) 20
+    VAR <char*> (266) 24 29
+    CMD <char*> (267) 18 25
+    LABEL <char*> (268) 16
+    ID <char*> (269) 17 26 27 28 30 33
+    GOTO (270) 17
+    CALL (271) 20
+    IF (272) 15
+    ENDIF (273) 15
 
 
 Nonterminals, with rules where they appear
 
-    $accept (36)
+    $accept (30)
         on left: 0
-    prog (37)
+    prog (31)
         on left: 1
         on right: 0
-    lines (38)
+    lines (32)
         on left: 2 3
         on right: 1 3
-    line (39)
+    line (33)
         on left: 4 5
         on right: 3
-    opt_seps (40)
+    opt_seps (34)
         on left: 6 7
-        on right: 4 5
-    seps (41)
+        on right: 4 5 24 25 26
+    seps (35)
         on left: 8 9
-        on right: 7 9 13
-    sep_or_nl (42)
+        on right: 7 9 13 15 27
+    sep_or_nl (36)
         on left: 10 11
         on right: 15
-    exprs (43)
+    exprs (37)
         on left: 12 13
         on right: 5 13 15
-    expr (44)
-        on left: 15 16 17 18 19 20 21 22 23 24 25
+    expr (38)
+        on left: 15 16 17 18 19 20 21 22 23
         on right: 12 13
-    $@1 (45)
+    $@1 (39)
         on left: 14
         on right: 15
-    assignment (46)
-        on left: 26 27 28 29
-        on right: 17
-    val <float> (47)
-        on left: 30 31 32 33
-        on right: 40
-    fn <float> (48)
-        on left: 34
-        on right: 23 41
-    params (49)
-        on left: 35 36 37 38 39
-        on right: 34 38 39
-    arith_expr <float> (50)
-        on left: 40 41 42 43 44 45 46 47
-        on right: 16 26 27 28 29 36 38 42 43 44 45 46 47 48 49 50 51 52 53
-    bool_expr <int> (51)
-        on left: 48 49 50 51 52 53 54 55
-        on right: 15 54 55
+    assignment (40)
+        on left: 24 25 26 27 28
+        on right: 19
+    val <float> (41)
+        on left: 29 30 31 32
+        on right: 37
+    fn <float> (42)
+        on left: 33
+        on right: 21 38
+    params (43)
+        on left: 34 35 36
+        on right: 33 36
+    arith_expr <float> (44)
+        on left: 37 38 39 40 41 42 43 44
+        on right: 18 24 25 26 27 35 36 39 40 41 42 43 44 45 46 47 48 49 50
+    bool_expr <int> (45)
+        on left: 45 46 47 48 49 50 51 52
+        on right: 15 51 52
 
 
 State 0
@@ -231,24 +221,22 @@ State 6
     4 line: opt_seps •
     5     | opt_seps • exprs opt_seps
 
-    error        shift, and go to state 9
-    COMMENT      shift, and go to state 10
-    IF           shift, and go to state 11
-    GOTO         shift, and go to state 12
-    VAR          shift, and go to state 13
-    CMD          shift, and go to state 14
-    SPECIAL_CMD  shift, and go to state 15
-    CUSTOM_VAR   shift, and go to state 16
-    CALL         shift, and go to state 17
-    MISC_ID      shift, and go to state 18
-    LABEL        shift, and go to state 19
+    error    shift, and go to state 9
+    COMMENT  shift, and go to state 10
+    VAR      shift, and go to state 11
+    CMD      shift, and go to state 12
+    LABEL    shift, and go to state 13
+    ID       shift, and go to state 14
+    GOTO     shift, and go to state 15
+    CALL     shift, and go to state 16
+    IF       shift, and go to state 17
 
     NEWLINE  reduce using rule 4 (line)
 
-    exprs       go to state 20
-    expr        go to state 21
-    assignment  go to state 22
-    fn          go to state 23
+    exprs       go to state 18
+    expr        go to state 19
+    assignment  go to state 20
+    fn          go to state 21
 
 
 State 7
@@ -256,7 +244,7 @@ State 7
     7 opt_seps: seps •
     9 seps: seps • SEP
 
-    SEP  shift, and go to state 24
+    SEP  shift, and go to state 22
 
     $default  reduce using rule 7 (opt_seps)
 
@@ -270,99 +258,119 @@ State 8
 
 State 9
 
-   25 expr: error •
+   23 expr: error •
 
-    $default  reduce using rule 25 (expr)
+    $default  reduce using rule 23 (expr)
 
 
 State 10
 
-   24 expr: COMMENT •
-
-    $default  reduce using rule 24 (expr)
-
-
-State 11
-
-   15 expr: IF • SEP bool_expr SEP $@1 exprs sep_or_nl ENDIF
-
-    SEP  shift, and go to state 25
-
-
-State 12
-
-   19 expr: GOTO • SEP MISC_ID
-
-    SEP  shift, and go to state 26
-
-
-State 13
-
-   26 assignment: VAR • '=' arith_expr
-
-    '='  shift, and go to state 27
-
-
-State 14
-
-   16 expr: CMD • arith_expr
-   27 assignment: CMD • '=' arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '='         shift, and go to state 34
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 38
-
-
-State 15
-
-   20 expr: SPECIAL_CMD •
-
-    $default  reduce using rule 20 (expr)
-
-
-State 16
-
-   28 assignment: CUSTOM_VAR • '=' arith_expr
-   29           | CUSTOM_VAR • SEP arith_expr
-
-    SEP  shift, and go to state 39
-    '='  shift, and go to state 40
-
-
-State 17
-
-   21 expr: CALL • SEP STRING
-
-    SEP  shift, and go to state 41
-
-
-State 18
-
-   22 expr: MISC_ID •
-   34 fn: MISC_ID • '(' params ')'
-
-    '('  shift, and go to state 42
+   22 expr: COMMENT •
 
     $default  reduce using rule 22 (expr)
 
 
-State 19
+State 11
 
-   18 expr: LABEL •
+   24 assignment: VAR • opt_seps '=' opt_seps arith_expr
 
-    $default  reduce using rule 18 (expr)
+    SEP  shift, and go to state 4
+
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps  go to state 23
+    seps      go to state 7
 
 
-State 20
+State 12
+
+   18 expr: CMD • arith_expr
+   25 assignment: CMD • opt_seps '=' opt_seps arith_expr
+
+    SEP    shift, and go to state 4
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps    go to state 30
+    seps        go to state 7
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 33
+
+
+State 13
+
+   16 expr: LABEL •
+
+    $default  reduce using rule 16 (expr)
+
+
+State 14
+
+   26 assignment: ID • opt_seps '=' opt_seps arith_expr
+   27           | ID • seps arith_expr
+   28           | ID •
+   33 fn: ID • '(' params ')'
+
+    SEP  shift, and go to state 4
+    '('  shift, and go to state 34
+
+    SEP       [reduce using rule 28 (assignment)]
+    NEWLINE   reduce using rule 28 (assignment)
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps  go to state 35
+    seps      go to state 36
+
+    shift/reduce conflict on token SEP:
+       28 assignment: ID •
+        8 seps: • SEP
+      Example: ID • SEP fn
+      Shift derivation
+        exprs
+        ↳ 12: expr
+              ↳ 19: assignment
+                    ↳ 27: ID seps       arith_expr
+                             ↳ 8: • SEP ↳ 38: fn
+      Reduce derivation
+        exprs
+        ↳ 13: exprs                  seps     expr
+              ↳ 12: expr             ↳ 8: SEP ↳ 21: fn
+                    ↳ 19: assignment
+                          ↳ 28: ID •
+
+
+
+State 15
+
+   17 expr: GOTO • SEP ID
+
+    SEP  shift, and go to state 37
+
+
+State 16
+
+   20 expr: CALL • SEP STRING
+
+    SEP  shift, and go to state 38
+
+
+State 17
+
+   15 expr: IF • seps bool_expr seps $@1 exprs sep_or_nl ENDIF
+
+    SEP  shift, and go to state 4
+
+    seps  go to state 39
+
+
+State 18
 
     5 line: opt_seps exprs • opt_seps
    13 exprs: exprs • seps expr
@@ -371,992 +379,1010 @@ State 20
 
     $default  reduce using rule 6 (opt_seps)
 
-    opt_seps  go to state 43
-    seps      go to state 44
+    opt_seps  go to state 40
+    seps      go to state 41
 
 
-State 21
+State 19
 
    12 exprs: expr •
 
     $default  reduce using rule 12 (exprs)
 
 
+State 20
+
+   19 expr: assignment •
+
+    $default  reduce using rule 19 (expr)
+
+
+State 21
+
+   21 expr: fn •
+
+    $default  reduce using rule 21 (expr)
+
+
 State 22
-
-   17 expr: assignment •
-
-    $default  reduce using rule 17 (expr)
-
-
-State 23
-
-   23 expr: fn •
-
-    $default  reduce using rule 23 (expr)
-
-
-State 24
 
     9 seps: seps SEP •
 
     $default  reduce using rule 9 (seps)
 
 
-State 25
+State 23
 
-   15 expr: IF SEP • bool_expr SEP $@1 exprs sep_or_nl ENDIF
+   24 assignment: VAR opt_seps • '=' opt_seps arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 45
-    '!'         shift, and go to state 46
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 47
-    bool_expr   go to state 48
+    '='  shift, and go to state 42
 
 
-State 26
+State 24
 
-   19 expr: GOTO SEP • MISC_ID
-
-    MISC_ID  shift, and go to state 49
-
-
-State 27
-
-   26 assignment: VAR '=' • arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 50
-
-
-State 28
-
-   32 val: INT •
-
-    $default  reduce using rule 32 (val)
-
-
-State 29
-
-   33 val: FLOAT •
-
-    $default  reduce using rule 33 (val)
-
-
-State 30
-
-   30 val: VAR •
-
-    $default  reduce using rule 30 (val)
-
-
-State 31
-
-   31 val: CUSTOM_VAR •
+   31 val: INT •
 
     $default  reduce using rule 31 (val)
 
 
+State 25
+
+   32 val: FLOAT •
+
+    $default  reduce using rule 32 (val)
+
+
+State 26
+
+   29 val: VAR •
+
+    $default  reduce using rule 29 (val)
+
+
+State 27
+
+   30 val: ID •
+   33 fn: ID • '(' params ')'
+
+    '('  shift, and go to state 34
+
+    $default  reduce using rule 30 (val)
+
+
+State 28
+
+   44 arith_expr: '-' • arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 43
+
+
+State 29
+
+   43 arith_expr: '(' • arith_expr ')'
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 44
+
+
+State 30
+
+   25 assignment: CMD opt_seps • '=' opt_seps arith_expr
+
+    '='  shift, and go to state 45
+
+
+State 31
+
+   37 arith_expr: val •
+
+    $default  reduce using rule 37 (arith_expr)
+
+
 State 32
 
-   34 fn: MISC_ID • '(' params ')'
+   38 arith_expr: fn •
 
-    '('  shift, and go to state 42
+    $default  reduce using rule 38 (arith_expr)
 
 
 State 33
 
-   47 arith_expr: '-' • arith_expr
+   18 expr: CMD arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 51
+    $default  reduce using rule 18 (expr)
 
 
 State 34
 
-   27 assignment: CMD '=' • arith_expr
+   33 fn: ID '(' • params ')'
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 52
+    $default  reduce using rule 34 (params)
+
+    val         go to state 31
+    fn          go to state 32
+    params      go to state 50
+    arith_expr  go to state 51
 
 
 State 35
 
-   46 arith_expr: '(' • arith_expr ')'
+   26 assignment: ID opt_seps • '=' opt_seps arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 53
+    '='  shift, and go to state 52
 
 
 State 36
 
-   40 arith_expr: val •
+    7 opt_seps: seps •
+    9 seps: seps • SEP
+   27 assignment: ID seps • arith_expr
 
-    $default  reduce using rule 40 (arith_expr)
+    SEP    shift, and go to state 22
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    $default  reduce using rule 7 (opt_seps)
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 53
 
 
 State 37
 
-   41 arith_expr: fn •
+   17 expr: GOTO SEP • ID
 
-    $default  reduce using rule 41 (arith_expr)
+    ID  shift, and go to state 54
 
 
 State 38
 
-   16 expr: CMD arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
+   20 expr: CALL SEP • STRING
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 16 (expr)
+    STRING  shift, and go to state 55
 
 
 State 39
 
-   29 assignment: CUSTOM_VAR SEP • arith_expr
+    9 seps: seps • SEP
+   15 expr: IF seps • bool_expr seps $@1 exprs sep_or_nl ENDIF
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+    SEP    shift, and go to state 22
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 56
+    '!'    shift, and go to state 57
 
-    val         go to state 36
-    fn          go to state 37
+    val         go to state 31
+    fn          go to state 32
     arith_expr  go to state 58
+    bool_expr   go to state 59
 
 
 State 40
-
-   28 assignment: CUSTOM_VAR '=' • arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 59
-
-
-State 41
-
-   21 expr: CALL SEP • STRING
-
-    STRING  shift, and go to state 60
-
-
-State 42
-
-   34 fn: MISC_ID '(' • params ')'
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 61
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    $default  reduce using rule 35 (params)
-
-    val         go to state 36
-    fn          go to state 37
-    params      go to state 62
-    arith_expr  go to state 63
-
-
-State 43
 
     5 line: opt_seps exprs opt_seps •
 
     $default  reduce using rule 5 (line)
 
 
-State 44
+State 41
 
     7 opt_seps: seps •
     9 seps: seps • SEP
    13 exprs: exprs seps • expr
 
-    error        shift, and go to state 9
-    SEP          shift, and go to state 24
-    COMMENT      shift, and go to state 10
-    IF           shift, and go to state 11
-    GOTO         shift, and go to state 12
-    VAR          shift, and go to state 13
-    CMD          shift, and go to state 14
-    SPECIAL_CMD  shift, and go to state 15
-    CUSTOM_VAR   shift, and go to state 16
-    CALL         shift, and go to state 17
-    MISC_ID      shift, and go to state 18
-    LABEL        shift, and go to state 19
+    error    shift, and go to state 9
+    SEP      shift, and go to state 22
+    COMMENT  shift, and go to state 10
+    VAR      shift, and go to state 11
+    CMD      shift, and go to state 12
+    LABEL    shift, and go to state 13
+    ID       shift, and go to state 14
+    GOTO     shift, and go to state 15
+    CALL     shift, and go to state 16
+    IF       shift, and go to state 17
 
     NEWLINE  reduce using rule 7 (opt_seps)
 
-    expr        go to state 64
-    assignment  go to state 22
-    fn          go to state 23
+    expr        go to state 60
+    assignment  go to state 20
+    fn          go to state 21
+
+
+State 42
+
+   24 assignment: VAR opt_seps '=' • opt_seps arith_expr
+
+    SEP  shift, and go to state 4
+
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps  go to state 61
+    seps      go to state 7
+
+
+State 43
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   44           | '-' arith_expr •
+
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 44 (arith_expr)
+
+
+State 44
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   43           | '(' arith_expr • ')'
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    ')'  shift, and go to state 62
 
 
 State 45
 
-   46 arith_expr: '(' • arith_expr ')'
-   55 bool_expr: '(' • bool_expr ')'
+   25 assignment: CMD opt_seps '=' • opt_seps arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 45
-    '!'         shift, and go to state 46
+    SEP  shift, and go to state 4
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 65
-    bool_expr   go to state 66
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps  go to state 63
+    seps      go to state 7
 
 
 State 46
 
-   54 bool_expr: '!' • bool_expr
+   39 arith_expr: arith_expr '+' • arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 45
-    '!'         shift, and go to state 46
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 47
-    bool_expr   go to state 67
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 64
 
 
 State 47
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   48 bool_expr: arith_expr • '<' arith_expr
-   49          | arith_expr • '>' arith_expr
-   50          | arith_expr • '=' '=' arith_expr
-   51          | arith_expr • '!' '=' arith_expr
-   52          | arith_expr • '<' '=' arith_expr
-   53          | arith_expr • '>' '=' arith_expr
+   40 arith_expr: arith_expr '-' • arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-    '='  shift, and go to state 68
-    '<'  shift, and go to state 69
-    '>'  shift, and go to state 70
-    '!'  shift, and go to state 71
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 65
 
 
 State 48
 
-   15 expr: IF SEP bool_expr • SEP $@1 exprs sep_or_nl ENDIF
+   41 arith_expr: arith_expr '*' • arith_expr
 
-    SEP  shift, and go to state 72
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 66
 
 
 State 49
 
-   19 expr: GOTO SEP MISC_ID •
+   42 arith_expr: arith_expr '/' • arith_expr
 
-    $default  reduce using rule 19 (expr)
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 67
 
 
 State 50
 
-   26 assignment: VAR '=' arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
+   33 fn: ID '(' params • ')'
+   36 params: params • ',' arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 26 (assignment)
+    ')'  shift, and go to state 68
+    ','  shift, and go to state 69
 
 
 State 51
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   47           | '-' arith_expr •
+   35 params: arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
 
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
 
-    $default  reduce using rule 47 (arith_expr)
+    $default  reduce using rule 35 (params)
 
 
 State 52
 
-   27 assignment: CMD '=' arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
+   26 assignment: ID opt_seps '=' • opt_seps arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+    SEP  shift, and go to state 4
 
-    $default  reduce using rule 27 (assignment)
+    $default  reduce using rule 6 (opt_seps)
+
+    opt_seps  go to state 70
+    seps      go to state 7
 
 
 State 53
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   46           | '(' arith_expr • ')'
+   27 assignment: ID seps arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-    ')'  shift, and go to state 73
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 27 (assignment)
 
 
 State 54
 
-   42 arith_expr: arith_expr '+' • arith_expr
+   17 expr: GOTO SEP ID •
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 74
+    $default  reduce using rule 17 (expr)
 
 
 State 55
 
-   43 arith_expr: arith_expr '-' • arith_expr
+   20 expr: CALL SEP STRING •
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 75
+    $default  reduce using rule 20 (expr)
 
 
 State 56
 
-   44 arith_expr: arith_expr '*' • arith_expr
+   43 arith_expr: '(' • arith_expr ')'
+   52 bool_expr: '(' • bool_expr ')'
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 56
+    '!'    shift, and go to state 57
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 76
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 71
+    bool_expr   go to state 72
 
 
 State 57
 
-   45 arith_expr: arith_expr '/' • arith_expr
+   51 bool_expr: '!' • bool_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 56
+    '!'    shift, and go to state 57
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 77
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 58
+    bool_expr   go to state 73
 
 
 State 58
 
-   29 assignment: CUSTOM_VAR SEP arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   45 bool_expr: arith_expr • '<' arith_expr
+   46          | arith_expr • '>' arith_expr
+   47          | arith_expr • '=' '=' arith_expr
+   48          | arith_expr • '!' '=' arith_expr
+   49          | arith_expr • '<' '=' arith_expr
+   50          | arith_expr • '>' '=' arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 29 (assignment)
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '='  shift, and go to state 74
+    '<'  shift, and go to state 75
+    '>'  shift, and go to state 76
+    '!'  shift, and go to state 77
 
 
 State 59
 
-   28 assignment: CUSTOM_VAR '=' arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
+   15 expr: IF seps bool_expr • seps $@1 exprs sep_or_nl ENDIF
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+    SEP  shift, and go to state 4
 
-    $default  reduce using rule 28 (assignment)
+    seps  go to state 78
 
 
 State 60
-
-   21 expr: CALL SEP STRING •
-
-    $default  reduce using rule 21 (expr)
-
-
-State 61
-
-   34 fn: MISC_ID • '(' params ')'
-   37 params: MISC_ID •
-
-    '('  shift, and go to state 42
-
-    $default  reduce using rule 37 (params)
-
-
-State 62
-
-   34 fn: MISC_ID '(' params • ')'
-   38 params: params • ',' arith_expr
-   39       | params • ',' MISC_ID
-
-    ')'  shift, and go to state 78
-    ','  shift, and go to state 79
-
-
-State 63
-
-   36 params: arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 36 (params)
-
-
-State 64
 
    13 exprs: exprs seps expr •
 
     $default  reduce using rule 13 (exprs)
 
 
-State 65
+State 61
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   46           | '(' arith_expr • ')'
-   48 bool_expr: arith_expr • '<' arith_expr
-   49          | arith_expr • '>' arith_expr
-   50          | arith_expr • '=' '=' arith_expr
-   51          | arith_expr • '!' '=' arith_expr
-   52          | arith_expr • '<' '=' arith_expr
-   53          | arith_expr • '>' '=' arith_expr
+   24 assignment: VAR opt_seps '=' opt_seps • arith_expr
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-    '='  shift, and go to state 68
-    ')'  shift, and go to state 73
-    '<'  shift, and go to state 69
-    '>'  shift, and go to state 70
-    '!'  shift, and go to state 71
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 79
 
 
-State 66
+State 62
 
-   55 bool_expr: '(' bool_expr • ')'
-
-    ')'  shift, and go to state 80
-
-
-State 67
-
-   54 bool_expr: '!' bool_expr •
-
-    $default  reduce using rule 54 (bool_expr)
-
-
-State 68
-
-   50 bool_expr: arith_expr '=' • '=' arith_expr
-
-    '='  shift, and go to state 81
-
-
-State 69
-
-   48 bool_expr: arith_expr '<' • arith_expr
-   52          | arith_expr '<' • '=' arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '='         shift, and go to state 82
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 83
-
-
-State 70
-
-   49 bool_expr: arith_expr '>' • arith_expr
-   53          | arith_expr '>' • '=' arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '='         shift, and go to state 84
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 85
-
-
-State 71
-
-   51 bool_expr: arith_expr '!' • '=' arith_expr
-
-    '='  shift, and go to state 86
-
-
-State 72
-
-   15 expr: IF SEP bool_expr SEP • $@1 exprs sep_or_nl ENDIF
-
-    $default  reduce using rule 14 ($@1)
-
-    $@1  go to state 87
-
-
-State 73
-
-   46 arith_expr: '(' arith_expr ')' •
-
-    $default  reduce using rule 46 (arith_expr)
-
-
-State 74
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   42           | arith_expr '+' arith_expr •
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 42 (arith_expr)
-
-
-State 75
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   43           | arith_expr '-' arith_expr •
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+   43 arith_expr: '(' arith_expr ')' •
 
     $default  reduce using rule 43 (arith_expr)
 
 
-State 76
+State 63
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   44           | arith_expr '*' arith_expr •
-   45           | arith_expr • '/' arith_expr
+   25 assignment: CMD opt_seps '=' opt_seps • arith_expr
 
-    $default  reduce using rule 44 (arith_expr)
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
 
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 80
 
-State 77
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   45           | arith_expr '/' arith_expr •
+State 64
 
-    $default  reduce using rule 45 (arith_expr)
+   39 arith_expr: arith_expr • '+' arith_expr
+   39           | arith_expr '+' arith_expr •
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
 
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
 
-State 78
+    $default  reduce using rule 39 (arith_expr)
 
-   34 fn: MISC_ID '(' params ')' •
 
-    $default  reduce using rule 34 (fn)
+State 65
 
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   40           | arith_expr '-' arith_expr •
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
 
-State 79
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
 
-   38 params: params ',' • arith_expr
-   39       | params ',' • MISC_ID
+    $default  reduce using rule 40 (arith_expr)
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 88
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 89
+State 66
 
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   41           | arith_expr '*' arith_expr •
+   42           | arith_expr • '/' arith_expr
 
-State 80
+    $default  reduce using rule 41 (arith_expr)
 
-   55 bool_expr: '(' bool_expr ')' •
 
-    $default  reduce using rule 55 (bool_expr)
+State 67
 
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   42           | arith_expr '/' arith_expr •
 
-State 81
+    $default  reduce using rule 42 (arith_expr)
 
-   50 bool_expr: arith_expr '=' '=' • arith_expr
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+State 68
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 90
+   33 fn: ID '(' params ')' •
 
+    $default  reduce using rule 33 (fn)
 
-State 82
 
-   52 bool_expr: arith_expr '<' '=' • arith_expr
+State 69
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+   36 params: params ',' • arith_expr
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 91
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
 
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 81
 
-State 83
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   48 bool_expr: arith_expr '<' arith_expr •
+State 70
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+   26 assignment: ID opt_seps '=' opt_seps • arith_expr
 
-    $default  reduce using rule 48 (bool_expr)
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
 
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 82
 
-State 84
 
-   53 bool_expr: arith_expr '>' '=' • arith_expr
+State 71
 
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   43           | '(' arith_expr • ')'
+   45 bool_expr: arith_expr • '<' arith_expr
+   46          | arith_expr • '>' arith_expr
+   47          | arith_expr • '=' '=' arith_expr
+   48          | arith_expr • '!' '=' arith_expr
+   49          | arith_expr • '<' '=' arith_expr
+   50          | arith_expr • '>' '=' arith_expr
 
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 92
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+    '='  shift, and go to state 74
+    ')'  shift, and go to state 62
+    '<'  shift, and go to state 75
+    '>'  shift, and go to state 76
+    '!'  shift, and go to state 77
 
 
-State 85
+State 72
 
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   49 bool_expr: arith_expr '>' arith_expr •
+   52 bool_expr: '(' bool_expr • ')'
 
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+    ')'  shift, and go to state 83
 
-    $default  reduce using rule 49 (bool_expr)
 
+State 73
 
-State 86
-
-   51 bool_expr: arith_expr '!' '=' • arith_expr
-
-    INT         shift, and go to state 28
-    FLOAT       shift, and go to state 29
-    VAR         shift, and go to state 30
-    CUSTOM_VAR  shift, and go to state 31
-    MISC_ID     shift, and go to state 32
-    '-'         shift, and go to state 33
-    '('         shift, and go to state 35
-
-    val         go to state 36
-    fn          go to state 37
-    arith_expr  go to state 93
-
-
-State 87
-
-   15 expr: IF SEP bool_expr SEP $@1 • exprs sep_or_nl ENDIF
-
-    error        shift, and go to state 9
-    COMMENT      shift, and go to state 10
-    IF           shift, and go to state 11
-    GOTO         shift, and go to state 12
-    VAR          shift, and go to state 13
-    CMD          shift, and go to state 14
-    SPECIAL_CMD  shift, and go to state 15
-    CUSTOM_VAR   shift, and go to state 16
-    CALL         shift, and go to state 17
-    MISC_ID      shift, and go to state 18
-    LABEL        shift, and go to state 19
-
-    exprs       go to state 94
-    expr        go to state 21
-    assignment  go to state 22
-    fn          go to state 23
-
-
-State 88
-
-   34 fn: MISC_ID • '(' params ')'
-   39 params: params ',' MISC_ID •
-
-    '('  shift, and go to state 42
-
-    $default  reduce using rule 39 (params)
-
-
-State 89
-
-   38 params: params ',' arith_expr •
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 38 (params)
-
-
-State 90
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   50 bool_expr: arith_expr '=' '=' arith_expr •
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 50 (bool_expr)
-
-
-State 91
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   52 bool_expr: arith_expr '<' '=' arith_expr •
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 52 (bool_expr)
-
-
-State 92
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   53 bool_expr: arith_expr '>' '=' arith_expr •
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
-
-    $default  reduce using rule 53 (bool_expr)
-
-
-State 93
-
-   42 arith_expr: arith_expr • '+' arith_expr
-   43           | arith_expr • '-' arith_expr
-   44           | arith_expr • '*' arith_expr
-   45           | arith_expr • '/' arith_expr
-   51 bool_expr: arith_expr '!' '=' arith_expr •
-
-    '+'  shift, and go to state 54
-    '-'  shift, and go to state 55
-    '*'  shift, and go to state 56
-    '/'  shift, and go to state 57
+   51 bool_expr: '!' bool_expr •
 
     $default  reduce using rule 51 (bool_expr)
 
 
+State 74
+
+   47 bool_expr: arith_expr '=' • '=' arith_expr
+
+    '='  shift, and go to state 84
+
+
+State 75
+
+   45 bool_expr: arith_expr '<' • arith_expr
+   49          | arith_expr '<' • '=' arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '='    shift, and go to state 85
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 86
+
+
+State 76
+
+   46 bool_expr: arith_expr '>' • arith_expr
+   50          | arith_expr '>' • '=' arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '='    shift, and go to state 87
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 88
+
+
+State 77
+
+   48 bool_expr: arith_expr '!' • '=' arith_expr
+
+    '='  shift, and go to state 89
+
+
+State 78
+
+    9 seps: seps • SEP
+   15 expr: IF seps bool_expr seps • $@1 exprs sep_or_nl ENDIF
+
+    SEP  shift, and go to state 22
+
+    $default  reduce using rule 14 ($@1)
+
+    $@1  go to state 90
+
+
+State 79
+
+   24 assignment: VAR opt_seps '=' opt_seps arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 24 (assignment)
+
+
+State 80
+
+   25 assignment: CMD opt_seps '=' opt_seps arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 25 (assignment)
+
+
+State 81
+
+   36 params: params ',' arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 36 (params)
+
+
+State 82
+
+   26 assignment: ID opt_seps '=' opt_seps arith_expr •
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 26 (assignment)
+
+
+State 83
+
+   52 bool_expr: '(' bool_expr ')' •
+
+    $default  reduce using rule 52 (bool_expr)
+
+
+State 84
+
+   47 bool_expr: arith_expr '=' '=' • arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 91
+
+
+State 85
+
+   49 bool_expr: arith_expr '<' '=' • arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 92
+
+
+State 86
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   45 bool_expr: arith_expr '<' arith_expr •
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 45 (bool_expr)
+
+
+State 87
+
+   50 bool_expr: arith_expr '>' '=' • arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 93
+
+
+State 88
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   46 bool_expr: arith_expr '>' arith_expr •
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 46 (bool_expr)
+
+
+State 89
+
+   48 bool_expr: arith_expr '!' '=' • arith_expr
+
+    INT    shift, and go to state 24
+    FLOAT  shift, and go to state 25
+    VAR    shift, and go to state 26
+    ID     shift, and go to state 27
+    '-'    shift, and go to state 28
+    '('    shift, and go to state 29
+
+    val         go to state 31
+    fn          go to state 32
+    arith_expr  go to state 94
+
+
+State 90
+
+   15 expr: IF seps bool_expr seps $@1 • exprs sep_or_nl ENDIF
+
+    error    shift, and go to state 9
+    COMMENT  shift, and go to state 10
+    VAR      shift, and go to state 11
+    CMD      shift, and go to state 12
+    LABEL    shift, and go to state 13
+    ID       shift, and go to state 14
+    GOTO     shift, and go to state 15
+    CALL     shift, and go to state 16
+    IF       shift, and go to state 17
+
+    exprs       go to state 95
+    expr        go to state 19
+    assignment  go to state 20
+    fn          go to state 21
+
+
+State 91
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   47 bool_expr: arith_expr '=' '=' arith_expr •
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 47 (bool_expr)
+
+
+State 92
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   49 bool_expr: arith_expr '<' '=' arith_expr •
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 49 (bool_expr)
+
+
+State 93
+
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   50 bool_expr: arith_expr '>' '=' arith_expr •
+
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
+
+    $default  reduce using rule 50 (bool_expr)
+
+
 State 94
 
-   13 exprs: exprs • seps expr
-   15 expr: IF SEP bool_expr SEP $@1 exprs • sep_or_nl ENDIF
+   39 arith_expr: arith_expr • '+' arith_expr
+   40           | arith_expr • '-' arith_expr
+   41           | arith_expr • '*' arith_expr
+   42           | arith_expr • '/' arith_expr
+   48 bool_expr: arith_expr '!' '=' arith_expr •
 
-    SEP      shift, and go to state 95
-    NEWLINE  shift, and go to state 96
+    '+'  shift, and go to state 46
+    '-'  shift, and go to state 47
+    '*'  shift, and go to state 48
+    '/'  shift, and go to state 49
 
-    seps       go to state 97
-    sep_or_nl  go to state 98
+    $default  reduce using rule 48 (bool_expr)
 
 
 State 95
+
+   13 exprs: exprs • seps expr
+   15 expr: IF seps bool_expr seps $@1 exprs • sep_or_nl ENDIF
+
+    SEP      shift, and go to state 96
+    NEWLINE  shift, and go to state 97
+
+    seps       go to state 98
+    sep_or_nl  go to state 99
+
+
+State 96
 
     8 seps: SEP •
    10 sep_or_nl: SEP •
@@ -1365,45 +1391,43 @@ State 95
     $default  reduce using rule 8 (seps)
 
 
-State 96
+State 97
 
    11 sep_or_nl: NEWLINE •
 
     $default  reduce using rule 11 (sep_or_nl)
 
 
-State 97
+State 98
 
     9 seps: seps • SEP
    13 exprs: exprs seps • expr
 
-    error        shift, and go to state 9
-    SEP          shift, and go to state 24
-    COMMENT      shift, and go to state 10
-    IF           shift, and go to state 11
-    GOTO         shift, and go to state 12
-    VAR          shift, and go to state 13
-    CMD          shift, and go to state 14
-    SPECIAL_CMD  shift, and go to state 15
-    CUSTOM_VAR   shift, and go to state 16
-    CALL         shift, and go to state 17
-    MISC_ID      shift, and go to state 18
-    LABEL        shift, and go to state 19
+    error    shift, and go to state 9
+    SEP      shift, and go to state 22
+    COMMENT  shift, and go to state 10
+    VAR      shift, and go to state 11
+    CMD      shift, and go to state 12
+    LABEL    shift, and go to state 13
+    ID       shift, and go to state 14
+    GOTO     shift, and go to state 15
+    CALL     shift, and go to state 16
+    IF       shift, and go to state 17
 
-    expr        go to state 64
-    assignment  go to state 22
-    fn          go to state 23
-
-
-State 98
-
-   15 expr: IF SEP bool_expr SEP $@1 exprs sep_or_nl • ENDIF
-
-    ENDIF  shift, and go to state 99
+    expr        go to state 60
+    assignment  go to state 20
+    fn          go to state 21
 
 
 State 99
 
-   15 expr: IF SEP bool_expr SEP $@1 exprs sep_or_nl ENDIF •
+   15 expr: IF seps bool_expr seps $@1 exprs sep_or_nl • ENDIF
+
+    ENDIF  shift, and go to state 100
+
+
+State 100
+
+   15 expr: IF seps bool_expr seps $@1 exprs sep_or_nl ENDIF •
 
     $default  reduce using rule 15 (expr)

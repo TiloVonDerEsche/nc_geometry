@@ -51,6 +51,10 @@ LOOP1:
 "
 
 Win Linux SEP error
+-> The problem was that I allowed exactly one SEP between expr,
+and since comments are expr,
+it produced syntax err when an expr list is followed by a comment,
+ where more than one SEPs are used before the comment
 
 Write grammar to accept:
 N550 IF R22<R2 GOTOB BOUCLE2
@@ -59,3 +63,18 @@ N560 ENDIF
 Without syntax error -> allow exprs before ENDIF
 
 "/" is like if(!debug), ~uncomments a line when in testing mode~
+
+Move the ambiguity of the SEP to the lexer
+([A-Z_]+)[ \t]+([0-9]+(\.[0-9]+)?) {
+    yylval.cmd = strdup(yytext);
+    return CMD_WITH_ARG;
+}
+
+expr:
+    CMD_WITH_ARG
+  | CMD arith_expr
+  | assignment_with_equals
+  | ...
+
+Distinguish between a program flow mode and motion mode ()
+Merge btw simple CSV like G-Code and Assembly like programming

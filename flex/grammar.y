@@ -29,20 +29,16 @@
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
 %token SEP NEWLINE SEMICOLON COMMENT OTHER
-%token <char*> STRING
 %token <int> INT
 %token <float> FLOAT
-
-%token EQ NEQ LTEQ GTEQ
-%token IF ENDIF GOTO
+%token <char*> STRING
 
 %token <char*> VAR
 %token <char*> CMD
-%token <char*> SPECIAL_CMD
-%token <char*> CUSTOM_VAR
-%token CALL
-%token <char*> MISC_ID
 %token <char*> LABEL
+%token <char*> ID
+%token GOTO CALL IF ENDIF
+
 
 %nterm <float> val
 %nterm <float> fn
@@ -101,7 +97,7 @@ exprs:
 ;
 
 expr:
-  IF SEP bool_expr SEP {
+  IF seps bool_expr seps {
       if (!$3) {
           skip++;
           printf("Skip=%d\n",skip);
@@ -112,47 +108,38 @@ expr:
         printf("Skip=%d\n",skip);
       }
     }
-  | CMD arith_expr       {if(!skip){ set_var($1,$2);}}
-  | assignment
   | LABEL                {
                           if(!skip){ set_var($1, (float)byte_counter); }
                          }
-  | GOTO SEP MISC_ID   {if(!skip){
+  | GOTO SEP ID          {if(!skip){
                           pending_jump_label = strdup($3);
                           jump_requested = 1;
 
-                          // Increment skip so the parser ignores everything
-                          // until it reaches the end of the current IF or line
                           skip = 1;
                           }
                         }
-  | SPECIAL_CMD          {
-                          if(strcmp($1,"/LASER_ON") == 0) {
+  | CMD arith_expr       {if(!skip){ set_var($1,$2);}}
+  | assignment
+  | CALL SEP STRING
+  | fn
+  | COMMENT
+  | error
+
+;
+
+assignment:
+  VAR opt_seps '=' opt_seps arith_expr          {if(!skip){set_var($1,$5);}}
+  | CMD opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
+  | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
+  | ID seps arith_expr {if(!skip){set_var($1,$3);}}
+  | ID                  {
+                          if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                          }
-                          else if(strcmp($1,"LASER_ON") == 0) {
-                            set_var("laser",1);
-                          }
-                          else if(strcmp($1,"/LASER_OFF") == 0) {
-                            set_var("laser",0);
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
                           }
                          }
-  | CALL SEP STRING
-  | MISC_ID
-  | fn
-  | COMMENT
-  | error   {/*  | ',' SEP bool_expr {printf("bool_expr=%d",$3);}*/}
-
-;
-
-assignment:
-  VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}
-  | CMD '=' arith_expr        {if(!skip){set_var($1,$3);}}
-  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var($1,$3);}}
-  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -161,8 +148,8 @@ val:
                   /*printf("Getting VAR=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
-  | CUSTOM_VAR   {
-                  /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
+  | ID           {
+                  /*printf("Getting ID=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
   | INT          {$$=$1;}
@@ -170,15 +157,13 @@ val:
 ;
 
 fn:
-  MISC_ID '(' params ')' {$$=0;}
+  ID '(' params ')' {$$=0;}
 ;
 
 params:
   %empty
   | arith_expr
-  | MISC_ID
   | params ',' arith_expr
-  | params ',' MISC_ID
 ;
 
 arith_expr:

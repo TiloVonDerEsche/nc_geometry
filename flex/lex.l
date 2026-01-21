@@ -38,6 +38,12 @@ id       [A-Za-z][_A-Za-z0-9]*
 R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
+"/"{id}         {
+                yylval.SPECIAL_CMD = strdup(yytext);
+                if(debug){ printf("A special command: %s\n", yytext); }
+                return SPECIAL_CMD;
+                }
+
 {letter}{id}":" {
                 char* s = yytext;
                 s[strlen(s) - 1] = '\0';
@@ -47,7 +53,19 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 }
 
 {letter}{id} {
-              if(strcmp(yytext,"CALL") == 0) {
+              if(strcmp(yytext,"LASER_ON") == 0 ||
+                 strcmp(yytext,"LASER_OFF") == 0 ) {
+                yylval.SPECIAL_CMD = strdup(yytext);
+                return SPECIAL_CMD;
+              }
+              else if(strcmp(yytext,"PUIS_LASER") == 0 ||
+                 strcmp(yytext,"MODE_LASER") == 0 ||
+                 strcmp(yytext,"VIT_TIR") == 0) {
+                yylval.CUSTOM_VAR = strdup(yytext);
+                if(debug){ printf("A custom Variable: %s\n", yytext); }
+                return CUSTOM_VAR;
+              }
+              else if(strcmp(yytext,"CALL") == 0) {
                 return CALL;
               }
               else if(strcmp(yytext,"GOTOB") == 0) {
@@ -63,9 +81,9 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 return ENDIF;
               }
               else {
-                if(debug){ printf("An ID: %s\n",yytext); }
-                yylval.ID = strdup(yytext);
-                return ID;
+                if(debug){ printf("A MISC_ID: %s\n",yytext); }
+                yylval.MISC_ID = strdup(yytext);
+                return MISC_ID;
               }
 
              }
@@ -76,8 +94,8 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                }
 
 "_"{id}   {
-        if(debug){ printf("A hidden ID: %s\n",yytext); }
-        return ID;
+        if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
+        return MISC_ID;
        }
 
 

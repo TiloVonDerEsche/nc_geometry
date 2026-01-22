@@ -63,8 +63,8 @@ lines:
 ;
 
 line:
-  opt_skip opt_seps
-  | opt_skip opt_seps exprs opt_seps
+  opt_seps
+  | opt_seps opt_skip exprs opt_seps
                         {
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);

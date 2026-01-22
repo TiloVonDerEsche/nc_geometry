@@ -17,8 +17,8 @@ Grammar
     2 lines: ε
     3      | lines line NEWLINE
 
-    4 line: opt_skip opt_seps
-    5     | opt_skip opt_seps exprs opt_seps
+    4 line: opt_seps
+    5     | opt_seps opt_skip exprs opt_seps
     6     | error
 
     7 opt_skip: ε
@@ -144,7 +144,7 @@ Nonterminals, with rules where they appear
         on right: 3
     opt_skip (40)
         on left: 7 8
-        on right: 4 5
+        on right: 5
     opt_seps (41)
         on left: 9 10
         on right: 4 5
@@ -209,24 +209,25 @@ State 2
     3 lines: lines • line NEWLINE
 
     error  shift, and go to state 4
-    '/'    shift, and go to state 5
+    SEP    shift, and go to state 5
 
     $end         reduce using rule 1 (prog)
-    SEP          reduce using rule 7 (opt_skip)
-    NEWLINE      reduce using rule 7 (opt_skip)
-    COMMENT      reduce using rule 7 (opt_skip)
-    IF           reduce using rule 7 (opt_skip)
-    GOTO         reduce using rule 7 (opt_skip)
-    VAR          reduce using rule 7 (opt_skip)
-    CMD          reduce using rule 7 (opt_skip)
-    SPECIAL_CMD  reduce using rule 7 (opt_skip)
-    CUSTOM_VAR   reduce using rule 7 (opt_skip)
-    CALL         reduce using rule 7 (opt_skip)
-    MISC_ID      reduce using rule 7 (opt_skip)
-    LABEL        reduce using rule 7 (opt_skip)
+    NEWLINE      reduce using rule 9 (opt_seps)
+    COMMENT      reduce using rule 9 (opt_seps)
+    IF           reduce using rule 9 (opt_seps)
+    GOTO         reduce using rule 9 (opt_seps)
+    VAR          reduce using rule 9 (opt_seps)
+    CMD          reduce using rule 9 (opt_seps)
+    SPECIAL_CMD  reduce using rule 9 (opt_seps)
+    CUSTOM_VAR   reduce using rule 9 (opt_seps)
+    CALL         reduce using rule 9 (opt_seps)
+    MISC_ID      reduce using rule 9 (opt_seps)
+    LABEL        reduce using rule 9 (opt_seps)
+    '/'          reduce using rule 9 (opt_seps)
 
     line      go to state 6
-    opt_skip  go to state 7
+    opt_seps  go to state 7
+    seps      go to state 8
 
 
 State 3
@@ -245,108 +246,112 @@ State 4
 
 State 5
 
-    8 opt_skip: '/' •
+   11 seps: SEP •
 
-    $default  reduce using rule 8 (opt_skip)
+    $default  reduce using rule 11 (seps)
 
 
 State 6
 
     3 lines: lines line • NEWLINE
 
-    NEWLINE  shift, and go to state 8
+    NEWLINE  shift, and go to state 9
 
 
 State 7
 
-    4 line: opt_skip • opt_seps
-    5     | opt_skip • opt_seps exprs opt_seps
+    4 line: opt_seps •
+    5     | opt_seps • opt_skip exprs opt_seps
 
-    SEP  shift, and go to state 9
+    '/'  shift, and go to state 10
 
-    $default  reduce using rule 9 (opt_seps)
+    NEWLINE   reduce using rule 4 (line)
+    $default  reduce using rule 7 (opt_skip)
 
-    opt_seps  go to state 10
-    seps      go to state 11
+    opt_skip  go to state 11
 
 
 State 8
+
+   10 opt_seps: seps •
+   12 seps: seps • SEP
+
+    SEP  shift, and go to state 12
+
+    $default  reduce using rule 10 (opt_seps)
+
+
+State 9
 
     3 lines: lines line NEWLINE •
 
     $default  reduce using rule 3 (lines)
 
 
-State 9
-
-   11 seps: SEP •
-
-    $default  reduce using rule 11 (seps)
-
-
 State 10
 
-    4 line: opt_skip opt_seps •
-    5     | opt_skip opt_seps • exprs opt_seps
+    8 opt_skip: '/' •
 
-    COMMENT      shift, and go to state 12
-    IF           shift, and go to state 13
-    GOTO         shift, and go to state 14
-    VAR          shift, and go to state 15
-    CMD          shift, and go to state 16
-    SPECIAL_CMD  shift, and go to state 17
-    CUSTOM_VAR   shift, and go to state 18
-    CALL         shift, and go to state 19
-    MISC_ID      shift, and go to state 20
-    LABEL        shift, and go to state 21
-
-    $default  reduce using rule 4 (line)
-
-    exprs       go to state 22
-    expr        go to state 23
-    assignment  go to state 24
-    fn          go to state 25
+    $default  reduce using rule 8 (opt_skip)
 
 
 State 11
 
-   10 opt_seps: seps •
-   12 seps: seps • SEP
+    5 line: opt_seps opt_skip • exprs opt_seps
 
-    SEP  shift, and go to state 26
+    COMMENT      shift, and go to state 13
+    IF           shift, and go to state 14
+    GOTO         shift, and go to state 15
+    VAR          shift, and go to state 16
+    CMD          shift, and go to state 17
+    SPECIAL_CMD  shift, and go to state 18
+    CUSTOM_VAR   shift, and go to state 19
+    CALL         shift, and go to state 20
+    MISC_ID      shift, and go to state 21
+    LABEL        shift, and go to state 22
 
-    $default  reduce using rule 10 (opt_seps)
+    exprs       go to state 23
+    expr        go to state 24
+    assignment  go to state 25
+    fn          go to state 26
 
 
 State 12
+
+   12 seps: seps SEP •
+
+    $default  reduce using rule 12 (seps)
+
+
+State 13
 
    25 expr: COMMENT •
 
     $default  reduce using rule 25 (expr)
 
 
-State 13
+State 14
 
    16 expr: IF • SEP bool_expr $@1 if_body ENDIF
 
     SEP  shift, and go to state 27
 
 
-State 14
+State 15
 
    20 expr: GOTO • SEP MISC_ID
 
     SEP  shift, and go to state 28
 
 
-State 15
+State 16
 
    31 assignment: VAR • '=' arith_expr
 
     '='  shift, and go to state 29
 
 
-State 16
+State 17
 
    17 expr: CMD • arith_expr
    32 assignment: CMD • '=' arith_expr
@@ -365,14 +370,14 @@ State 16
     arith_expr  go to state 40
 
 
-State 17
+State 18
 
    21 expr: SPECIAL_CMD •
 
     $default  reduce using rule 21 (expr)
 
 
-State 18
+State 19
 
    33 assignment: CUSTOM_VAR • '=' arith_expr
    34           | CUSTOM_VAR • SEP arith_expr
@@ -381,14 +386,14 @@ State 18
     '='  shift, and go to state 42
 
 
-State 19
+State 20
 
    22 expr: CALL • SEP STRING
 
     SEP  shift, and go to state 43
 
 
-State 20
+State 21
 
    23 expr: MISC_ID •
    39 fn: MISC_ID • '(' params ')'
@@ -398,19 +403,19 @@ State 20
     $default  reduce using rule 23 (expr)
 
 
-State 21
+State 22
 
    19 expr: LABEL •
 
     $default  reduce using rule 19 (expr)
 
 
-State 22
+State 23
 
-    5 line: opt_skip opt_seps exprs • opt_seps
+    5 line: opt_seps opt_skip exprs • opt_seps
    14 exprs: exprs • seps expr
 
-    SEP  shift, and go to state 9
+    SEP  shift, and go to state 5
 
     $default  reduce using rule 9 (opt_seps)
 
@@ -418,32 +423,25 @@ State 22
     seps      go to state 46
 
 
-State 23
+State 24
 
    13 exprs: expr •
 
     $default  reduce using rule 13 (exprs)
 
 
-State 24
+State 25
 
    18 expr: assignment •
 
     $default  reduce using rule 18 (expr)
 
 
-State 25
+State 26
 
    24 expr: fn •
 
     $default  reduce using rule 24 (expr)
-
-
-State 26
-
-   12 seps: seps SEP •
-
-    $default  reduce using rule 12 (seps)
 
 
 State 27
@@ -668,7 +666,7 @@ State 44
 
 State 45
 
-    5 line: opt_skip opt_seps exprs opt_seps •
+    5 line: opt_seps opt_skip exprs opt_seps •
 
     $default  reduce using rule 5 (line)
 
@@ -679,23 +677,23 @@ State 46
    12 seps: seps • SEP
    14 exprs: exprs seps • expr
 
-    SEP          shift, and go to state 26
-    COMMENT      shift, and go to state 12
-    IF           shift, and go to state 13
-    GOTO         shift, and go to state 14
-    VAR          shift, and go to state 15
-    CMD          shift, and go to state 16
-    SPECIAL_CMD  shift, and go to state 17
-    CUSTOM_VAR   shift, and go to state 18
-    CALL         shift, and go to state 19
-    MISC_ID      shift, and go to state 20
-    LABEL        shift, and go to state 21
+    SEP          shift, and go to state 12
+    COMMENT      shift, and go to state 13
+    IF           shift, and go to state 14
+    GOTO         shift, and go to state 15
+    VAR          shift, and go to state 16
+    CMD          shift, and go to state 17
+    SPECIAL_CMD  shift, and go to state 18
+    CUSTOM_VAR   shift, and go to state 19
+    CALL         shift, and go to state 20
+    MISC_ID      shift, and go to state 21
+    LABEL        shift, and go to state 22
 
     $default  reduce using rule 10 (opt_seps)
 
     expr        go to state 66
-    assignment  go to state 24
-    fn          go to state 25
+    assignment  go to state 25
+    fn          go to state 26
 
 
 State 47
@@ -1283,22 +1281,22 @@ State 89
 
     SEP          shift, and go to state 96
     NEWLINE      shift, and go to state 97
-    COMMENT      shift, and go to state 12
-    IF           shift, and go to state 13
+    COMMENT      shift, and go to state 13
+    IF           shift, and go to state 14
     ENDIF        shift, and go to state 98
-    GOTO         shift, and go to state 14
-    VAR          shift, and go to state 15
-    CMD          shift, and go to state 16
-    SPECIAL_CMD  shift, and go to state 17
-    CUSTOM_VAR   shift, and go to state 18
-    CALL         shift, and go to state 19
-    MISC_ID      shift, and go to state 20
-    LABEL        shift, and go to state 21
+    GOTO         shift, and go to state 15
+    VAR          shift, and go to state 16
+    CMD          shift, and go to state 17
+    SPECIAL_CMD  shift, and go to state 18
+    CUSTOM_VAR   shift, and go to state 19
+    CALL         shift, and go to state 20
+    MISC_ID      shift, and go to state 21
+    LABEL        shift, and go to state 22
 
     expr        go to state 99
     if_element  go to state 100
-    assignment  go to state 24
-    fn          go to state 25
+    assignment  go to state 25
+    fn          go to state 26
 
 
 State 90

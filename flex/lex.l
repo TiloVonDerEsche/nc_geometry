@@ -4,7 +4,7 @@
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
-  int debug = 1;
+  int debug = 0;
   int skip = 0;
 %}
 
@@ -38,11 +38,6 @@ id       [A-Za-z][_A-Za-z0-9]*
 R{inum} {yylval.VAR = strdup(yytext); return VAR;}
 H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
-"/"{id}         {
-                yylval.SPECIAL_CMD = strdup(yytext);
-                if(debug){ printf("A special command: %s\n", yytext); }
-                return SPECIAL_CMD;
-                }
 
 {letter}{id}":" {
                 char* s = yytext;

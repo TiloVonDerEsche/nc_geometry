@@ -63,8 +63,8 @@ lines:
 ;
 
 line:
-  opt_seps
-  | opt_seps exprs opt_seps
+  opt_skip opt_seps
+  | opt_skip opt_seps exprs opt_seps
                         {
                          print_hashmap(h, hmhis);
                          print_hashmap(h, stdout);
@@ -81,6 +81,11 @@ line:
   | error
 ;
 
+opt_skip:
+    %empty
+    | '/'
+;
+
 opt_seps:
   %empty
   | seps
@@ -89,11 +94,6 @@ opt_seps:
 seps:
   SEP
   | seps SEP
-;
-
-sep_or_nl:
-  SEP
-  | NEWLINE
 ;
 
 exprs:
@@ -128,14 +128,8 @@ expr:
                           }
                         }
   | SPECIAL_CMD          {
-                          if(strcmp($1,"/LASER_ON") == 0) {
+                          if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                          }
-                          else if(strcmp($1,"LASER_ON") == 0) {
-                            set_var("laser",1);
-                          }
-                          else if(strcmp($1,"/LASER_OFF") == 0) {
-                            set_var("laser",0);
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);

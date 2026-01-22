@@ -102,12 +102,12 @@ exprs:
 ;
 
 expr:
-  IF SEP bool_expr SEP {
+  IF SEP bool_expr {
       if (!$3) {
           skip++;
           printf("Skip=%d\n",skip);
       }
-  } exprs sep_or_nl ENDIF {
+  } if_body ENDIF {
       if (skip > 0) {
         skip--;
         printf("Skip=%d\n",skip);
@@ -145,8 +145,19 @@ expr:
   | MISC_ID
   | fn
   | COMMENT
-
 ;
+
+if_body:
+  %empty
+  | if_body if_element
+;
+
+if_element:
+  expr
+  | SEP
+  | NEWLINE
+;
+
 
 assignment:
   VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}

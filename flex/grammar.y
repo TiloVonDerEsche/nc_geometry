@@ -223,7 +223,7 @@ void jump(char* label_name) {
     //size_t llen = strlen(label_name);
     //printf("\nlabel_len=%zu\n",llen);
 
-    float offset = get_var_val(label_name) + strlen(label_name) + 1;
+    float offset = get_var_val(label_name); //+ strlen(label_name) + 1;
 
     if (debug) {
       k = strfloat_get(h, label_name);

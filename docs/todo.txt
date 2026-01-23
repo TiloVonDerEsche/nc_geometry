@@ -1,47 +1,15 @@
-First finish fseek approach.
+linuxCNC approach:
+Afterwards perhaps split parser logic, to avoid programming
+CUSTOM_VARs SPECIAL_CMD etc. per hand in switch case
+simple parser for old school linear NC code
+bison parser for IF cond goto statements and arith_expr & bool_expr
 
-Then rewrite logic to instruction list / compiler approach.
+Distinguish between a program flow mode and motion mode ()
+Merge btw simple CSV like G-Code and Assembly like programming
 
-Benefits:
-Feature	fseek + Byte Offset	String Array	Instruction List (AST)
-Memory	Minimal	~15-50 MB	~20-60 MB
-GOTO Speed	Slow (Disk + Re-parse)	Fast (Re-parse string)	Instant (Index jump)
-Complexity	High (Lexer restarts)	Medium	Medium-High
-Suitability	Large log files	Small scripts	Professional CNC/G-Cod
+|=======================================================|
 
-
-// Inside your executor loop:
-float old_val = get_var_val(instr.var_name);
-if (old_val != instr.new_value) {
-    set_var(instr.var_name, instr.new_value);
-    log_to_json(instr.var_name, instr.new_value, current_line);
-}
-
-
-
-
-typedef enum { SET_VAR, MOVE, LABEL, GOTO } OpType;
-
-typedef struct {
-    OpType type;
-    char* target;    // Variable name or Label name
-    float value;     // The numeric value or jump target index
-    int line_number; // Original file line for reporting
-} Instruction;
-
-Instruction program[MAX_LINES];
-int instr_count = 0;
-
-// In Bison:
-assignment: VAR SET arith_expr {
-    program[instr_count++] = (Instruction){SET_VAR, strdup($1), $3, yylineno};
-}
-
-
-Why do we need to copy paste the .mpf files into a fresh file to avoid syntax errs?
-Look for residual tokens, which our lexer can't handle. Perhaps tabs instead of spaces
-
-
+First finish our approach:
 Do we need to jump ahead with a gotob?
 
 "
@@ -50,31 +18,29 @@ gotob LOOP1
 LOOP1:
 "
 
-Win Linux SEP error
--> The problem was that I allowed exactly one SEP between expr,
-and since comments are expr,
-it produced syntax err when an expr list is followed by a comment,
- where more than one SEPs are used before the comment
+Fix line off by one error
 
-Write grammar to accept:
-N550 IF R22<R2 GOTOB BOUCLE2
-N560 ENDIF
+Should the skipping of the label after jumping:
+Here
+float offset = get_var_val(label_name) + strlen(label_name) + 1;
 
-Without syntax error -> allow exprs before ENDIF
+Move "+ strlen(label_name) + 1"
+to the lexer?
 
-"/" is like if(!debug), ~uncomments a line when in testing mode~
+-> float offset = get_var_val(label_name);
 
-Move the ambiguity of the SEP to the lexer
-([A-Z_]+)[ \t]+([0-9]+(\.[0-9]+)?) {
-    yylval.cmd = strdup(yytext);
-    return CMD_WITH_ARG;
-}
+Only print the vars in the hashmap that changed their value
+(term: delta encoding)
+cJSON or equivalents doesn't seem to have historical lookup as built in feat
 
-expr:
-    CMD_WITH_ARG
-  | CMD arith_expr
-  | assignment_with_equals
-  | ...
 
-Distinguish between a program flow mode and motion mode ()
-Merge btw simple CSV like G-Code and Assembly like programming
+We could replace the hmhis.json
+with a additionally live hashmap.
+One hashmap for current state one for previous state.
+
+-> Live track detection and filling of track_list
+
+✔ Merge hmhis generation and track detection into ONE pass
+✔ Keep OpenGL viewer separate (good modular design)
+✔ Make hmhis.json optional debug output
+✔ Use prev vs current state in memory for change detection

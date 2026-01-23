@@ -116,7 +116,15 @@ expr:
   | CMD arith_expr       {if(!skip){ set_var($1,$2);}}
   | assignment
   | LABEL                {
-                          if(!skip){ set_var($1, (float)byte_counter); }
+                          if(!skip){
+                            if (get_var_val($1) == 0) { //define once
+                              set_var($1, (float)byte_counter);
+
+                              char line_label[256];
+                              snprintf(line_label, sizeof(line_label), "%s_line", $1);
+                              set_var(line_label, get_var_val("line"));
+                            }
+                          }
                          }
   | GOTO SEP MISC_ID   {if(!skip){
                           pending_jump_label = strdup($3);
@@ -215,8 +223,7 @@ void jump(char* label_name) {
     //size_t llen = strlen(label_name);
     //printf("\nlabel_len=%zu\n",llen);
 
-    float offset = get_var_val(label_name) + strlen(label_name) + 2;
-
+    float offset = get_var_val(label_name) + strlen(label_name) + 1;
 
     if (debug) {
       k = strfloat_get(h, label_name);
@@ -229,10 +236,19 @@ void jump(char* label_name) {
       }
     }
 
-    if(debug){ printf("Jumping to offset=%d\n\n",(long)offset); }
-
-
     if (offset >= 0) {
+        char line_label[256];
+        snprintf(line_label, sizeof(line_label), "%s_line", label_name);
+        float original_line = get_var_val(line_label);
+
+        set_var("line", original_line); //reset line to line after label
+        byte_counter = offset;          //reset byte_counter to offset of label
+
+        if(1 || debug){
+          printf("Jumping to line=%d, offset=%d\n\n",
+                (long)original_line,(long)offset);
+        }
+
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }

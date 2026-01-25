@@ -27,20 +27,27 @@ float offset = get_var_val(label_name) + strlen(label_name) + 1;
 Move "+ strlen(label_name) + 1"
 to the lexer?
 
--> float offset = get_var_val(label_name);
+loop2D_test:
+line and N match at first
+After first jump line is one greater than N
+
+
+
+|=======================================================|
+Optimizations, Third Release:
 
 Only print the vars in the hashmap that changed their value
 (term: delta encoding)
 cJSON or equivalents doesn't seem to have historical lookup as built in feat
 
 
-We could replace the hmhis.json
-with a additionally live hashmap.
+hmhis.json optional debug output
+Additional live hashmap.
 One hashmap for current state one for previous state.
 
 -> Live track detection and filling of track_list
 
-✔ Merge hmhis generation and track detection into ONE pass
-✔ Keep OpenGL viewer separate (good modular design)
-✔ Make hmhis.json optional debug output
-✔ Use prev vs current state in memory for change detection
+- Merge hmhis generation and track detection into ONE pass
+- Keep OpenGL viewer separate (good modular design)
+- Make hmhis.json optional debug output
+- Use prev vs current state in memory for change detection

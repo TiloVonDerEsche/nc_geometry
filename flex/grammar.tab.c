@@ -1706,7 +1706,9 @@ void jump(char* label_name) {
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
 
-    //printf("fgetc=%c\n\n",fgetc(yyin));
+    printf("fgetc=%c\n\n",fgetc(yyin));
+    fseek(yyin, -1, SEEK_CUR);
+
 
 }
 

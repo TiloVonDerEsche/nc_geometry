@@ -43,7 +43,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 char* s = yytext;
                 s[strlen(s) - 1] = '\0';
                 yylval.LABEL = strdup(s);
-                if(debug){ printf("A label: %s\n", s); }
+                if(1 || debug){ printf("A label: %s\n", s); }
                 return LABEL;
                 }
 
@@ -110,6 +110,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
 [ \t]      		 {return SEP;}
+"\r\n"         {return NEWLINE;}
 "\n"           {return NEWLINE;}
 ","            {return yytext[0];}
 .      		     {return OTHER;}

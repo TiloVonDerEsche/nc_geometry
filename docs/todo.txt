@@ -28,8 +28,14 @@ Move "+ strlen(label_name) + 1"
 to the lexer?
 
 loop2D_test:
+Now we are jumping right after the ':' of a label which is correct
 line and N match at first
 After first jump line is one greater than N
+
+Exprs before ENDIF don't seem to execute
+
+LOOP_CODE_CUBE_10VX_MM_FH33_50:
+Seemingly switches endlessly btw Loop 2 & 3
 
 
 

@@ -1,5 +1,7 @@
 %{
   #include "grammar.tab.h"
+  void set_var(char*, float);
+  float get_var_val(char*);
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
@@ -107,11 +109,11 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 "\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
 
-";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
+";"[^\n]* {if( 1 || debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
 [ \t]      		 {return SEP;}
-"\r\n"         {return NEWLINE;}
-"\n"           {return NEWLINE;}
+"\r\n"         {set_var("line", get_var_val("line") + 1); return NEWLINE;}
+"\n"           {set_var("line", get_var_val("line") + 1); return NEWLINE;}
 ","            {return yytext[0];}
 .      		     {return OTHER;}
 

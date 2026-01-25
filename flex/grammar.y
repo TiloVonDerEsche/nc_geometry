@@ -59,7 +59,7 @@ prog:
 
 lines:
   %empty
-  | lines line NEWLINE {set_var("line",get_var_val("line")+1);}
+  | lines line NEWLINE
 ;
 
 line:
@@ -241,7 +241,7 @@ void jump(char* label_name) {
         snprintf(line_label, sizeof(line_label), "%s_line", label_name);
         float original_line = get_var_val(line_label);
 
-        set_var("line", original_line); //reset line to line after label
+        set_var("line", original_line); //reset line to line of label
         byte_counter = offset;          //reset byte_counter to offset of label
 
         if(1 || debug){
@@ -288,7 +288,7 @@ void init_hashmap() {
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 1;
+  kh_val(h, k) = 0;
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");

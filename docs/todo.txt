@@ -20,13 +20,6 @@ LOOP1:
 
 Fix line off by one error
 
-Should the skipping of the label after jumping:
-Here
-float offset = get_var_val(label_name) + strlen(label_name) + 1;
-
-Move "+ strlen(label_name) + 1"
-to the lexer?
-
 loop2D_test:
 Now we are jumping right after the ':' of a label which is correct
 line and N match at first
@@ -36,6 +29,11 @@ Exprs before ENDIF don't seem to execute
 
 LOOP_CODE_CUBE_10VX_MM_FH33_50:
 Seemingly switches endlessly btw Loop 2 & 3
+
+Implement G Code 90 & 91
+-> G91 incremental / relative mode
+-> G90 Absolute Mode
+
 
 
 

@@ -17,8 +17,10 @@
   extern int skip;
   char* pending_jump_label = NULL;
   int jump_requested = 0;
+  int incr_mode = 0;
 
   void jump(char*);
+  void set_var_incr(char*, float);
   void set_var(char*, float);
   float get_var_val(char*);
   void init_hashmap();
@@ -33,11 +35,10 @@
 %token <int> INT
 %token <float> FLOAT
 
-%token EQ NEQ LTEQ GTEQ
 %token IF ENDIF GOTO
 
-%token <char*> VAR
 %token <char*> CMD
+%token <char*> VAR
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
 %token CALL
@@ -113,7 +114,19 @@ expr:
         printf("Skip=%d\n",skip);
       }
     }
-  | CMD arith_expr       {if(!skip){ set_var($1,$2);}}
+  | CMD arith_expr       {
+                          if(!skip){
+                            set_var($1,$2);
+
+                            if($1[0] == 'G') {
+                              switch((int)$2) {
+                                case 90: incr_mode=0;puts("G90!");break;
+                                case 91: incr_mode=1;puts("G91!");break;
+                                default: break;
+                              }
+                            }
+                          }
+                         }
   | assignment
   | LABEL                {
                           if(!skip){
@@ -162,10 +175,10 @@ if_element:
 
 
 assignment:
-  VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}
-  | CMD '=' arith_expr        {if(!skip){set_var($1,$3);}}
-  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var($1,$3);}}
-  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
+  VAR '=' arith_expr          {if(!skip){set_var_incr($1,$3);}}
+  | CMD '=' arith_expr        {if(!skip){set_var_incr($1,$3);}}
+  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var_incr($1,$3);}}
+  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var_incr($1,$3);}}
 ;
 
 
@@ -261,6 +274,18 @@ void jump(char* label_name) {
 
 
 //hashmap fns
+
+
+void set_var_incr(char* varname, float fnum) {
+  if(!skip){
+    if (incr_mode) {
+      set_var(varname, get_var_val(varname)+fnum);
+    }
+    else {
+      set_var(varname,fnum);
+    }
+  }
+}
 
 void set_var(char* varname, float fnum) {
   k = strfloat_put(h, varname, &absent);

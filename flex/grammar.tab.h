@@ -62,20 +62,16 @@ extern int yydebug;
     STRING = 263,                  /* STRING  */
     INT = 264,                     /* INT  */
     FLOAT = 265,                   /* FLOAT  */
-    EQ = 266,                      /* EQ  */
-    NEQ = 267,                     /* NEQ  */
-    LTEQ = 268,                    /* LTEQ  */
-    GTEQ = 269,                    /* GTEQ  */
-    IF = 270,                      /* IF  */
-    ENDIF = 271,                   /* ENDIF  */
-    GOTO = 272,                    /* GOTO  */
-    VAR = 273,                     /* VAR  */
-    CMD = 274,                     /* CMD  */
-    SPECIAL_CMD = 275,             /* SPECIAL_CMD  */
-    CUSTOM_VAR = 276,              /* CUSTOM_VAR  */
-    CALL = 277,                    /* CALL  */
-    MISC_ID = 278,                 /* MISC_ID  */
-    LABEL = 279                    /* LABEL  */
+    IF = 266,                      /* IF  */
+    ENDIF = 267,                   /* ENDIF  */
+    GOTO = 268,                    /* GOTO  */
+    CMD = 269,                     /* CMD  */
+    VAR = 270,                     /* VAR  */
+    SPECIAL_CMD = 271,             /* SPECIAL_CMD  */
+    CUSTOM_VAR = 272,              /* CUSTOM_VAR  */
+    CALL = 273,                    /* CALL  */
+    MISC_ID = 274,                 /* MISC_ID  */
+    LABEL = 275                    /* LABEL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -85,8 +81,8 @@ extern int yydebug;
 union YYSTYPE
 {
   char* STRING;                            /* STRING  */
-  char* VAR;                               /* VAR  */
   char* CMD;                               /* CMD  */
+  char* VAR;                               /* VAR  */
   char* SPECIAL_CMD;                       /* SPECIAL_CMD  */
   char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
   char* MISC_ID;                           /* MISC_ID  */
@@ -98,7 +94,7 @@ union YYSTYPE
   int INT;                                 /* INT  */
   int bool_expr;                           /* bool_expr  */
 
-#line 102 "grammar.tab.h"
+#line 98 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

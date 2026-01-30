@@ -8,8 +8,6 @@
   int yyerror(char* s);
 
   strfloat_t* h;
-  khint_t k;
-  int absent;
 
   FILE* hmhis;
 
@@ -175,10 +173,10 @@ if_element:
 
 
 assignment:
-  VAR '=' arith_expr          {if(!skip){set_var_incr($1,$3);}}
-  | CMD '=' arith_expr        {if(!skip){set_var_incr($1,$3);}}
-  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var_incr($1,$3);}}
-  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var_incr($1,$3);}}
+  CMD '=' arith_expr        {if(!skip){set_var_incr($1,$3);}}
+  | VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}
+  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var($1,$3);}}
+  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -239,6 +237,9 @@ void jump(char* label_name) {
     float offset = get_var_val(label_name); //+ strlen(label_name) + 1;
 
     if (debug) {
+      khint_t k;
+      int absent;
+
       k = strfloat_get(h, label_name);
       if ( kh_exist(h, k) ) {
         printf("Found in hm: label_name=%s\n",label_name);
@@ -277,17 +278,18 @@ void jump(char* label_name) {
 
 
 void set_var_incr(char* varname, float fnum) {
-  if(!skip){
     if (incr_mode) {
       set_var(varname, get_var_val(varname)+fnum);
     }
     else {
       set_var(varname,fnum);
     }
-  }
 }
 
 void set_var(char* varname, float fnum) {
+  khint_t k;
+  int absent;
+
   k = strfloat_put(h, varname, &absent);
   if (absent) {
     kh_key(h, k) = strdup(varname);}
@@ -296,6 +298,10 @@ void set_var(char* varname, float fnum) {
 }
 
 float get_var_val(char* varname) {
+  if (!varname) return 0;
+
+  khint_t k;
+  int absent;
   k = strfloat_get(h, varname);
   if ( kh_exist(h, k) ) {
     return kh_val(h, k);

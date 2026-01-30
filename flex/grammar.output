@@ -49,8 +49,8 @@ Grammar
    29           | SEP
    30           | NEWLINE
 
-   31 assignment: VAR '=' arith_expr
-   32           | CMD '=' arith_expr
+   31 assignment: CMD '=' arith_expr
+   32           | VAR '=' arith_expr
    33           | CUSTOM_VAR '=' arith_expr
    34           | CUSTOM_VAR SEP arith_expr
 
@@ -112,8 +112,8 @@ Terminals, with rules where they appear
     IF (266) 16
     ENDIF (267) 16
     GOTO (268) 20
-    CMD <char*> (269) 17 32
-    VAR <char*> (270) 31 35
+    CMD <char*> (269) 17 31
+    VAR <char*> (270) 32 35
     SPECIAL_CMD <char*> (271) 21
     CUSTOM_VAR <char*> (272) 33 34 36
     CALL (273) 22
@@ -339,7 +339,7 @@ State 15
 State 16
 
    17 expr: CMD • arith_expr
-   32 assignment: CMD • '=' arith_expr
+   31 assignment: CMD • '=' arith_expr
 
     INT         shift, and go to state 29
     FLOAT       shift, and go to state 30
@@ -357,7 +357,7 @@ State 16
 
 State 17
 
-   31 assignment: VAR • '=' arith_expr
+   32 assignment: VAR • '=' arith_expr
 
     '='  shift, and go to state 40
 
@@ -516,7 +516,7 @@ State 34
 
 State 35
 
-   32 assignment: CMD '=' • arith_expr
+   31 assignment: CMD '=' • arith_expr
 
     INT         shift, and go to state 29
     FLOAT       shift, and go to state 30
@@ -580,7 +580,7 @@ State 39
 
 State 40
 
-   31 assignment: VAR '=' • arith_expr
+   32 assignment: VAR '=' • arith_expr
 
     INT         shift, and go to state 29
     FLOAT       shift, and go to state 30
@@ -782,7 +782,7 @@ State 52
 
 State 53
 
-   32 assignment: CMD '=' arith_expr •
+   31 assignment: CMD '=' arith_expr •
    47 arith_expr: arith_expr • '+' arith_expr
    48           | arith_expr • '-' arith_expr
    49           | arith_expr • '*' arith_expr
@@ -793,7 +793,7 @@ State 53
     '*'  shift, and go to state 57
     '/'  shift, and go to state 58
 
-    $default  reduce using rule 32 (assignment)
+    $default  reduce using rule 31 (assignment)
 
 
 State 54
@@ -881,7 +881,7 @@ State 58
 
 State 59
 
-   31 assignment: VAR '=' arith_expr •
+   32 assignment: VAR '=' arith_expr •
    47 arith_expr: arith_expr • '+' arith_expr
    48           | arith_expr • '-' arith_expr
    49           | arith_expr • '*' arith_expr
@@ -892,7 +892,7 @@ State 59
     '*'  shift, and go to state 57
     '/'  shift, and go to state 58
 
-    $default  reduce using rule 31 (assignment)
+    $default  reduce using rule 32 (assignment)
 
 
 State 60

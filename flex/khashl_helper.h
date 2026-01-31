@@ -22,6 +22,11 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
   fprintf(destination,"},\n"); //replace last comma
 }
 
+typedef struct {
+  float x;
+  float y;
+  float z;
+} vec3D;
 
 
 

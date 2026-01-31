@@ -17,6 +17,9 @@
   char* pending_jump_label = NULL;
   int jump_requested = 0;
   int incr_mode = 0;
+  size_t tid = 1;
+  vec3D A = {0,0,0};
+  vec3D B = {0,0,0};
 
   void jump(char*);
   void set_var_incr(char*, float);
@@ -149,9 +152,18 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
+                            A.x = get_var_val("X");
+                            A.y = get_var_val("Y");
+                            A.z = get_var_val("Z");
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
+                            B.x = get_var_val("X");
+                            B.y = get_var_val("Y");
+                            B.z = get_var_val("Z");
+
+                            fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f\n",
+                            tid++, A.x, A.y, A.z, B.x, B.y, B.z);
                           }
                          }
   | CALL SEP STRING
@@ -340,7 +352,7 @@ FILE* init_file(char* f_path, char* f_header) {
       exit(-1);
   }
 
-  fprintf(fp,f_header);
+  fprintf(fp,"%s\n",f_header);
 
   return fp;
 }

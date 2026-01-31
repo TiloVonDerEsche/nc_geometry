@@ -12,11 +12,10 @@ main(int argc, char *argv[])
         else
                 yyin = stdin;
 
-        if(hmhis_json) {hmhis = init_file("./data/hmhis.json","[\n");}
+        if(hmhis_json) {hmhis = init_file("./data/hmhis.json","[");}
         tl = init_file("./data/track_list.csv","track_index,Ax,Ay,Az,Bx,By,Bz");
 
         h = init_hashmap();
-        h_prev = init_hashmap();
 
         yyparse ();
 

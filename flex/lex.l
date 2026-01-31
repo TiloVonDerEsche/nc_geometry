@@ -6,6 +6,8 @@
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
+  int hmhis_stdout = 0;
+  int hmhis_json = 0;
   int debug = 0;
   int skip = 0;
 %}
@@ -45,7 +47,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 char* s = yytext;
                 s[strlen(s) - 1] = '\0';
                 yylval.LABEL = strdup(s);
-                if(1 || debug){ printf("A label: %s\n", s); }
+                if(debug){ printf("A label: %s\n", s); }
                 return LABEL;
                 }
 
@@ -109,7 +111,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 "\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
 
-";"[^\n]* {if( 1 || debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
+";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
 [ \t]      		 {return SEP;}
 "\r\n"         {set_var("line", get_var_val("line") + 1); return NEWLINE;}

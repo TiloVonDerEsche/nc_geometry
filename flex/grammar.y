@@ -10,6 +10,7 @@
   strfloat_t* h;
 
   FILE* hmhis;
+  FILE* tl;
 
   extern long byte_counter;
   extern int skip;
@@ -65,8 +66,8 @@ line:
   opt_seps
   | opt_seps opt_skip exprs opt_seps
                         {
-                         print_hashmap(h, hmhis);
-                         print_hashmap(h, stdout);
+                         if(hmhis_json) {print_hashmap(h, hmhis);}
+                         if(hmhis_stdout) {print_hashmap(h, stdout);}
 
                          if (jump_requested) {
                               jump_requested = 0;
@@ -104,12 +105,12 @@ expr:
   IF SEP bool_expr {
       if (!$3) {
           skip++;
-          printf("Skip=%d\n",skip);
+          if(debug) {printf("Skip=%d\n",skip);}
       }
   } if_body ENDIF {
       if (skip > 0) {
         skip--;
-        printf("Skip=%d\n",skip);
+        if(debug) {printf("Skip=%d\n",skip);}
       }
     }
   | CMD arith_expr       {
@@ -118,8 +119,8 @@ expr:
 
                             if($1[0] == 'G') {
                               switch((int)$2) {
-                                case 90: incr_mode=0;puts("G90!");break;
-                                case 91: incr_mode=1;puts("G91!");break;
+                                case 90: incr_mode=0;break;
+                                case 91: incr_mode=1;break;
                                 default: break;
                               }
                             }
@@ -258,7 +259,7 @@ void jump(char* label_name) {
         set_var("line", original_line); //reset line to line of label
         byte_counter = offset;          //reset byte_counter to offset of label
 
-        if(1 || debug){
+        if(debug){
           printf("Jumping to line=%d, offset=%d\n\n",
                 (long)original_line,(long)offset);
         }
@@ -266,11 +267,6 @@ void jump(char* label_name) {
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
     }
-
-    printf("fgetc=%c\n\n",fgetc(yyin));
-    fseek(yyin, -1, SEEK_CUR);
-
-
 }
 
 
@@ -328,6 +324,18 @@ void init_hashmap() {
   //print_hashmap(h, stdout);
 }
 
+//file functions
+
+
+
+void close_hmhis() {
+  //delete last redundant comma
+  fseek(hmhis, -3, SEEK_CUR);
+  fprintf(hmhis,"]");
+  fclose(hmhis);
+}
+
+/*
 void init_hmhis() {
   printf("Opening: hmhis.json in write mode...\n");
   hmhis = fopen("./data/hmhis.json", "w");
@@ -336,15 +344,40 @@ void init_hmhis() {
       return;
   }
   fprintf(hmhis,"[");
-
 }
 
-void close_hmhis() {
-  //delete last redundant comma
-  fseek(hmhis, -3, SEEK_CUR);
-  fprintf(hmhis,"]");
-  fclose(hmhis);
+void init_track_list()  {
+  //-----------------------------------------//
+  char* tl_header = "track_index,Ax,Ay,Az,Bx,By,Bz";
+  char* tl_path = "./data/track_list.csv";
+  //-----------------------------------------//
+
+  printf("Opening: track_list.csv in write mode...\n");
+  tl = fopen(tl_path, "w");
+  if (tl == NULL) {
+      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",tl_path);
+      return;
+  }
+
+  fprintf(tl,tl_header);
 }
+*/
+
+FILE* init_file(char* f_path, char* f_header) {
+  printf("Opening: %s in write mode...\n",f_path);
+  FILE* fp = fopen(f_path, "w");
+  if (fp == NULL) {
+      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",f_path);
+      exit(-1);
+  }
+
+  fprintf(fp,f_header);
+
+  return fp;
+}
+
+
+
 
 //bison fns
 

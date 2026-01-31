@@ -78,6 +78,7 @@
   int yyerror(char* s);
 
   strfloat_t* h;
+  strfloat_t* h_prev;
 
   FILE* hmhis;
   FILE* tl;
@@ -92,8 +93,7 @@
   void set_var_incr(char*, float);
   void set_var(char*, float);
   float get_var_val(char*);
-  void init_hashmap();
-  void init_hmhis();
+  strfloat_t* init_hashmap();
 
 
 #line 100 "grammar.tab.c"
@@ -1750,11 +1750,11 @@ float get_var_val(char* varname) {
 }
 
 
-void init_hashmap() {
+strfloat_t* init_hashmap() {
   khint_t k;
   int absent;
 
-  h = strfloat_init();
+  strfloat_t* h = strfloat_init();
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
@@ -1764,12 +1764,10 @@ void init_hashmap() {
   kh_key(h, k) = strdup("laser");
   kh_val(h, k) = 0;
 
-  //print_hashmap(h, stdout);
+  return h;
 }
 
 //file functions
-
-
 
 void close_hmhis() {
   //delete last redundant comma
@@ -1777,34 +1775,6 @@ void close_hmhis() {
   fprintf(hmhis,"]");
   fclose(hmhis);
 }
-
-/*
-void init_hmhis() {
-  printf("Opening: hmhis.json in write mode...\n");
-  hmhis = fopen("./data/hmhis.json", "w");
-  if (hmhis == NULL) {
-      fprintf(stderr, "Error: Could not open hmhis.json (in write mode)!\n");
-      return;
-  }
-  fprintf(hmhis,"[");
-}
-
-void init_track_list()  {
-  //-----------------------------------------//
-  char* tl_header = "track_index,Ax,Ay,Az,Bx,By,Bz";
-  char* tl_path = "./data/track_list.csv";
-  //-----------------------------------------//
-
-  printf("Opening: track_list.csv in write mode...\n");
-  tl = fopen(tl_path, "w");
-  if (tl == NULL) {
-      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",tl_path);
-      return;
-  }
-
-  fprintf(tl,tl_header);
-}
-*/
 
 FILE* init_file(char* f_path, char* f_header) {
   printf("Opening: %s in write mode...\n",f_path);
@@ -1818,9 +1788,6 @@ FILE* init_file(char* f_path, char* f_header) {
 
   return fp;
 }
-
-
-
 
 //bison fns
 

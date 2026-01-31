@@ -501,8 +501,8 @@ char *yytext_ptr;
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
-  int hmhis_stdout = 0;
-  int hmhis_json = 0;
+  int hmhis_stdout = 1;
+  int hmhis_json = 1;
   int debug = 0;
   int skip = 0;
 #line 508 "lex.yy.c"

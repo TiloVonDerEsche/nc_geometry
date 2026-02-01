@@ -6,8 +6,6 @@
 int
 main(int argc, char *argv[])
 {
-  Config config = {0};
-
   // Read the config file
   if (read_config("config.txt", &config) != 0) {
     return 1;
@@ -17,16 +15,18 @@ main(int argc, char *argv[])
   printf("mpf_file=%s\n", config.mpf_file);
   printf("track_list_csv=%s\n", config.track_list_csv);
 
+  debug = config.debug_prints;
+
   yyin = fopen(config.mpf_file, "rb");
 
-  if(hmhis_json) {hmhis = init_file("./data/hmhis.json","[");}
-  tl = init_file("./data/track_list.csv","track_index,Ax,Ay,Az,Bx,By,Bz");
+  if(config.hmhis_to_file) {hmhis = init_file(config.hmhis_json,"[");}
+  tl = init_file(config.track_list_csv,"track_index,Ax,Ay,Az,Bx,By,Bz");
 
   h = init_hashmap();
 
   yyparse ();
 
-  if(hmhis_json) {close_hmhis();}
+  if(config.hmhis_to_file) {close_hmhis();}
   fclose(tl);
   return 0;
 }

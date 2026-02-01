@@ -35,19 +35,15 @@ typedef struct {
 } vec3D;
 
 typedef struct {
+  int debug_prints;
+  int hmhis_to_stdout;
+  int hmhis_to_file;
+
   size_t lines_to_read;
-  size_t mpf_lines;
-  size_t max_line_len;
 
   char mpf_file[256];
-  char data_tuples_csv[256];
   char track_list_csv[256];
-  char intpol_csv[256];
-
-  float horizontal_radius;
-  float vertical_radius;
-
-  float step_dis;
+  char hmhis_json[256];
 } Config;
 
 char* trim(char* str) {
@@ -104,42 +100,41 @@ int read_config(const char* fpath, Config* config) {
             continue;
         }
 
-        if (strcmp(key, "lines_to_read") == 0) {
-            config->lines_to_read = (size_t)atoi(value);
+        if (strcmp(key, "debug_prints") == 0) {
+            config->debug_prints = atoi(value);
         }
-        else if (strcmp(key, "max_line_len") == 0) {
-            config->max_line_len = (size_t)atoi(value);
+        else if (strcmp(key, "hmhis_to_stdout") == 0) {
+            config->hmhis_to_stdout = atoi(value);
         }
+        else if (strcmp(key, "hmhis_to_file") == 0) {
+            config->hmhis_to_file = atoi(value);
+        }
+
         else if (strcmp(key, "mpf_file") == 0) {
             strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
             config->mpf_file[sizeof(config->mpf_file) - 1] = '\0';
-        }
-        else if (strcmp(key, "data_tuples_csv") == 0) {
-            strncpy(config->data_tuples_csv, value, sizeof(config->data_tuples_csv) - 1);
-            config->data_tuples_csv[sizeof(config->data_tuples_csv) - 1] = '\0';
         }
         else if (strcmp(key, "track_list_csv") == 0) {
             strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);
             config->track_list_csv[sizeof(config->track_list_csv) - 1] = '\0';
         }
-        else if (strcmp(key, "interpolation_csv") == 0) {
-            strncpy(config->intpol_csv, value, sizeof(config->intpol_csv) - 1);
-            config->intpol_csv[sizeof(config->intpol_csv) - 1] = '\0';
-        }
-        else if (strcmp(key, "horizontal_radius") == 0) {
-            config->horizontal_radius = atof(value);
-        }
-        else if (strcmp(key, "vertical_radius") == 0) {
-            config->vertical_radius = atof(value);
-        }
-        else if (strcmp(key, "step_distance") == 0) {
-            config->step_dis = atof(value);
+        else if (strcmp(key, "hmhis_json") == 0) {
+            strncpy(config->hmhis_json, value, sizeof(config->hmhis_json) - 1);
+            config->hmhis_json[sizeof(config->hmhis_json) - 1] = '\0';
         }
         else if (strcmp(key, "tracks_to_plot") == 0) {
           //Do nothing; Used by t_vis_color.c
         }
+        else if (strcmp(key, "interpolation_csv") == 0) {}
+
+        else if (strcmp(key, "lines_to_read") == 0) {
+            config->lines_to_read = (size_t)atoi(value);}
+        else if (strcmp(key, "horizontal_radius") == 0) {}
+        else if (strcmp(key, "vertical_radius") == 0) {}
+        else if (strcmp(key, "step_distance") == 0) {}
+        else if (strcmp(key, "track_accel_margin") == 0) {}
         else {
-            fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,fpath);
+          fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,fpath);
         }
     }
 

@@ -6,6 +6,11 @@
 
   int yylex (void);
   int yyerror(char* s);
+  void jump(char*);
+  void set_var_incr(char*, float);
+  void set_var(char*, float);
+  float get_var_val(char*);
+  strfloat_t* init_hashmap();
 
   strfloat_t* h;
 
@@ -13,20 +18,18 @@
   FILE* tl;
 
   extern long byte_counter;
-  extern int skip;
+
   char* pending_jump_label = NULL;
   int jump_requested = 0;
   int incr_mode = 0;
+  int skip = 0;
+
   size_t tid = 1;
   vec3D A = {0,0,0};
   vec3D B = {0,0,0};
 
-  void jump(char*);
-  void set_var_incr(char*, float);
-  void set_var(char*, float);
-  float get_var_val(char*);
-  strfloat_t* init_hashmap();
-
+  Config config = {0};
+  int debug;
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -68,8 +71,8 @@ line:
   opt_seps
   | opt_seps opt_skip exprs opt_seps
                         {
-                         if(hmhis_json) {print_hashmap(h, hmhis);}
-                         if(hmhis_stdout) {print_hashmap(h, stdout);}
+                         if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
+                         if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
 
                          if (jump_requested) {
                               jump_requested = 0;

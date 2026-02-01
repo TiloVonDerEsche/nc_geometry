@@ -1725,6 +1725,7 @@ void jump(char* label_name) {
 
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
+        //yy_flush_buffer(YY_CURRENT_BUFFER);
     }
 }
 

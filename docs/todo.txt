@@ -30,6 +30,12 @@ start timer string.
 When setting hmhis_to_file to 1, the LOOP_CUBE program only builds
 8 tracks in right angle form (like 2 tracks at 90°)
 
+Non-determinism problem.
+Semingly jumping fseek in a reduction rule can cause a race condition
+Adding yyclearin after yyrestart makes it worse.
+-> A fix could be to preload the mpf file
+  into a str array and jump with line indices
+
 |=======================================================|
 Optimizations, Third Release:
 

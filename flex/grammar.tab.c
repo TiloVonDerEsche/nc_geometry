@@ -1715,6 +1715,8 @@ void jump(char* label_name) {
 
         set_var("line", original_line); //reset line to line of label
         byte_counter = offset;          //reset byte_counter to offset of label
+        skip = 0;
+        jump_requested = 0;
 
         if(debug){
           printf("Jumping to line=%d, offset=%d\n\n",

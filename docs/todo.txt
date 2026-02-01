@@ -20,29 +20,15 @@ LOOP1:
 
 Fix line off by one error
 
-loop2D_test:
-Now we are jumping right after the ':' of a label which is correct
-line and N match at first
-After first jump line is one greater than N
-
 Exprs before ENDIF don't seem to execute
 
-LOOP_CODE_CUBE_10VX_MM_FH33_50:
-Seemingly switches endlessly btw Loop 2 & 3
 
-Implement G Code 90 & 91
--> G91 incremental / relative mode
--> G90 Absolute Mode
+|===============Stress Tests===============|
+When spam starting the .exe, sometimes it gets stuck in an endless loop, on the
+start timer string.
 
-Implemented G90 & 91 -> incr_mode. It remains to understand the meant
-permanence of the incr_mode -> Does it stay activated when G91 is called
-once, until G90 is called to turn it off? For which assignment formats should it work -> G91 PUIS_LASER 500 ?
-
-BOUCLE2 loop
-constructs a wall of 64 horizontal cylinders
-
-BOUCLE3 loop
-constructs a wall of 64 vertical cylinders
+When setting hmhis_to_file to 1, the LOOP_CUBE program only builds
+8 tracks in right angle form (like 2 tracks at 90°)
 
 |=======================================================|
 Optimizations, Third Release:

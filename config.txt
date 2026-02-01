@@ -1,16 +1,19 @@
-enable_debug_prints = 1;
+debug_prints = 0;
+//not recommended for large mpf files
+hmhis_to_stdout = 0;
+hmhis_to_file = 0;
 
 mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
 track_list_csv = "./data/track_list.csv";
-tracks_to_plot = "./data/track_list.csv"; 
+hmhis_json = "./data/hmhis.json";
+
+tracks_to_plot = "./data/track_list.csv";
 
 
 //=============not used===============//
-data_tuples_csv = "./data/tuple_lists/_dl.csv";
 interpolation_csv = "./data/interpolation/_intpol.csv";
 
 lines_to_read = -1; //amount of lines read (-1 for all lines)
-max_line_len = 1000; // max chars in one line
 
 //radii of welding track
 horizontal_radius= 0.49;

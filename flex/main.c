@@ -19,7 +19,10 @@ main(int argc, char *argv[])
 
   yyin = fopen(config.mpf_file, "rb");
 
-  if(config.hmhis_to_file) {hmhis = init_file(config.hmhis_json,"[");}
+  if(config.hmhis_to_file) {
+    hmhis = init_file(config.hmhis_json,"[");
+    setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
+  }
   tl = init_file(config.track_list_csv,"track_index,Ax,Ay,Az,Bx,By,Bz");
 
   h = init_hashmap();

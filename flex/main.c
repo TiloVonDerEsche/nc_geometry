@@ -24,6 +24,7 @@ main(int argc, char *argv[])
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
   }
   tl = init_file(config.track_list_csv,"track_index,Ax,Ay,Az,Bx,By,Bz");
+  //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often
 
   h = init_hashmap();
 

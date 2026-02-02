@@ -5,7 +5,7 @@
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
-  
+
   int debug;
 %}
 
@@ -106,7 +106,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 [()]      {return yytext[0];}
 
-"\""[^\"]*"\"" {printf("A string: %s\n",yytext); return STRING;}
+"\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",yytext); } return STRING;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 

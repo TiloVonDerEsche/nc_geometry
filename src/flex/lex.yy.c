@@ -500,7 +500,7 @@ char *yytext_ptr;
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
-  
+
   int debug;
 #line 505 "lex.yy.c"
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -915,7 +915,7 @@ case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
 #line 109 "lex.l"
-{printf("A string: %s\n",yytext); return STRING;}
+{ if(debug){ printf("A string: %s\n",yytext); } return STRING;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP

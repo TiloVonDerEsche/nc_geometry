@@ -30,6 +30,7 @@ main(int argc, char *argv[])
 
   yyparse ();
 
+  printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}
   fclose(tl);
   return 0;

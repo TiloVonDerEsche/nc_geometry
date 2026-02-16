@@ -2,7 +2,7 @@
 1. **Create a folder** named `data`.
 2. Move the NC code (`.mpf`) file into the `data` folder.
 
-3. **Set the desired values for the vars in `config.txt`:**
+3. **Set the desired values** for the vars in **`config.txt`**:
 
    - **`debug_prints`** — Enables token ident and jump info debug prints, when set to 1.
    - **`hmhis_to_stdout`** — Enables var hashmap snapshot printing to stdout, for every .mpf line, when set to 1.

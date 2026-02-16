@@ -1720,7 +1720,7 @@ void jump(char* label_name) {
 
         if(debug){
           printf("Jumping to line=%d, offset=%d\n\n",
-                (long)original_line,(long)offset);
+                (int)original_line,(int)offset);
         }
 
         fseek(yyin, (long)offset, SEEK_SET);

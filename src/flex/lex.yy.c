@@ -1,5 +1,5 @@
 
-#line 2 "lex.yy.c"
+#line 3 "lex.yy.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -502,9 +502,9 @@ char *yytext_ptr;
   #define YY_USER_ACTION byte_counter += yyleng;
 
   int debug;
-#line 505 "lex.yy.c"
+#line 506 "lex.yy.c"
 /* scanner for a simplified numeric control (NC from CNC machining) language */
-#line 507 "lex.yy.c"
+#line 508 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -725,7 +725,7 @@ YY_DECL
 
 
 
-#line 728 "lex.yy.c"
+#line 729 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -954,7 +954,7 @@ YY_RULE_SETUP
 #line 119 "lex.l"
 ECHO;
 	YY_BREAK
-#line 957 "lex.yy.c"
+#line 958 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 

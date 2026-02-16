@@ -4,17 +4,14 @@
 
 3. **Set the desired values in `config.txt`:**
 
-   - **`mpf_lines`** — Number of lines of the `.mpf` file to read and convert.
-   - **`precision`** — *(unused at the moment)*.
-   - **`max_line_len`** — Must be larger than the longest line in the `.mpf` file.
-   - **`mpf_file`** — Path of the `.mpf` file.
-   - **`data_tuples_csv`** — Path of the `data_tuples.csv` output file.
-   - **`track_list_csv`** — Path of the `track_list.csv` output file.
-   - **`horizontal_radius`** — Horizontal radius of a track.
-   - **`vertical_radius`** — Vertical radius of a track.
-
-4. Start the `generate_track_list.exe` file.  
-   Afterwards, `data_tuples.csv` and `track_list.csv` should appear in the `data` folder.
+   - **`debug_prints`** — Enables token ident and jump info debug prints, when set to 1.
+   - **`hmhis_to_stdout`** — Enables var hashmap snapshot printing to stdout, for every .mpf line, when set to 1.
+   - **`hmhis_to_file`** — Enables var hashmap snapshot printing to hmhis.json file, for every .mpf line, when set to 1
+   - **`mpf_file`** — Sets the path of the `.mpf` file.
+   - **`track_list_csv`** — Sets the path of the `track_list.csv` output file.
+   - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which should be read by the `3d_track_visualizer.exe`.
+4. Start the `generate_track_list.exe` file in a terminal.  
+   Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
 
 5. Make sure `3d_track_visualizer.exe` is in the **same directory** as `generate_track_list.exe`.  
    Both should have the `data` folder, with the CSVs and the `.mpf` file in their directory.

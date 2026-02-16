@@ -2,7 +2,7 @@
    - Gnu **`bison`**
    - **`flex`**
    - **`gcc`**
-   - make (optional for use of Makefile, see alternative steps below point 5)
+   - `make` (optional for use of Makefile, see alternative steps below point 5)
 
 
 # Guide to using the project

@@ -1,5 +1,5 @@
 # Requirements to build **`generate_track_list.exe`**:
-   - Gnu **`bison`**
+   - **`bison`** (Gnu)
    - **`flex`**
    - **`gcc`**
    - `make` (optional for use of Makefile, see alternative steps below point 5)

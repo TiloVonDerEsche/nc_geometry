@@ -1,6 +1,6 @@
 # Info
 This NC Interpreter is designed around the NC dialect of the AddUp M400 machine.
-This Sinumerik manual seems to describe that dialect: https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf
+The following Sinumerik manual seems to describe that dialect: https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf
 
 # Guide to using the project
 1. **Setup a root folder** for the project.
@@ -28,7 +28,7 @@ This Sinumerik manual seems to describe that dialect: https://cache.industry.sie
 9. Start `3d_track_visualizer.exe` — this should open a window with a 3D visualization of the tracks.  
    You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.
    
-# Features of the versions of **`generate_track_list.exe`**:
+# Version-Features of **`generate_track_list.exe`**:
 	- 0.1 Basic NC cmds f.e. X,Y,Z, variables and arithmetic & boolean expressions.
 	- 0.2 IF COND THEN BODY ENDIF Block, and GOTOB jmp command.
 	- 0.3 A,B,C work-plain rotation commands. 

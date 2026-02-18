@@ -34,10 +34,10 @@ The following Sinumerik manual seems to describe that dialect: <br> https://cach
 - **`0.3`** A,B,C work-plain rotation commands. 
 
 # Building **`generate_track_list.exe`** yourself:
-Requirements:
-	- **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
-	- **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
-	- **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
-	- `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see manual commands point 5)
+Requirements: <br>
+- **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
+- **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
+- **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
+- `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see manual commands point 5)
 
 

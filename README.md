@@ -1,6 +1,6 @@
 # Info
-This Repository contains GNU: Bison, Flex and C Code, which defines a NC Interpreter "generate_track_list.csv", that reads a NC file (.mpf) and outputs a "track_list.csv" file. <br>
-The "track_list.csv" contains:
+This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter `generate_track_list.exe`, that reads a NC `.mpf` file and outputs a `track_list.csv` file. <br>
+# The **`track_list.csv` contains**:
 - track_index
 -  start point A, end point B of a welding track
 <br>

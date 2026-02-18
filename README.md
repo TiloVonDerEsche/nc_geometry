@@ -1,6 +1,14 @@
 # Info
-This NC Interpreter is designed around the NC dialect of the AddUp M400 machine. <br>
-The following Sinumerik manual seems to describe that dialect: <br> https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf
+This Repository contains GNU: Bison, Flex and C Code, which defines a NC Interpreter "generate_track_list.csv", that reads a NC file (.mpf) and outputs a "track_list.csv" file. <br>
+The "track_list.csv" contains:
+- track_index
+-  start point A, end point B of a welding track
+<br>
+A track is detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
+<br>
+The NC Interpreter is designed around the dialect of the AddUp M400 machine. <br>
+The following Sinumerik manual seems to describe that dialect: <br>
+https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf <br>
 
 # Guide to using the project
 1. **Setup a root folder** for the project.

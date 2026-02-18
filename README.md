@@ -1,5 +1,5 @@
 # Info
-This NC Interpreter is designed around the NC dialect of the AddUp M400 machine.
+This NC Interpreter is designed around the NC dialect of the AddUp M400 machine. <br>
 The following Sinumerik manual seems to describe that dialect: https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf
 
 # Guide to using the project

@@ -8,7 +8,7 @@ TARGET=x86_64-w64-mingw32.static
 export PKG_CONFIG_PATH=${MXE_PATH}/usr/${TARGET}/lib/pkgconfig
 
 # Cross-compile with static linking
-${MXE_PATH}/usr/bin/${TARGET}-gcc ./track_visualization/opengl/mult_color/t_vis_color.c -o ./3d_track_visualizer.exe \
+${MXE_PATH}/usr/bin/${TARGET}-gcc ./src/track_visualization/opengl/mult_color/t_vis_color.c -o ./3d_track_visualizer.exe \
   `$MXE_PATH/usr/bin/${TARGET}-pkg-config --cflags --libs --static glut glew` \
   -lopengl32 -lglu32 -lm \
   -static \

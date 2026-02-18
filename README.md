@@ -29,9 +29,9 @@ The following Sinumerik manual seems to describe that dialect: <br> https://cach
    You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.
    
 # Version-Features of **`generate_track_list.exe`**:
-	- **`0.1`** Basic NC cmds f.e. X,Y,Z, variables and arithmetic & boolean expressions.
-	- **`0.2`** IF COND THEN BODY ENDIF Block, and GOTOB jmp command.
-	- **`0.3`** A,B,C work-plain rotation commands. 
+- **`0.1`** Basic NC cmds f.e. X,Y,Z, variables and arithmetic & boolean expressions.
+- **`0.2`** IF COND THEN BODY ENDIF Block, and GOTOB jmp command.
+- **`0.3`** A,B,C work-plain rotation commands. 
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements:

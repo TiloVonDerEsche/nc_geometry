@@ -1,8 +1,8 @@
 # Info
 This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter `generate_track_list.exe`, that reads a NC `.mpf` file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
-- track_index
--  start point A, end point B of a welding track
+- `track_index`
+-  start `point A`, end `point B` of a welding track
 <br>
 A track is detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
 <br>

@@ -1,5 +1,8 @@
-#include "khashl.h"
 #include <ctype.h>
+#include <math.h>
+
+#include "khashl.h"
+//---khashmap_helper-----//
 
 KHASHL_MAP_INIT(KH_LOCAL,
   strfloat_t, strfloat,
@@ -46,6 +49,45 @@ typedef struct {
   char hmhis_json[256];
 } Config;
 
+
+//------Math Functions------//
+vec3D rot_x(vec3D p, float t) {
+   float st = sin(t);
+   float ct = cos(t);
+   return (vec3D) {
+   p.x,
+   p.y * ct - p.z * st,
+   p.y * st + p.z * ct
+   };
+}
+
+
+vec3D rot_y(vec3D p, float t) {
+   float st = sin(t);
+   float ct = cos(t);
+   return (vec3D) {
+   p.x * ct + p.z * st,
+   p.y,
+   -p.x * st + p.z * ct
+   };
+}
+
+
+vec3D rot_z(vec3D p, float t) {
+   float st = sin(t);
+   float ct = cos(t);
+   return (vec3D) {
+   p.x * ct - p.y * st,
+   p.x * st + p.y * ct,
+   p.z
+   };
+}
+
+vec3D rot_xyz(vec3D p, vec3D abc) {
+   return rot_x(rot_y(rot_z(p,abc.z),abc.y),abc.x);
+}
+//------------String Functions--------------//
+
 char* trim(char* str) {
     char* end;
     // Remove leading whitespace and quotes
@@ -71,6 +113,8 @@ void parse_line(char* line, char** key, char** value) {
     //inc the char pointer to give trim the str which starts after '='
     *value = trim(eq_pos + 1);
 }
+
+//------------File Functions-------------------//
 
 int read_config(const char* fpath, Config* config) {
     printf("Opening %s...\n",fpath);

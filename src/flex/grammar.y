@@ -7,6 +7,9 @@
   int yylex (void);
   int yyerror(char* s);
   void jump(char*);
+    
+  vec3D rot_point();
+
   void set_var_incr(char*, float);
   void set_var(char*, float);
   float get_var_val(char*);
@@ -25,8 +28,8 @@
   int skip = 0;
 
   size_t tid = 1;
-  vec3D A = {0,0,0};
-  vec3D B = {0,0,0};
+  vec3D A;
+  vec3D B;
 
   Config config = {0};
   int debug;
@@ -155,15 +158,11 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                            A.x = get_var_val("X");
-                            A.y = get_var_val("Y");
-                            A.z = get_var_val("Z");
+                            A = rot_point();                            
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
-                            B.x = get_var_val("X");
-                            B.y = get_var_val("Y");
-                            B.z = get_var_val("Z");
+                            B = rot_point();   
 
                             fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f\n",
                             tid++, A.x, A.y, A.z, B.x, B.y, B.z);
@@ -286,8 +285,19 @@ void jump(char* label_name) {
     }
 }
 
-
 //hashmap fns
+vec3D rot_point() {
+    vec3D p = {
+          get_var_val("X"),
+          get_var_val("Y"),
+          get_var_val("Z")};
+    vec3D abc = {
+          get_var_val("A"),
+          get_var_val("B"),
+          get_var_val("C")};
+
+    return rot_xyz(p,abc); 
+}
 
 
 void set_var_incr(char* varname, float fnum) {

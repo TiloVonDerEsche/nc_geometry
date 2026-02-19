@@ -51,9 +51,13 @@ typedef struct {
 
 
 //------Math Functions------//
+#define PI 3.14159265358979323846
+#define TO_RAD(deg) ((deg) * PI / 180.0)
+
 vec3D rot_x(vec3D p, float t) {
-   float st = sin(t);
-   float ct = cos(t);
+   float rad = TO_RAD(t);
+   float st = sin(rad);
+   float ct = cos(rad);
    return (vec3D) {
    p.x,
    p.y * ct - p.z * st,
@@ -63,8 +67,9 @@ vec3D rot_x(vec3D p, float t) {
 
 
 vec3D rot_y(vec3D p, float t) {
-   float st = sin(t);
-   float ct = cos(t);
+   float rad = TO_RAD(t);
+   float st = sin(rad);
+   float ct = cos(rad);
    return (vec3D) {
    p.x * ct + p.z * st,
    p.y,
@@ -74,8 +79,9 @@ vec3D rot_y(vec3D p, float t) {
 
 
 vec3D rot_z(vec3D p, float t) {
-   float st = sin(t);
-   float ct = cos(t);
+   float rad = TO_RAD(t);
+   float st = sin(rad);
+   float ct = cos(rad);
    return (vec3D) {
    p.x * ct - p.y * st,
    p.x * st + p.y * ct,

@@ -3,7 +3,7 @@ debug_prints = 0;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
 
-mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
+mpf_file = "./data/nc_code/test/abc/dummy.mpf";
 track_list_csv = "./data/track_list.csv";
 hmhis_json = "./data/hmhis.json";
 

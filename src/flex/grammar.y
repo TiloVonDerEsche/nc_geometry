@@ -7,7 +7,7 @@
   int yylex (void);
   int yyerror(char* s);
   void jump(char*);
-    
+
   vec3D rot_point();
 
   void set_var_incr(char*, float);
@@ -79,7 +79,7 @@ line:
 
                          if (jump_requested) {
                               jump_requested = 0;
-                              skip = 0; // Reset skip before jumping
+                              skip = 0;
                               char* target = pending_jump_label;
                               pending_jump_label = NULL;
                               jump(target);
@@ -158,14 +158,17 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                            A = rot_point();                            
+                            A = rot_point();
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
-                            B = rot_point();   
+                            B = rot_point();
 
-                            fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f\n",
-                            tid++, A.x, A.y, A.z, B.x, B.y, B.z);
+                            fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+                            tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+                            get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+                            //coll_vec,
+                            config.hrad, config.vrad);
                           }
                          }
   | CALL SEP STRING
@@ -296,7 +299,7 @@ vec3D rot_point() {
           get_var_val("B"),
           get_var_val("C")};
 
-    return rot_xyz(p,abc); 
+    return rot_xyz(p,abc);
 }
 
 

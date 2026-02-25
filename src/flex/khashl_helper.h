@@ -47,6 +47,9 @@ typedef struct {
   char mpf_file[256];
   char track_list_csv[256];
   char hmhis_json[256];
+
+  float hrad;
+  float vrad;
 } Config;
 
 
@@ -178,9 +181,14 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "interpolation_csv") == 0) {}
 
         else if (strcmp(key, "lines_to_read") == 0) {
-            config->lines_to_read = (size_t)atoi(value);}
-        else if (strcmp(key, "horizontal_radius") == 0) {}
-        else if (strcmp(key, "vertical_radius") == 0) {}
+            config->lines_to_read = (size_t)atoi(value);
+        }
+        else if (strcmp(key, "horizontal_radius") == 0) {
+            config->hrad = atof(value);
+        }
+        else if (strcmp(key, "vertical_radius") == 0) {
+            config->vrad = atof(value);
+        }
         else if (strcmp(key, "step_distance") == 0) {}
         else if (strcmp(key, "track_accel_margin") == 0) {}
         else {

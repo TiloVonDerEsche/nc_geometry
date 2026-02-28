@@ -60,8 +60,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                  strcmp(yytext,"Flow_gas_2") == 0 ||
                  strcmp(yytext,"Flow_gas_3") == 0 ||
                  strcmp(yytext,"Feeder_Speed_2") == 0 ||
-                 strcmp(yytext,"Feeder_Speed_3") == 0 ||
-                 strcmp(yytext,"TOFFL") == 0) {
+                 strcmp(yytext,"Feeder_Speed_3") == 0) {
 
                 yylval.CUSTOM_VAR = strdup(yytext);
                 if(debug){ printf("A custom Variable: %s\n", yytext); }

@@ -190,9 +190,9 @@ if_element:
 
 
 assignment:
-  CMD '=' arith_expr        {if(!skip){set_var_incr($1,$3);}}
-  | VAR '=' arith_expr          {if(!skip){set_var($1,$3);}}
-  | CUSTOM_VAR '=' arith_expr {if(!skip){set_var($1,$3);}}
+  CMD opt_seps '=' opt_seps arith_expr        {if(!skip){set_var_incr($1,$5);}}
+  | VAR opt_seps '=' opt_seps arith_expr          {if(!skip){set_var($1,$5);}}
+  | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
 ;
 

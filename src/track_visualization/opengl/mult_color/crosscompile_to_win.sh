@@ -16,7 +16,7 @@ ${MXE_PATH}/usr/bin/${TARGET}-gcc ./src/track_visualization/opengl/mult_color/t_
 
 # Check for errors
 if [ $? -eq 0 ]; then
-  echo "Compilation successful! Executable: 3d_track_visualizer.exe"
+  echo "Compilation successful for executable: 3d_track_visualizer.exe"
 else
-  echo "Compilation failed."
+  echo "Compilation failed for executable: 3d_track_visualizer.exe"
 fi

@@ -132,6 +132,11 @@ expr:
                                 default: break;
                               }
                             }
+                            else if(is_coord($1[0])) {
+                              B = rot_point();
+                              write_track_line();
+                              A = rot_point();
+                            }
                           }
                          }
   | assignment
@@ -164,11 +169,7 @@ expr:
                             set_var("laser",0);
                             B = rot_point();
 
-                            fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-                            tid++, A.x, A.y, A.z, B.x, B.y, B.z,
-                            get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-                            //coll_vec,
-                            config.hrad, config.vrad);
+                            write_track_line();
                           }
                          }
   | CALL SEP STRING
@@ -363,6 +364,15 @@ void close_hmhis() {
   fclose(hmhis);
 }
 
+void write_track_line() {
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+  //coll_vec,
+  config.hrad, config.vrad);
+}
+
+
 FILE* init_file(char* f_path, char* f_header) {
   printf("Opening: %s in write mode...\n",f_path);
   FILE* fp = fopen(f_path, "w");
@@ -374,6 +384,18 @@ FILE* init_file(char* f_path, char* f_header) {
   fprintf(fp,"%s\n",f_header);
 
   return fp;
+}
+
+void write_track_line() {
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+  //coll_vec,
+  config.hrad, config.vrad);
+}
+
+int is_coord(char c) {
+  return (c == 'X' || c == 'Y' || c == 'Z' || c == 'A' || c == 'B' || c == 'C');
 }
 
 //bison fns

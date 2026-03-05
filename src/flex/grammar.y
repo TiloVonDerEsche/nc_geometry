@@ -14,6 +14,8 @@
   void set_var(char*, float);
   float get_var_val(char*);
   strfloat_t* init_hashmap();
+  void write_track_line();
+  int is_coord(char);
 
   strfloat_t* h;
 
@@ -26,10 +28,11 @@
   int jump_requested = 0;
   int incr_mode = 0;
   int skip = 0;
+  int track_written = 0;
 
   size_t tid = 1;
-  vec3D A;
-  vec3D B;
+  vec3D A = {0,0,0};
+  vec3D B = {0,0,0};
 
   Config config = {0};
   int debug;
@@ -74,6 +77,8 @@ line:
   opt_seps
   | opt_seps opt_skip exprs opt_seps
                         {
+                         track_written--; //counter for how many lines not to print_track
+    
                          if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
                          if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
 
@@ -123,8 +128,6 @@ expr:
     }
   | CMD arith_expr       {
                           if(!skip){
-                            set_var($1,$2);
-
                             if($1[0] == 'G') {
                               switch((int)$2) {
                                 case 90: incr_mode=0;break;
@@ -132,11 +135,16 @@ expr:
                                 default: break;
                               }
                             }
-                            else if(is_coord($1[0])) {
+                            else if(is_coord($1[0])
+                              && !config.tracks_def_by_laser && !(track_written>0)) {
                               B = rot_point();
                               write_track_line();
                               A = rot_point();
+                              //prevent mult writes in line with mult coord cmds
+                              track_written = config.track_mid_len; 
                             }
+
+                            set_var($1,$2);
                           }
                          }
   | assignment
@@ -163,11 +171,12 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                            A = rot_point();
+                            if (config.tracks_def_by_laser){A=rot_point();}
+                            
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
-                            B = rot_point();
+                            if (config.tracks_def_by_laser){B=rot_point();}
 
                             write_track_line();
                           }
@@ -363,15 +372,6 @@ void close_hmhis() {
   fprintf(hmhis,"]");
   fclose(hmhis);
 }
-
-void write_track_line() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-  //coll_vec,
-  config.hrad, config.vrad);
-}
-
 
 FILE* init_file(char* f_path, char* f_header) {
   printf("Opening: %s in write mode...\n",f_path);

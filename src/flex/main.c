@@ -23,9 +23,9 @@ main(int argc, char *argv[])
     hmhis = init_file(config.hmhis_json,"[");
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
   }
-  tl = init_file(config.track_list_csv,"track_index,Ax,Ay,Az,Bx,By,Bz,\
-  laser_power,machine_speed,coll_Vx,coll_Vy,coll_Vz,hradius,vradius");
-  //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often
+  tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
+  laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
+  //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often.
 
   h = init_hashmap();
 

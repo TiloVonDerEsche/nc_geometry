@@ -41,8 +41,8 @@ typedef struct {
   int debug_prints;
   int hmhis_to_stdout;
   int hmhis_to_file;
-
-  size_t lines_to_read;
+  int tracks_def_by_laser;
+  int track_mid_len;
 
   char mpf_file[256];
   char track_list_csv[256];
@@ -162,6 +162,12 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "hmhis_to_file") == 0) {
             config->hmhis_to_file = atoi(value);
         }
+        else if (strcmp(key, "tracks_def_by_laser") == 0) { 
+            config->tracks_def_by_laser = atoi(value);
+        }
+         else if (strcmp(key, "track_mid_len") == 0) {
+            config->track_mid_len = atoi(value);
+        }
 
         else if (strcmp(key, "mpf_file") == 0) {
             strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
@@ -179,10 +185,6 @@ int read_config(const char* fpath, Config* config) {
           //Do nothing; Used by t_vis_color.c
         }
         else if (strcmp(key, "interpolation_csv") == 0) {}
-
-        else if (strcmp(key, "lines_to_read") == 0) {
-            config->lines_to_read = (size_t)atoi(value);
-        }
         else if (strcmp(key, "horizontal_radius") == 0) {
             config->hrad = atof(value);
         }

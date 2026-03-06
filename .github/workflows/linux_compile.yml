@@ -15,3 +15,13 @@ jobs:
     - uses: actions/checkout@v4
     - name: make
       run: make -C ./src/flex
+    - name: Create Release
+      uses: softprops/action-gh-release@v2
+      if: github.ref == 'refs/heads/main'
+      with:
+        files: ./generate_track_list.bin
+        tag_name: latest-build
+        name: Continuous Build
+        prerelease: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

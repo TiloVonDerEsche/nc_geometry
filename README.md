@@ -51,4 +51,5 @@ Requirements: <br>
 # Download
 Under the Releases tab you can download the latest binaries (executables) and the corresponding source code in a .zip if interested.
 [Download from Releases](releases)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/USER/REPO)](https://github.com/USER/REPO/releases/latest)
 

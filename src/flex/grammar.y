@@ -78,7 +78,7 @@ line:
   | opt_seps opt_skip exprs opt_seps
                         {
                          track_written--; //counter for how many lines not to print_track
-    
+
                          if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
                          if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
 
@@ -141,7 +141,7 @@ expr:
                               write_track_line();
                               A = rot_point();
                               //prevent mult writes in line with mult coord cmds
-                              track_written = config.track_mid_len; 
+                              track_written = config.track_mid_len;
                             }
 
                             set_var($1,$2);
@@ -172,7 +172,7 @@ expr:
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
                             if (config.tracks_def_by_laser){A=rot_point();}
-                            
+
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
@@ -314,7 +314,7 @@ vec3D rot_point() {
 
 
 void set_var_incr(char* varname, float fnum) {
-    if (incr_mode) {
+    if (incr_mode && is_coord(varname[0])) {
       set_var(varname, get_var_val(varname)+fnum);
     }
     else {

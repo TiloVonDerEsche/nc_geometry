@@ -1,5 +1,5 @@
+[![Linux build generate_track_list.bin](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml/badge.svg)](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml) <br>
 # Info
-[![Linux build generate_track_list.bin](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml/badge.svg)](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml)
 This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter `generate_track_list.exe`, that reads a NC `.mpf` file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
 - `track_index`

@@ -1,2 +1,15 @@
 #!/bin/bash
-gcc ./src/flex/main.c -o ./generate_track_list.bin -lm
+clear
+echo "Compiling generate_track_list.bin..."
+make -C ./src/flex
+
+if [ $? -eq 0 ]; then
+  echo "Compilation successful for executable: generate_track_list.bin"
+else
+  echo "Compilation failed for executable: generate_track_list.bin"
+fi
+echo ""
+
+./src/track_visualization/opengl/mult_color/linux_compile.sh
+
+echo "Exiting..."

@@ -115,15 +115,14 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
     dy /= length;
     dz /= length;
 
-    // Define up vector (global y-axis)
-    float up[3] = {0.0f, 1.0f, 0.0f};
+    float up[3] = {0.0f, 0.0f, 1.0f};
     // Check if direction is nearly parallel to y-axis
-    if (fabs(fabs(dy) - 1.0f) < 0.001f) {
-        up[0] = 0.0f; up[1] = 0.0f; up[2] = 1.0f; // Use z-axis as up
-    }
+    // if (fabs(fabs(dy) - 1.0f) < 0.001f) {
+    //     up[0] = 0.0f; up[1] = 0.0f; up[2] = 1.0f; // Use z-axis as up
+    // }
 
     // Compute local y-axis: v = up - (up • w) * w
-    float dot_up_w = up[0] * dx + up[1] * dy + up[2] * dz;
+    float dot_up_w = up[2] * dz; //up[0] * dx + up[1] * dy +
     float v[3];
     v[0] = up[0] - dot_up_w * dx;
     v[1] = up[1] - dot_up_w * dy;

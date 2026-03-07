@@ -48,5 +48,7 @@ Requirements: <br>
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
-
+# Download
+Under the Releases tab you can download the latest binaries (executables) and the corresponding source code in a .zip if interested.
+[Download from Releases](releases)
 

@@ -1,0 +1,212 @@
+;Цикл обработки внутренних и наружных канавок
+PROC KANAVKA(REAL X_CYL, REAL Z_KAN,REAL D_KAN, REAL WIDTH, REAL _RND, REAL N_STOPS, REAL FEED_Z, REAL FEED_FINE)
+
+;X_CYL - диаметр цилиндра или отверстия (чистовой)
+;Z_KAN - левый край канавки (образуемый кромкой D1)
+;D_KAN - диаметр дна канавки
+;WIDTH - ширина канавки
+;_RND - радиус скругления вершин канавки
+;N_STOPS - количество остановок:
+;                 0 - без остановок
+;                 1 - с остановкой с припуском для проверки
+;                 2 - дополнительная остановка для снятия стружки
+;                 3 - ТОЛЬКО остановка для снятия стружки
+;FEED_Z - подача подчистки дна, если < 0 - подчистка не производится
+;FEED_FINE - подача на чистовом и предчистовом проходе
+
+DEF REAL PLATE_WIDTH ;ширина пластины
+DEF REAL TOOL_ORI    ;ориентация режущей кромки
+DEF REAL X_K         ;множитель для оси X
+DEF REAL DEPTH       ;Припуск для чистовой и получистовой
+DEF STRING[30] ERR   ;Текст ошибки
+DEF REAL _LEFT       ;Переменная для хранения левой стороны
+DEF REAL _RIGHT      ;Переменная для хранения правой стороны
+DEF REAL _VAR        ;Переменная для хранения всякой всячины
+DEF REAL X_ACT       ;Текущее положение по оси X
+DEF REAL Z_ACT       ;Текущее положение по оси Z
+DEF REAL ITER
+DEF REAL ITER_NUMS
+
+
+
+PLATE_WIDTH=2;  затычка. На реальном станке PLATE_WIDTH=$TC_DP9[$P_TOOLNO,1]
+; PLATE_WIDTH=$TC_DP9[$P_TOOLNO,1]
+
+DEPTH=0.1*PLATE_WIDTH
+
+GOTOF CHECK_ERRORS
+BODY:
+
+;Обдирка
+_VAR=2
+IF ((N_STOPS==0) OR (N_STOPS==3))
+  _VAR=1
+ENDIF
+
+_LEFT=Z_KAN+_VAR*DEPTH
+_RIGHT=Z_KAN+WIDTH-PLATE_WIDTH-_VAR*DEPTH
+ITER_NUMS=TRUNC((_RIGHT-_LEFT)/(PLATE_WIDTH*0.75))+1
+
+D1
+G0 Z=_LEFT
+
+FOR ITER=0 TO ITER_NUMS
+  G0 Z=_LEFT+(_RIGHT-_LEFT)*(ITER/ITER_NUMS)
+  X=X_CYL+2*X_K
+  G1 X=D_KAN+2*_VAR*X_K*DEPTH M108
+  IF (ITER==0)
+    G1 X=IC(2*DEPTH*X_K)
+  ELSE
+    G1 X=IC(2*DEPTH*X_K) Z=IC(-DEPTH)
+  ENDIF
+  G0 X=X_CYL+2*X_K
+ENDFOR
+
+G0 X=X_ACT M109
+
+IF (N_STOPS>1)
+  G0 Z=Z_ACT
+  MSG("Сними стружку")
+  M0
+  MSG()
+  G0 Z=_LEFT
+ENDIF
+
+IF ((N_STOPS==0) OR (N_STOPS==3))
+  GOTOF CHIST
+ENDIF
+
+
+F=FEED_FINE
+
+G0 Z=Z_KAN+DEPTH
+X=X_CYL+2*X_K
+G1 X=D_KAN+DEPTH*2*X_K
+Z=IC(DEPTH)
+X=IC(0.5*X_K)
+G0 X=X_CYL+2*X_K
+D2
+G0 Z=Z_KAN+WIDTH-DEPTH
+G1 X=D_KAN+DEPTH*2*X_K
+D1
+G1 Z=Z_KAN+DEPTH*2 FB=FEED_Z
+X=IC(0.5*X_K)
+G0 X=X_ACT
+
+IF (N_STOPS>0)
+  G0 Z=Z_ACT
+  MSG("Проверь D"<<(D_KAN+2*DEPTH*X_K)<<"и l"<<(WIDTH-2*DEPTH))
+  M0
+  MSG()
+  G0 Z=Z_KAN
+ENDIF
+
+CHIST:
+
+F=FEED_FINE
+
+G0 Z=Z_KAN-_RND-0.05-$P_TOOLR
+X=X_CYL+2*X_K
+IF (X_K>0)
+  G41 G1 X=X_CYL Z=IC($P_TOOLR) M108
+  Z=Z_KAN RND=_RND
+  X=D_KAN
+  Z=IC($P_TOOLR+DEPTH)
+  G40 G1 X=IC(0.5) Z=IC(-$P_TOOLR)
+ELSE
+  G42 G1 X=X_CYL Z=IC($P_TOOLR)
+  Z=Z_KAN RND=_RND
+  X=D_KAN
+  Z=IC($P_TOOLR+DEPTH)
+  G40 G1 X=IC(-0.5) Z=IC(-$P_TOOLR)
+ENDIF
+G0 X=X_CYL+2*X_K
+D2
+G0 Z=Z_KAN+WIDTH+_RND+0.05+$P_TOOLR
+
+IF (X_K>0)
+  G42 G1 X=X_CYL Z=IC(-$P_TOOLR)
+  Z=Z_KAN+WIDTH RND=_RND
+  X=D_KAN
+  D1
+  Z=Z_KAN+DEPTH+$P_TOOLR FB=FEED_Z
+  G40 G1 X=IC(0.5) Z=IC(-$P_TOOLR)
+ELSE
+  G41 G1 X=X_CYL Z=IC(-$P_TOOLR)
+  Z=Z_KAN+WIDTH RND=_RND
+  X=D_KAN
+  Z=Z_KAN+DEPTH+$P_TOOLR FB=FEED_Z
+  G40 G1 X=IC(-0.5) Z=IC(-$P_TOOLR)
+ENDIF
+
+M109
+G0 X=X_ACT
+Z=Z_ACT
+
+M30
+
+CHECK_ERRORS:
+
+;Текущие координаты
+X_ACT=$AA_IW[X]
+Z_ACT=$AA_IW[Z]
+
+IF (_RND<=0)
+  _RND=0.05
+ENDIF
+
+IF (FEED_FINE<=0)
+  FEED_FINE=$P_F
+ENDIF
+
+IF (FEED_Z<=0)
+  FEED_Z=$P_F
+ENDIF
+
+IF (WIDTH<PLATE_WIDTH)
+  ERR="Ширина пластины слишком большая"
+  GOTOF ERR
+ENDIF
+
+;Если только один чистовой проход и пластина широкая
+IF (((PLATE_WIDTH+2*DEPTH)>WIDTH) AND ((N_STOPS==3) OR (N_STOPS==0)))
+  ERR="Не хватает места для чистового"
+  GOTOF ERR
+ENDIF
+
+;Если два чистовых прохода и пластина широкая
+IF (((PLATE_WIDTH+4*DEPTH)>WIDTH) AND ((N_STOPS==1) OR (N_STOPS==2)))
+  ERR="Не_хватает_места_для_чистового"
+  GOTOF ERR
+ENDIF
+
+TOOL_ORI=$TC_DP2[$P_TOOLNO,$P_TOOL]
+IF (TOOL_ORI==3)
+  X_K=1
+ELSE
+  X_K=-1
+ENDIF
+
+
+
+IF ((TOOL_ORI<>2) AND (TOOL_ORI<>3))
+  ERR="Положение_резца_не_поддерживается"
+  GOTOF ERR
+ENDIF
+
+IF ((X_ACT-X_CYL)*X_K<0)
+  ERR="Неверная_начальная_точка"
+  GOTOF ERR
+ENDIF
+
+IF ((X_CYL-D_KAN)*X_K<0)
+  ERR="D_канавки_указан_неверно"
+  GOTOF ERR
+ENDIF
+
+GOTOB BODY
+
+ERR:
+  MSG(ERR)
+  M0
+M30

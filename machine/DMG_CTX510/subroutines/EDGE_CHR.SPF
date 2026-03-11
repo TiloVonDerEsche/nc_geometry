@@ -1,0 +1,94 @@
+PROC EDGE_CHR(REAL X_CHR,REAL Z_CHR,REAL _CHR,REAL _MAX_DEPTH, REAL FINE_FEED, REAL RECURS)
+
+DEF STRING[30] ERROR_TEXT="";
+DEF REAL X_K=1;
+DEF REAL Z_K=1;
+DEF INT TOOL_ORI;
+DEF REAL X_ACT;
+DEF REAL Z_ACT;
+DEF INT ITER;
+
+IF (_MAX_DEPTH<=0)
+  _MAX_DEPTH=1
+ENDIF
+
+IF (FINE_FEED<=0)
+  FINE_FEED=0.12
+ENDIF
+
+IF (RECURS>0)
+  FINE_FEED=$P_F
+ENDIF
+
+X_ACT=$AA_IW[X]
+Z_ACT=$AA_IW[Z]
+
+TOOL_ORI=$TC_DP2[$P_TOOLNO,$P_TOOL]
+
+;MSG(""<<_MAX_DEPTH)
+
+IF ((TOOL_ORI<>2) AND (TOOL_ORI<>4) AND (TOOL_ORI<>3))
+  ERROR_TEXT="TOOL_ORI_NOT_SUPPORTED"
+  GOTOF ERROR
+ENDIF
+
+IF (TOOL_ORI==2)
+  X_K=-1
+ENDIF
+
+IF (TOOL_ORI==4)
+  Z_K=-1
+ENDIF
+
+IF ((((X_ACT-X_CHR)*X_K)<1) OR (((Z_ACT-Z_CHR)*Z_K)<1))
+  ERROR_TEXT="ACT_POS_ERR"
+  GOTOF ERROR
+ENDIF
+
+IF ((_CHR>_MAX_DEPTH) AND (RECURS<=0))
+  ITER=1
+  OBDIR_CHR:
+    ;MSG(""<<ITER)
+    EDGE_CHR(X_CHR,Z_CHR,_MAX_DEPTH*ITER,_MAX_DEPTH*ITER,1,1)
+    ITER=ITER+1
+  IF ITER<=TRUNC((_CHR-0.01)/_MAX_DEPTH) GOTOB OBDIR_CHR
+ENDIF
+
+G0 Z=Z_CHR+Z_K X=X_CHR-2*($P_TOOLR+_CHR+0.1)*X_K
+G1 Z=Z_CHR FB=FINE_FEED M108
+X=X_CHR-2*($P_TOOLR+_CHR+0.1)*X_K+2*($P_TOOLR+0.1)*TAN(22.5)*X_K RND=($P_TOOLR+0.1) FB=FINE_FEED
+X=X_CHR RND=$P_TOOLR+0.1 ANG=(90+45*Z_K)*X_K FB=FINE_FEED
+Z=IC(-($P_TOOLR+0.1)*TAN(22.5)*Z_K) FB=FINE_FEED
+X=X_CHR+X_K FB=FINE_FEED M109
+G0 X=X_ACT Z=Z_ACT
+
+M30
+
+ERROR:
+MSG(ERROR_TEXT)
+G4 F10
+M30
+
+;This comment is automatically created by sinumerik-highlight package
+;{
+;  "machine": {
+;    "machineName": "DMG",
+;    "machineType": "Lathe",
+;    "subType": "Horizontal",
+;    "firstCarriage": {
+;      "position": "Rear",
+;      "axisY": true,
+;      "drivedTool": true,
+;      "coolantOn": "M108",
+;      "coolantOff": "M109",
+;      "toolChange": "TC(1)",
+;      "drivedToolSpindleNum": "1"
+;    },
+;    "diam90": false,
+;    "firstSpindle": {
+;      "name": "C4",
+;      "num": "4"
+;    }
+;  }
+;}
+;End of comment created by sinumerik-highlight package

@@ -1,0 +1,113 @@
+PROC CORNER2(REAL X_CORNER, REAL Z_CORNER, REAL R_CORNER, REAL MAX_DEPTH, REAL CROSS, REAL ALLOWANCE) DISPLOF
+
+;X_CORNER - координата вершины угла по оси X
+;Z_CORNER - координата вершины угла по оси Z
+;R-CORNER - радиус при вершине
+;MAX_DEPTH - максимальный съем материала
+;CROSS - направление обработки (0 - по оси Z, >0 - по оси X)
+;ALLOWANCE - остаточный припуск
+
+DEF REAL X_K ;Коэффициент X
+DEF REAL Z_K ;Коэффициент Z
+DEF REAL X_ACT ;Начальное подложение по оси Х
+DEF REAL Z_ACT ;Начальное подложение по оси Z
+DEF REAL T_ORI    ;Положение режущей кромки
+DEF REAL T_RND    ;Радиус при вершине резца
+DEF INT ITER      ; Номер прохода
+DEF INT ITER_NUMS ; Количество проходов
+DEF STRING[50] _ERROR ;Текст ошибки
+
+T_ORI=$TC_DP2[$P_TOOLNO,$P_TOOL]
+
+IF ((T_ORI<1) OR (T_ORI>4))
+  MSG("Положение_резца_не_поддерживается")
+  GOTOF ERR
+ENDIF
+
+;Коэффициенты в зависимости от положения режущей кромки
+X_K=1
+Z_K=1
+
+IF ((T_ORI==1) OR (T_ORI==4))
+  Z_K=-1
+ENDIF
+
+IF ((T_ORI==1) OR (T_ORI==2))
+  X_K=-1
+ENDIF
+
+;Текущие координаты
+X_ACT=$AA_IW[X]
+Z_ACT=$AA_IW[Z]
+
+;Координаты угла с учетом припуска
+X_CORNER=X_CORNER+ALLOWANCE*X_K*2
+Z_CORNER=Z_CORNER+ALLOWANCE*Z_K
+
+;Поправка на радиус при вершине резца
+R_CORNER=R_CORNER-$P_TOOLR
+
+IF (((X_ACT-X_CORNER)*X_K<0) OR ((Z_ACT-Z_CORNER)*Z_K<0))
+  MSG("Неправильное_начальное_положение")
+  GOTOF ERR
+ENDIF
+
+M108
+
+IF (CROSS>0)
+  ;Обработка по оси X
+  ITER_NUMS=TRUNC((Z_ACT-Z_K*1.1-Z_CORNER)/Z_K/MAX_DEPTH)+1
+  ITER=1
+  TURN_X:
+  G0 X=X_ACT Z=Z_ACT
+  G0 Z=Z_ACT-Z_K-(Z_ACT-Z_K-Z_CORNER)*(ITER/ITER_NUMS)+Z_K
+  G1 Z=Z_ACT-Z_K-(Z_ACT-Z_K-Z_CORNER)*(ITER/ITER_NUMS)
+  IF ((Z_ACT-Z_K-(Z_ACT-Z_K-Z_CORNER)*(ITER/ITER_NUMS)-(Z_CORNER+Z_K*R_CORNER))*Z_K>0)
+    G1 X=X_CORNER
+  ELSE
+    G1 X=X_CORNER+2*X_K*R_CORNER-2*X_K*SQRT(POT(R_CORNER)+0.00001-POT(Z_CORNER+Z_K*R_CORNER-(Z_ACT-Z_K-(Z_ACT-Z_K-Z_CORNER)*(ITER/ITER_NUMS))))
+    IF (ABS(Z_ACT-Z_K-(Z_ACT-Z_K-Z_CORNER)*(ITER/ITER_NUMS)-Z_CORNER)<0.00001)
+      G1 X=X_CORNER RND=R_CORNER
+      G1 Z=IC(R_CORNER*Z_K)
+    ENDIF
+  ENDIF
+  G1 X=IC(X_K) Z=IC(Z_K/2)
+  G0 X=X_ACT Z=Z_ACT
+  ITER=ITER+1
+  IF (ITER<=ITER_NUMS) GOTOB TURN_X
+ELSE
+  ;Обработка по оси Z
+  ITER_NUMS=TRUNC((X_ACT-2*X_K*1.1-X_CORNER)/2*X_K/MAX_DEPTH)+1
+  ITER=1
+  TURN_Z:
+  G0 X=X_ACT Z=Z_ACT
+  G0 X=X_ACT-2*X_K-(X_ACT-2*X_K-X_CORNER)*(ITER/ITER_NUMS)+2*X_K
+  G1 X=X_ACT-2*X_K-(X_ACT-2*X_K-X_CORNER)*(ITER/ITER_NUMS)
+  IF ((X_ACT-2*X_K-(X_ACT-2*X_K-X_CORNER)*(ITER/ITER_NUMS)-(X_CORNER+2*X_K*R_CORNER))*X_K>0)
+    G1 Z=Z_CORNER
+  ELSE
+    G1 Z=Z_CORNER+Z_K*R_CORNER-Z_K*SQRT(POT(R_CORNER)+0.00001-POT(X_CORNER+2*X_K*R_CORNER-(X_ACT-2*X_K-(X_ACT-2*X_K-X_CORNER)*(ITER/ITER_NUMS)))/4)
+    IF (ABS(X_ACT-2*X_K-(X_ACT-2*X_K-X_CORNER)*(ITER/ITER_NUMS)-X_CORNER)<0.00001)
+      G1 Z=Z_CORNER RND=R_CORNER
+      G1 X=IC(2*R_CORNER*X_K)
+    ENDIF
+  ENDIF
+  G1 X=IC(X_K) Z=IC(Z_K/2)
+  G0 X=X_ACT Z=Z_ACT
+  ITER=ITER+1
+  IF (ITER<=ITER_NUMS) GOTOB TURN_Z
+ENDIF
+
+IF (CROSS>0)
+  G0 Z=Z_CORNER+Z_K
+ELSE
+  G0 X=X_CORNER+2*X_K
+ENDIF
+
+M109
+
+M30
+
+ERR:
+M0
+M30

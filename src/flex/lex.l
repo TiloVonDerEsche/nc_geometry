@@ -23,7 +23,6 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 %%
 
-
 {inum} {
         yylval.INT = atoi(yytext);
         if(debug){ printf("An integer: %d\n", yylval.INT); }
@@ -69,6 +68,10 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
               }
               else if(strcmp(yytext,"CALL") == 0) {
                 return CALL;
+              }
+              else if(strcmp(yytext,"REPEAT") == 0) {
+                if(debug){ puts("A REPEAT!"); }
+                return REPEAT;
               }
               else if(strcmp(yytext,"GOTOB") == 0) {
                 if(debug){ puts("A GOTO!"); }

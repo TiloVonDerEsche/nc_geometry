@@ -45,7 +45,7 @@
 %token <int> INT
 %token <float> FLOAT
 
-%token IF ENDIF GOTO
+%token IF ENDIF REPEAT GOTO
 
 %token <char*> CMD
 %token <char*> VAR

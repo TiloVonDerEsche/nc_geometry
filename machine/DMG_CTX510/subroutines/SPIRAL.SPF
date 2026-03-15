@@ -37,3 +37,18 @@ G0 Z=Z_SAFE
 
 
 M17
+  
+;This comment is automatically created by sinumerik-highlight package
+;{
+;  "machine": {
+;    "machineName": "DMG",
+;    "machineType": "Mill",
+;    "cnc": "SINUMERIK",
+;    "cncOptions": {},
+;    "firstSpindle": {
+;      "name": "C",
+;      "num": 1
+;    }
+;  }
+;}
+;End of comment created by sinumerik-highlight package

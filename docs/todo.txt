@@ -10,17 +10,67 @@ Merge btw simple CSV like G-Code and Assembly like programming
 |=======================================================|
 
 First finish our approach:
-Do we need to jump ahead with a gotob?
-
 "
-gotob LOOP1
+GOTOF LOOP1
 
 LOOP1:
 "
+REPEAT
+
 
 Fix line off by one error
 
 Exprs before ENDIF don't seem to execute
+
+G Codes:
+If not G1 & G2 used "Z coord without move"
+this.planeAxes = ['X', 'Y', 'Z']
+if (plane === 'G18') {
+    this.planeAxes = ['Z', 'X', 'Y']
+}
+if (plane === 'G19') {
+    this.planeAxes = ['Y', 'Z', 'X']
+}
+
+DIAM ON / OFF / 90
+
+    if (pole.type) {
+        if (pole.X && View.sinumerikView.parseData.diamon) {
+            pole.X *= 2
+        }
+        if (pole.type == 'G110') {
+            if (pole.X != undefined) {
+                View.sinumerikView.parseData.pole.X = coordsInFrame.X + pole.X;
+            }
+            if (pole.Y != undefined) {
+                View.sinumerikView.parseData.pole.X = coordsInFrame.Y + pole.Y;
+            }
+            if (pole.Z != undefined) {
+                View.sinumerikView.parseData.pole.Z = coordsInFrame.Z + pole.Z;
+            }
+        }
+        if (pole.type == 'G111') {
+            if (pole.X != undefined) {
+                View.sinumerikView.parseData.pole.X = pole.X;
+            }
+            if (pole.Y != undefined) {
+                View.sinumerikView.parseData.pole.Y = pole.Y;
+            }
+            if (pole.Z != undefined) {
+                View.sinumerikView.parseData.pole.Z = pole.Z;
+            }
+        }
+        if (pole.type == 'G112') {
+            if (pole.X != undefined) {
+                View.sinumerikView.parseData.pole.X = View.sinumerikView.parseData.pole.X + pole.X;
+            }
+            if (pole.Y != undefined) {
+                View.sinumerikView.parseData.pole.Y = View.sinumerikView.parseData.pole.Y + pole.Y;
+            }
+            if (pole.Z != undefined) {
+                View.sinumerikView.parseData.pole.Z = View.sinumerikView.parseData.pole.Z + pole.Z;
+            }
+        }
 
 
 |===============Stress Tests===============|

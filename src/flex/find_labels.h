@@ -19,7 +19,6 @@ void find_labels(strfloat_t* h, FILE* mpf) {
         return;
     }
 
-    printf("Matches found:\n");
     size_t li = 1;
     long byte_offset = 0;
     while (fgets(line, sizeof(line), mpf)) {
@@ -51,8 +50,14 @@ void find_labels(strfloat_t* h, FILE* mpf) {
             label_id[length] = '\0';
 
             //----Save byte_offset and label_line in hashmap
-            printf("Line %zu | Offset %ld | ID: '%s' | Content: %s",
-              li, byoffset_colon, label_id, line);
+            /*printf("Line %zu | Offset %ld | ID: '%s' | Content: %s",
+              li, byoffset_colon, label_id, line);*/
+            set_var(label_id, (float)byoffset_colon);
+
+            char line_label[MAX_LINE_LENGTH+5];
+            snprintf(line_label, sizeof(line_label), "%s_line", label_id);
+            set_var(line_label, (float)li);
+
           }
         }
 
@@ -64,4 +69,5 @@ void find_labels(strfloat_t* h, FILE* mpf) {
 
     // Free memory allocated to the pattern buffer
     regfree(&regex);
+    rewind(mpf);
 }

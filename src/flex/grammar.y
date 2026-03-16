@@ -150,17 +150,7 @@ expr:
                           }
                          }
   | assignment
-  | LABEL                {
-                          if(!skip){
-                            if (get_var_val($1) == 0) { //define once
-                              set_var($1, (float)byte_counter);
-
-                              char line_label[256];
-                              snprintf(line_label, sizeof(line_label), "%s_line", $1);
-                              set_var(line_label, get_var_val("line"));
-                            }
-                          }
-                         }
+  | LABEL                //already handled in find_labels.h
   | GOTOB SEP MISC_ID   {if(!skip){
                           pending_jump_label = strdup($3);
                           jump_requested = 1;

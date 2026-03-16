@@ -17,7 +17,12 @@ main(int argc, char *argv[])
 
   debug = config.debug_prints;
 
-  yyin = fopen(config.mpf_file, "rb");
+  FILE* mpf = fopen(config.mpf_file, "rb");
+  //--------Preprocessor for Labels
+  
+
+  //--------Bison Interpreter
+  yyin = mpf;
 
   if(config.hmhis_to_file) {
     hmhis = init_file(config.hmhis_json,"[");

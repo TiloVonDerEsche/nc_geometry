@@ -30,7 +30,7 @@
   int skip = 0;
   int track_written = 0;
 
-  size_t tid = 1;
+  size_t tid = 0;
   vec3D A = {0,0,0};
   vec3D B = {0,0,0};
 
@@ -78,21 +78,21 @@ lines:
 line:
   opt_seps
   | opt_seps opt_skip exprs opt_seps
-                        {
-                         track_written--; //counter for how many lines not to print_track
+    {
+     track_written--; //counter for how many lines not to print_track
 
-                         if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
-                         if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
+     if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
+     if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
 
-                         if (jump_requested) {
-                              jump_requested = 0;
-                              skip = 0;
-                              char* target = pending_jump_label;
-                              pending_jump_label = NULL;
-                              jump(target);
-                              free(target);
-                         }
-                        }
+     if (jump_requested) {
+          jump_requested = 0;
+          skip = 0;
+          char* target = pending_jump_label;
+          pending_jump_label = NULL;
+          jump(target);
+          free(target);
+     }
+    }
   | error
 ;
 
@@ -161,7 +161,7 @@ expr:
                             }
                           }
                          }
-  | GOTO SEP MISC_ID   {if(!skip){
+  | GOTOB SEP MISC_ID   {if(!skip){
                           pending_jump_label = strdup($3);
                           jump_requested = 1;
 

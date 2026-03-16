@@ -16,11 +16,11 @@ main(int argc, char *argv[])
   printf("track_list_csv=%s\n", config.track_list_csv);
 
   debug = config.debug_prints;
-  
+
   h = init_hashmap();
   FILE* mpf = fopen(config.mpf_file, "rb");
   //--------Preprocessor for Labels
-
+  find_labels(h,mpf);
 
   //--------Bison Interpreter
   yyin = mpf;

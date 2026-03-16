@@ -7,6 +7,7 @@
 
 void find_labels(FILE* mpf) {
     char line[MAX_LINE_LENGTH];
+    char clean_line[MAX_LINE_LENGTH];
     int reti;
     regex_t regex;
     regmatch_t pmatch[2];
@@ -18,28 +19,41 @@ void find_labels(FILE* mpf) {
         return;
     }
 
-
     printf("Matches found:\n");
     size_t li = 1;
     long byte_offset = 0;
     while (fgets(line, sizeof(line), mpf)) {
-        // Execute regex match
-        reti = regexec(&regex, line, 2, pmatch, 0);
-        if (!reti) {
-          // pmatch[0].rm_eo is the byte offset relative to the START of 'line'
-          // where the match (the colon) ends.
-          long byoffset_colon = byte_offset + pmatch[0].rm_eo;
-
-          int start = pmatch[1].rm_so; // Start Offset
-          int end = pmatch[1].rm_eo;   // End Offset
-          int length = end - start;
-
-          char label_id[MAX_LINE_LENGTH];
-          strncpy(label_id, &line[start], length);
-          label_id[length] = '\0';
-          printf("Line %zu | Offset %ld | ID: '%s' | Content: %s",
-            li, byoffset_colon, label_id, line);
+        strncpy(clean_line, line, MAX_LINE_LENGTH);
+        char *comment_ptr = strchr(clean_line, ';');
+        if (comment_ptr) {
+            *comment_ptr = '\0'; // Terminate string at the semicolon
         }
+
+        // If the line contains a quote before a colon, it's likely a string
+        char *quote_ptr = strchr(clean_line, '"');
+        char *colon_ptr = strchr(clean_line, ':');
+
+
+        // Execute regex match
+        if (quote_ptr == NULL || (colon_ptr != NULL && colon_ptr < quote_ptr)) {
+          reti = regexec(&regex, clean_line, 2, pmatch, 0);
+          if (!reti) {
+            // pmatch[0].rm_eo is the byte offset relative to the START of 'line'
+            // where the match (the colon) ends.
+            long byoffset_colon = byte_offset + pmatch[0].rm_eo;
+
+            int start = pmatch[1].rm_so; // Start Offset
+            int end = pmatch[1].rm_eo;   // End Offset
+            int length = end - start;
+
+            char label_id[MAX_LINE_LENGTH];
+            strncpy(label_id, &clean_line[start], length);
+            label_id[length] = '\0';
+            printf("Line %zu | Offset %ld | ID: '%s' | Content: %s",
+              li, byoffset_colon, label_id, line);
+          }
+        }
+
         // Update the global file offset for the next line
         // ftell is the most reliable way to handle varying line lengths
         byte_offset = ftell(mpf);

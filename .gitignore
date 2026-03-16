@@ -7,15 +7,18 @@
 *.zip
 
 
-img/
 data/
 backup/
 Backup/
+
+docs/cloud_link.txt
 docs/old
 docs/nc_code_doc
-docs/cloud_link.txt
-docs/Laptop
-docs/manual/
+docs/prompts
+docs/manuals/
+docs/graphics
+
+
 track_visualization/freeglut_test
 track_visualization/pyplot
 track_visualization/opengl/Backup

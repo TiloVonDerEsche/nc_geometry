@@ -41,19 +41,21 @@
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
 %token SEP NEWLINE SEMICOLON COMMENT OTHER
-%token <char*> STRING
-%token <int> INT
-%token <float> FLOAT
 
-%token IF ENDIF REPEAT GOTO
+%token IF ENDIF
+%token GOTOB GOTOF GOTO REPEAT
+%token CALL
+%token <char*> MISC_ID
 
+%token <char*> LABEL
 %token <char*> CMD
 %token <char*> VAR
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
-%token CALL
-%token <char*> MISC_ID
-%token <char*> LABEL
+
+%token <char*> STRING
+%token <int> INT
+%token <float> FLOAT
 
 %nterm <float> val
 %nterm <float> fn

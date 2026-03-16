@@ -64,15 +64,17 @@ extern int yydebug;
     FLOAT = 265,                   /* FLOAT  */
     IF = 266,                      /* IF  */
     ENDIF = 267,                   /* ENDIF  */
-    REPEAT = 268,                  /* REPEAT  */
-    GOTO = 269,                    /* GOTO  */
-    CMD = 270,                     /* CMD  */
-    VAR = 271,                     /* VAR  */
-    SPECIAL_CMD = 272,             /* SPECIAL_CMD  */
-    CUSTOM_VAR = 273,              /* CUSTOM_VAR  */
-    CALL = 274,                    /* CALL  */
-    MISC_ID = 275,                 /* MISC_ID  */
-    LABEL = 276                    /* LABEL  */
+    GOTOB = 268,                   /* GOTOB  */
+    GOTOF = 269,                   /* GOTOF  */
+    GOTO = 270,                    /* GOTO  */
+    REPEAT = 271,                  /* REPEAT  */
+    CMD = 272,                     /* CMD  */
+    VAR = 273,                     /* VAR  */
+    SPECIAL_CMD = 274,             /* SPECIAL_CMD  */
+    CUSTOM_VAR = 275,              /* CUSTOM_VAR  */
+    CALL = 276,                    /* CALL  */
+    MISC_ID = 277,                 /* MISC_ID  */
+    LABEL = 278                    /* LABEL  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -95,7 +97,7 @@ union YYSTYPE
   int INT;                                 /* INT  */
   int bool_expr;                           /* bool_expr  */
 
-#line 99 "grammar.tab.h"
+#line 101 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

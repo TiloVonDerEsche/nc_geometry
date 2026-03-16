@@ -66,17 +66,6 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 if(debug){ printf("A custom Variable: %s\n", yytext); }
                 return CUSTOM_VAR;
               }
-              else if(strcmp(yytext,"CALL") == 0) {
-                return CALL;
-              }
-              else if(strcmp(yytext,"REPEAT") == 0) {
-                if(debug){ puts("A REPEAT!"); }
-                return REPEAT;
-              }
-              else if(strcmp(yytext,"GOTOB") == 0) {
-                if(debug){ puts("A GOTO!"); }
-                return GOTO;
-              }
               else if(strcmp(yytext,"IF") == 0) {
                 if(debug){ puts("An IF!"); }
                 return IF;
@@ -84,6 +73,25 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
               else if(strcmp(yytext,"ENDIF") == 0) {
                 if(debug){ puts("An ENDIF!"); }
                 return ENDIF;
+              }
+              else if(strcmp(yytext,"GOTOB") == 0) {
+                if(debug){ puts("A GOTOB!"); }
+                return GOTOB;
+              }
+              else if(strcmp(yytext,"GOTOF") == 0) {
+                if(debug){ puts("A GOTOF!"); }
+                return GOTOF;
+              }
+              else if(strcmp(yytext,"GOTO") == 0) {
+                if(debug){ puts("A GOTO!"); }
+                return GOTO;
+              }
+              else if(strcmp(yytext,"REPEAT") == 0) {
+                if(debug){ puts("A REPEAT!"); }
+                return REPEAT;
+              }
+              else if(strcmp(yytext,"CALL") == 0) {
+                return CALL;
               }
               else {
                 if(debug){ printf("A MISC_ID: %s\n",yytext); }

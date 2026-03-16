@@ -74,15 +74,9 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 if(debug){ puts("An ENDIF!"); }
                 return ENDIF;
               }
-              else if(strcmp(yytext,"GOTOB") == 0) {
-                if(debug){ puts("A GOTOB!"); }
-                return GOTOB;
-              }
-              else if(strcmp(yytext,"GOTOF") == 0) {
-                if(debug){ puts("A GOTOF!"); }
-                return GOTOF;
-              }
-              else if(strcmp(yytext,"GOTO") == 0) {
+              else if(strcmp(yytext,"GOTOB") == 0 ||
+                      strcmp(yytext,"GOTOF") == 0 ||
+                      strcmp(yytext,"GOTO") == 0) {
                 if(debug){ puts("A GOTO!"); }
                 return GOTO;
               }

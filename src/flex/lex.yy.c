@@ -860,15 +860,9 @@ YY_RULE_SETUP
                 if(debug){ puts("An ENDIF!"); }
                 return ENDIF;
               }
-              else if(strcmp(yytext,"GOTOB") == 0) {
-                if(debug){ puts("A GOTOB!"); }
-                return GOTOB;
-              }
-              else if(strcmp(yytext,"GOTOF") == 0) {
-                if(debug){ puts("A GOTOF!"); }
-                return GOTOF;
-              }
-              else if(strcmp(yytext,"GOTO") == 0) {
+              else if(strcmp(yytext,"GOTOB") == 0 ||
+                      strcmp(yytext,"GOTOF") == 0 ||
+                      strcmp(yytext,"GOTO") == 0) {
                 if(debug){ puts("A GOTO!"); }
                 return GOTO;
               }
@@ -889,7 +883,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 104 "lex.l"
+#line 98 "lex.l"
 {yylval.CMD = strdup(yytext);
                 if(debug){ printf("A command: %s\n", yytext); }
                 return CMD;
@@ -897,7 +891,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 109 "lex.l"
+#line 103 "lex.l"
 {
         if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
         return MISC_ID;
@@ -905,68 +899,68 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 115 "lex.l"
+#line 109 "lex.l"
 { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 116 "lex.l"
+#line 110 "lex.l"
 { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 117 "lex.l"
+#line 111 "lex.l"
 {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 119 "lex.l"
+#line 113 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 121 "lex.l"
+#line 115 "lex.l"
 { if(debug){ printf("A string: %s\n",yytext); } return STRING;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 123 "lex.l"
+#line 117 "lex.l"
 {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 125 "lex.l"
+#line 119 "lex.l"
 {return SEP;}
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 126 "lex.l"
+#line 120 "lex.l"
 {set_var("line", get_var_val("line") + 1); return NEWLINE;}
 	YY_BREAK
 case 17:
 /* rule 17 can match eol */
 YY_RULE_SETUP
-#line 127 "lex.l"
+#line 121 "lex.l"
 {set_var("line", get_var_val("line") + 1); return NEWLINE;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 128 "lex.l"
+#line 122 "lex.l"
 {return yytext[0];}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 129 "lex.l"
+#line 123 "lex.l"
 {return OTHER;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 131 "lex.l"
+#line 125 "lex.l"
 ECHO;
 	YY_BREAK
-#line 970 "lex.yy.c"
+#line 964 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1983,7 +1977,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 131 "lex.l"
+#line 125 "lex.l"
 
 
 

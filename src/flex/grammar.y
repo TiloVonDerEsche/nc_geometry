@@ -43,7 +43,7 @@
 %token SEP NEWLINE SEMICOLON COMMENT OTHER
 
 %token IF ENDIF
-%token GOTOB GOTOF GOTO REPEAT
+%token GOTO REPEAT
 %token CALL
 %token <char*> MISC_ID
 
@@ -151,7 +151,7 @@ expr:
                          }
   | assignment
   | LABEL                //already handled in find_labels.h
-  | GOTOB SEP MISC_ID   {if(!skip){
+  | GOTO SEP MISC_ID   {if(!skip){
                           pending_jump_label = strdup($3);
                           jump_requested = 1;
 

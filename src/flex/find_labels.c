@@ -9,11 +9,7 @@ void find_labels(FILE* mpf) {
     regex_t regex;
     int reti;
 
-    // Compile regex:
-    // ^[a-zA-Z_]      -> Starts with a letter or underscore
-    // [a-zA-Z0-9_]* -> Followed by any number of alphanumeric/underscores
-    // :               -> Followed by a colon
-    reti = regcomp(&regex, "^([a-zA-Z_][a-zA-Z0-9_]*):", REG_EXTENDED);
+    reti = regcomp(&regex, "^([A-Z_][A-Za-z0-9_]*):", REG_EXTENDED);
     if (reti) {
         fprintf(stderr, "Could not compile regex\n");
         return;

@@ -16,10 +16,11 @@ main(int argc, char *argv[])
   printf("track_list_csv=%s\n", config.track_list_csv);
 
   debug = config.debug_prints;
-
+  
+  h = init_hashmap();
   FILE* mpf = fopen(config.mpf_file, "rb");
   //--------Preprocessor for Labels
-  
+
 
   //--------Bison Interpreter
   yyin = mpf;
@@ -32,7 +33,7 @@ main(int argc, char *argv[])
   laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
   //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often.
 
-  h = init_hashmap();
+
 
   yyparse ();
 

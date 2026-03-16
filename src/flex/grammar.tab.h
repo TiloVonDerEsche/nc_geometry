@@ -59,22 +59,22 @@ extern int yydebug;
     SEMICOLON = 260,               /* SEMICOLON  */
     COMMENT = 261,                 /* COMMENT  */
     OTHER = 262,                   /* OTHER  */
-    STRING = 263,                  /* STRING  */
-    INT = 264,                     /* INT  */
-    FLOAT = 265,                   /* FLOAT  */
-    IF = 266,                      /* IF  */
-    ENDIF = 267,                   /* ENDIF  */
-    GOTOB = 268,                   /* GOTOB  */
-    GOTOF = 269,                   /* GOTOF  */
-    GOTO = 270,                    /* GOTO  */
-    REPEAT = 271,                  /* REPEAT  */
+    IF = 263,                      /* IF  */
+    ENDIF = 264,                   /* ENDIF  */
+    GOTOB = 265,                   /* GOTOB  */
+    GOTOF = 266,                   /* GOTOF  */
+    GOTO = 267,                    /* GOTO  */
+    REPEAT = 268,                  /* REPEAT  */
+    CALL = 269,                    /* CALL  */
+    MISC_ID = 270,                 /* MISC_ID  */
+    LABEL = 271,                   /* LABEL  */
     CMD = 272,                     /* CMD  */
     VAR = 273,                     /* VAR  */
     SPECIAL_CMD = 274,             /* SPECIAL_CMD  */
     CUSTOM_VAR = 275,              /* CUSTOM_VAR  */
-    CALL = 276,                    /* CALL  */
-    MISC_ID = 277,                 /* MISC_ID  */
-    LABEL = 278                    /* LABEL  */
+    STRING = 276,                  /* STRING  */
+    INT = 277,                     /* INT  */
+    FLOAT = 278                    /* FLOAT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -83,13 +83,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-  char* STRING;                            /* STRING  */
+  char* MISC_ID;                           /* MISC_ID  */
+  char* LABEL;                             /* LABEL  */
   char* CMD;                               /* CMD  */
   char* VAR;                               /* VAR  */
   char* SPECIAL_CMD;                       /* SPECIAL_CMD  */
   char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
-  char* MISC_ID;                           /* MISC_ID  */
-  char* LABEL;                             /* LABEL  */
+  char* STRING;                            /* STRING  */
   float FLOAT;                             /* FLOAT  */
   float val;                               /* val  */
   float fn;                                /* fn  */

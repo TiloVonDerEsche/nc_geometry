@@ -34,7 +34,7 @@ main(int argc, char *argv[])
   laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
   //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often.
 
-  yyparse ();
+  yyparse();
 
   printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}

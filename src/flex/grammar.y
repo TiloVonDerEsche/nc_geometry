@@ -77,7 +77,7 @@
 
 prog:
   lines YYEOF {printf("%lu tracks written to %s!\n",tid,config.track_list_csv);}
-  | YYEOF     { printf("File %s is empty!\n",config.mpf_file); }
+  | YYEOF     { printf("Warning: File %s is empty!\n",config.mpf_file); }
 ;
 
 lines:

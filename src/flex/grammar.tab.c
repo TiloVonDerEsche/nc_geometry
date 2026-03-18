@@ -115,7 +115,7 @@
   vec3D B = {0,0,0};
 
   Config config = {0};
-  int debug;
+
 
 #line 121 "grammar.tab.c"
 

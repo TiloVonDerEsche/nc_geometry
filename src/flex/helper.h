@@ -37,7 +37,6 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define TO_RAD(deg) ((deg) * PI / 180.0)
 
 //===========Extern Vars===========//
-extern long byte_counter;
 extern int debug;
 extern Config config;
 

@@ -4,10 +4,12 @@
   void set_var(char*, float);
   float get_var_val(char*);
 
-  long byte_counter;
+  long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;
 
   #define MAX_LINE_LEN 1024
+
+  int lfwrap();
 %}
 
 /* label finder */
@@ -55,4 +57,6 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 %%
 
-int lfwrap(){return 1;}
+int lfwrap(){
+    return 1;
+}

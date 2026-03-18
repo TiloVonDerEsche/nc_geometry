@@ -1,8 +1,5 @@
 #include "helper.h"
 
-long byte_counter = 0;
-int debug = 1;
-
 //---khashmap_helper-----//
 
 strfloat_t* init_hashmap() {

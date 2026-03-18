@@ -1,19 +1,7 @@
 #include <stdio.h>
 #include "helper.h"
 
-
 extern void label_finder(FILE* fp);
-
-/*
-extern Config config;
-extern int debug;
-extern strfloat_t* h;
-
-extern void close_hmhis();
-extern FILE* hmhis;
-extern size_t tid;
-extern FILE* tl;
-*/
 
 extern FILE* yyin;
 extern int yyparse();

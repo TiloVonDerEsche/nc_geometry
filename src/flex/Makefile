@@ -9,7 +9,7 @@ helper.o: helper.c helper.h
 main.o: main.c
 	gcc -c main.c -o main.o
 
-lf.yy.c: ./label_finder/lf.l
+./label_finder/lf.yy.c: ./label_finder/lf.l
 	flex -o ./label_finder/lf.yy.c ./label_finder/lf.l
 
 lf.yy.o: ./label_finder/lf.yy.c

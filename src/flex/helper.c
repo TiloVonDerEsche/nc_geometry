@@ -1,4 +1,13 @@
 #include "helper.h"
+ 
+Config config = {0};
+
+int debug = 0;
+
+strfloat_t* h = NULL;
+
+FILE* hmhis = NULL;
+FILE* tl = NULL;
 
 //---khashmap_helper-----//
 
@@ -50,18 +59,6 @@ FILE* init_file(char* f_path, char* f_header) {
 }
 ////////////////////////////////////////////////////////////
 
-
-
-
-void set_var_incr(char* varname, float fnum) {
-    if (incr_mode && is_coord(varname[0])) {
-      set_var(varname, get_var_val(varname)+fnum);
-    }
-    else {
-      set_var(varname,fnum);
-    }
-}
-
 void set_var(char* varname, float fnum) {
   khint_t k;
   int absent;
@@ -85,27 +82,6 @@ float get_var_val(char* varname) {
 
   return 0;
 }
-
-
-//file functions
-
-void close_hmhis() {
-  //delete last redundant comma
-  fseek(hmhis, -3, SEEK_CUR);
-  fprintf(hmhis,"]");
-  fclose(hmhis);
-}
-
-
-
-void write_track_line() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-  //coll_vec,
-  config.hrad, config.vrad);
-}
-
 
 //------Math Functions------//
 

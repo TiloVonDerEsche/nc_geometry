@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include "helper.h"
 
+extern Config config;   
+extern int debug;
+extern strfloat_t* h;
+
+extern FILE* hmhis;
+extern FILE* tl;
+
 extern void label_finder(FILE* fp);
 
 extern FILE* yyin;
@@ -19,7 +26,6 @@ main(int argc, char *argv[])
   printf("mpf_file=%s\n", config.mpf_file);
   printf("track_list_csv=%s\n", config.track_list_csv);
 
-
   debug = config.debug_prints;
 
   h = init_hashmap();
@@ -37,11 +43,10 @@ main(int argc, char *argv[])
   }
   tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
   laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
-  //setvbuf(tl, NULL, _IONBF, 0); takes longer, errors occur more often.
 
   yyparse();
 
-  printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
+  //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}
   fclose(tl);
   return 0;

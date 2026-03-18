@@ -1,3 +1,4 @@
+*.o
 *.exe
 *.bin
 *.dll
@@ -5,6 +6,7 @@
 *.json
 *.mpf
 *.zip
+
 
 
 data/

@@ -4,6 +4,13 @@
 
   #include "helper.h"
 
+  extern Config config;   
+  extern int debug;
+  extern strfloat_t* h;
+
+  extern FILE* hmhis;
+  extern FILE* tl;
+
   extern FILE* yyin;
   extern int yylex();
 
@@ -27,13 +34,6 @@
   void write_track_line();
   int is_coord(char);
 
-  strfloat_t* h;
-
-  FILE* hmhis;
-  FILE* tl;
-
-  extern long byte_counter;
-
   char* pending_jump_label = NULL;
   int jump_requested = 0;
   int incr_mode = 0;
@@ -43,8 +43,6 @@
   size_t tid = 0;
   vec3D A = {0,0,0};
   vec3D B = {0,0,0};
-
-  Config config = {0};
 
 %}
 
@@ -260,24 +258,8 @@ bool_expr:
 %%
 
 void jump(char* label_name) {
-    //size_t llen = strlen(label_name);
-    //printf("\nlabel_len=%zu\n",llen);
 
-    float offset = get_var_val(label_name); //+ strlen(label_name) + 1;
-
-    if (debug) {
-      khint_t k;
-      int absent;
-
-      k = strfloat_get(h, label_name);
-      if ( kh_exist(h, k) ) {
-        printf("Found in hm: label_name=%s\n",label_name);
-        //offset = kh_val(h, k);
-      }
-      else {
-        printf("NOT found in hm: label_name=%s\n",label_name);
-      }
-    }
+    float offset = get_var_val(label_name);
 
     if (offset >= 0) {
         char line_label[256];
@@ -285,7 +267,7 @@ void jump(char* label_name) {
         float original_line = get_var_val(line_label);
 
         set_var("line", original_line); //reset line to line of label
-        byte_counter = offset;          //reset byte_counter to offset of label
+        //byte_counter = offset;          //reset byte_counter to offset of label
         skip = 0;
         jump_requested = 0;
 
@@ -296,10 +278,33 @@ void jump(char* label_name) {
 
         fseek(yyin, (long)offset, SEEK_SET);
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
-        yy_flush_buffer(YY_CURRENT_BUFFER);
+        //yy_flush_buffer(YY_CURRENT_BUFFER);
     }
 }
 
+void write_track_line() {
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+  //coll_vec,
+  config.hrad, config.vrad);
+}
+
+void set_var_incr(char* varname, float fnum) {
+    if (incr_mode && is_coord(varname[0])) {
+      set_var(varname, get_var_val(varname)+fnum);
+    }
+    else {
+      set_var(varname,fnum);
+    }
+}
+
+void close_hmhis() {
+  //delete last redundant comma
+  fseek(hmhis, -3, SEEK_CUR);
+  fprintf(hmhis,"]");
+  fclose(hmhis);
+}
 
 int yyerror(char* s) {
 	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));

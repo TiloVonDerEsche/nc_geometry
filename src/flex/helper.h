@@ -37,22 +37,15 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define TO_RAD(deg) ((deg) * PI / 180.0)
 
 //===========Extern Vars===========//
-extern int debug;
+
 extern Config config;
+extern int debug;
 
 extern strfloat_t* h;
 
-extern size_t tid;
-
-extern FILE* yyin;
-
-extern FILE* tl;
 extern FILE* hmhis;
-
-extern vec3D A;
-extern vec3D B;
-
-extern int incr_mode;
+extern FILE* tl;
+extern FILE* yyin;
 
 //===========Functions===========//
 strfloat_t* init_hashmap();

@@ -1,14 +1,26 @@
-#include <ctype.h>
-#include <math.h>
+#include "helper.h"
 
-#include "khashl.h"
+long byte_counter = 0;
+int debug = 1;
+
 //---khashmap_helper-----//
 
-KHASHL_MAP_INIT(KH_LOCAL,
-  strfloat_t, strfloat,
-  const char*, float,
-  kh_hash_str, kh_eq_str)
+strfloat_t* init_hashmap() {
+  khint_t k;
+  int absent;
 
+  strfloat_t* h = strfloat_init();
+
+  k = strfloat_put(h, "line", &absent);
+  kh_key(h, k) = strdup("line");
+  kh_val(h, k) = 0;
+
+  k = strfloat_put(h, "laser", &absent);
+  kh_key(h, k) = strdup("laser");
+  kh_val(h, k) = 0;
+
+  return h;
+}
 
 //print in JSON object syntax
 void print_hashmap(strfloat_t* h, FILE* destination) {
@@ -27,35 +39,78 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
   fprintf(destination,"},\n"); //replace last comma
 }
 
-//=========================================================//
-//---------------------Helper Functions--------------------//
-//=========================================================//
+FILE* init_file(char* f_path, char* f_header) {
+  printf("Opening: %s in write mode...\n",f_path);
+  FILE* fp = fopen(f_path, "w");
+  if (fp == NULL) {
+      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",f_path);
+      exit(-1);
+  }
 
-typedef struct {
-  float x;
-  float y;
-  float z;
-} vec3D;
+  fprintf(fp,"%s\n",f_header);
 
-typedef struct {
-  int debug_prints;
-  int hmhis_to_stdout;
-  int hmhis_to_file;
-  int tracks_def_by_laser;
-  int track_mid_len;
+  return fp;
+}
+////////////////////////////////////////////////////////////
 
-  char mpf_file[256];
-  char track_list_csv[256];
-  char hmhis_json[256];
 
-  float hrad;
-  float vrad;
-} Config;
+
+
+void set_var_incr(char* varname, float fnum) {
+    if (incr_mode && is_coord(varname[0])) {
+      set_var(varname, get_var_val(varname)+fnum);
+    }
+    else {
+      set_var(varname,fnum);
+    }
+}
+
+void set_var(char* varname, float fnum) {
+  khint_t k;
+  int absent;
+
+  k = strfloat_put(h, varname, &absent);
+  if (absent) {
+    kh_key(h, k) = strdup(varname);}
+  kh_val(h, k) = fnum;
+  //printf("Set %s to %f\n", varname, fnum);
+}
+
+float get_var_val(char* varname) {
+  if (!varname) return 0;
+
+  khint_t k;
+  int absent;
+  k = strfloat_get(h, varname);
+  if ( kh_exist(h, k) ) {
+    return kh_val(h, k);
+  }
+
+  return 0;
+}
+
+
+//file functions
+
+void close_hmhis() {
+  //delete last redundant comma
+  fseek(hmhis, -3, SEEK_CUR);
+  fprintf(hmhis,"]");
+  fclose(hmhis);
+}
+
+
+
+void write_track_line() {
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+  //coll_vec,
+  config.hrad, config.vrad);
+}
 
 
 //------Math Functions------//
-#define PI 3.14159265358979323846
-#define TO_RAD(deg) ((deg) * PI / 180.0)
 
 vec3D rot_x(vec3D p, float t) {
    float rad = TO_RAD(t);
@@ -95,7 +150,24 @@ vec3D rot_z(vec3D p, float t) {
 vec3D rot_xyz(vec3D p, vec3D abc) {
    return rot_x(rot_y(rot_z(p,abc.z),abc.y),abc.x);
 }
+
+vec3D rot_point() {
+    vec3D p = {
+          get_var_val("X"),
+          get_var_val("Y"),
+          get_var_val("Z")};
+    vec3D abc = {
+          get_var_val("A"),
+          get_var_val("B"),
+          get_var_val("C")};
+
+    return rot_xyz(p,abc);
+}
+
 //------------String Functions--------------//
+int is_coord(char c) {
+  return (c == 'X' || c == 'Y' || c == 'Z' || c == 'A' || c == 'B' || c == 'C');
+}
 
 char* trim(char* str) {
     char* end;

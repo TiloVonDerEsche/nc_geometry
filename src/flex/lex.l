@@ -1,12 +1,11 @@
 %{
   #include "grammar.tab.h"
+  //#include "helper.h"
+
   void set_var(char*, float);
   float get_var_val(char*);
-
-  long byte_counter = 0;
-  #define YY_USER_ACTION byte_counter += yyleng;
-
-  int debug;
+  
+  extern int debug;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */

@@ -2,7 +2,17 @@
   #include <stdio.h>
   #include <math.h>
 
-  #include "khashl_helper.h"
+  #include "helper.h"
+
+  extern FILE* yyin;
+  extern int yylex();
+
+  extern void yyrestart(FILE*);
+  struct yy_buffer_state;
+  typedef struct yy_buffer_state *YY_BUFFER_STATE;
+  extern YY_BUFFER_STATE yy_current_buffer; 
+
+  #define YY_CURRENT_BUFFER yy_current_buffer
 
   int yylex (void);
   int yyerror(char* s);
@@ -35,7 +45,7 @@
   vec3D B = {0,0,0};
 
   Config config = {0};
-  int debug;
+
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -290,110 +300,8 @@ void jump(char* label_name) {
     }
 }
 
-//hashmap fns
-vec3D rot_point() {
-    vec3D p = {
-          get_var_val("X"),
-          get_var_val("Y"),
-          get_var_val("Z")};
-    vec3D abc = {
-          get_var_val("A"),
-          get_var_val("B"),
-          get_var_val("C")};
 
-    return rot_xyz(p,abc);
-}
-
-
-void set_var_incr(char* varname, float fnum) {
-    if (incr_mode && is_coord(varname[0])) {
-      set_var(varname, get_var_val(varname)+fnum);
-    }
-    else {
-      set_var(varname,fnum);
-    }
-}
-
-void set_var(char* varname, float fnum) {
-  khint_t k;
-  int absent;
-
-  k = strfloat_put(h, varname, &absent);
-  if (absent) {
-    kh_key(h, k) = strdup(varname);}
-  kh_val(h, k) = fnum;
-  //printf("Set %s to %f\n", varname, fnum);
-}
-
-float get_var_val(char* varname) {
-  if (!varname) return 0;
-
-  khint_t k;
-  int absent;
-  k = strfloat_get(h, varname);
-  if ( kh_exist(h, k) ) {
-    return kh_val(h, k);
-  }
-
-  return 0;
-}
-
-
-strfloat_t* init_hashmap() {
-  khint_t k;
-  int absent;
-
-  strfloat_t* h = strfloat_init();
-
-  k = strfloat_put(h, "line", &absent);
-  kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 0;
-
-  k = strfloat_put(h, "laser", &absent);
-  kh_key(h, k) = strdup("laser");
-  kh_val(h, k) = 0;
-
-  return h;
-}
-
-//file functions
-
-void close_hmhis() {
-  //delete last redundant comma
-  fseek(hmhis, -3, SEEK_CUR);
-  fprintf(hmhis,"]");
-  fclose(hmhis);
-}
-
-FILE* init_file(char* f_path, char* f_header) {
-  printf("Opening: %s in write mode...\n",f_path);
-  FILE* fp = fopen(f_path, "w");
-  if (fp == NULL) {
-      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",f_path);
-      exit(-1);
-  }
-
-  fprintf(fp,"%s\n",f_header);
-
-  return fp;
-}
-
-void write_track_line() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-  //coll_vec,
-  config.hrad, config.vrad);
-}
-
-int is_coord(char c) {
-  return (c == 'X' || c == 'Y' || c == 'Z' || c == 'A' || c == 'B' || c == 'C');
-}
-
-//bison fns
-
-int yyerror(char* s)
-{
+int yyerror(char* s) {
 	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
 	return 0;
 }

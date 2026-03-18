@@ -1,12 +1,27 @@
-#include "lex.yy.c"
-#include "grammar.tab.c"
-#include "find_labels.h"
+#include <stdio.h>
+#include "helper.h"
 
 
+extern void label_finder(FILE* fp);
+
+/*
+extern Config config;
+extern int debug;
+extern strfloat_t* h;
+
+extern void close_hmhis();
+extern FILE* hmhis;
+extern size_t tid;
+extern FILE* tl;
+*/
+
+extern FILE* yyin;
+extern int yyparse();
 
 int
 main(int argc, char *argv[])
 {
+
   // Read the config file
   if (read_config("config.txt", &config) != 0) {
     return 1;
@@ -16,13 +31,15 @@ main(int argc, char *argv[])
   printf("mpf_file=%s\n", config.mpf_file);
   printf("track_list_csv=%s\n", config.track_list_csv);
 
+
   debug = config.debug_prints;
 
   h = init_hashmap();
   FILE* mpf = fopen(config.mpf_file, "rb");
   //--------Preprocessor for Labels
-  find_labels(h,mpf);
-  //print_hashmap(h, stdout);
+  label_finder(mpf);
+  rewind(mpf);
+  print_hashmap(h, stdout);
   //--------Bison Interpreter
   yyin = mpf;
 

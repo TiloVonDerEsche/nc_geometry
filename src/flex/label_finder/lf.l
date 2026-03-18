@@ -1,11 +1,11 @@
+%option prefix="lf"
 %{
-  #include "./../grammar.tab.h"
+  #include "./../helper.h" 
   void set_var(char*, float);
   float get_var_val(char*);
 
-  long byte_counter = 0;
+  long byte_counter;
   #define YY_USER_ACTION byte_counter += yyleng;
-  int debug = 1;
 
   #define MAX_LINE_LEN 1024
 %}
@@ -25,7 +25,7 @@ id       [A-Za-z][_A-Za-z0-9]*
 %%
 
 {letter}{id}":" {
-                char* s = yytext;
+                char* s = lftext;
                 s[strlen(s) - 1] = '\0';
                 if(debug){ printf("A label: %s, len=%lu \n", s,strlen(s)); }
                
@@ -40,21 +40,19 @@ id       [A-Za-z][_A-Za-z0-9]*
                 snprintf(line_label, sizeof(line_label), "%s_line", label_id);
                 set_var(line_label, (float)get_var_val("line"));
 
-                return LABEL;
+                
                 }
 
-"\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",yytext); } return STRING;}
-";"[^\n]*      {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
+"\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",lftext); }}
+";"[^\n]*      {if(debug){ printf("A comment: %s\n", lftext); }}
 
-[ \t]          {return SEP;}
-"\r\n"         {set_var("line", get_var_val("line") + 1); return NEWLINE;}
-"\n"           {set_var("line", get_var_val("line") + 1); return NEWLINE;}
+[ \t]          {}
+"\r\n"         {set_var("line", get_var_val("line") + 1);}
+"\n"           {set_var("line", get_var_val("line") + 1);}
+<<EOF>>        {return 0;}
 
-.	       {return OTHER;}
+.	       {}
 
 %%
 
-
-int yywrap(){
-    return 1;
-}
+int lfwrap(){return 1;}

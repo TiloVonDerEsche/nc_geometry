@@ -12,14 +12,13 @@
   extern FILE* tl;
 
   extern FILE* yyin;
-  extern int yylex();
 
   extern void yyrestart(FILE*);
-  struct yy_buffer_state;
-  typedef struct yy_buffer_state *YY_BUFFER_STATE;
-  extern YY_BUFFER_STATE yy_current_buffer; 
+  //struct yy_buffer_state;
+  //typedef struct yy_buffer_state *YY_BUFFER_STATE;
+  //extern YY_BUFFER_STATE yy_current_buffer; 
 
-  #define YY_CURRENT_BUFFER yy_current_buffer
+  //#define YY_CURRENT_BUFFER yy_current_buffer
 
   int yylex (void);
   int yyerror(char* s);

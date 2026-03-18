@@ -30,6 +30,12 @@ main(int argc, char *argv[])
 
   h = init_hashmap();
   FILE* mpf = fopen(config.mpf_file, "rb");
+  if (mpf == NULL) {
+    fprintf(stderr, "Error: Could not open %s (in read mode)!\
+    \n\rDoes that file exist?\n",config.mpf_file);
+    return -1;
+  }
+
   //--------Preprocessor for Labels
   label_finder(mpf);
   rewind(mpf);

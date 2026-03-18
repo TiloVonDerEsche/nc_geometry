@@ -47,7 +47,8 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-%token SEP NEWLINE SEMICOLON COMMENT OTHER
+%token SEP NEWLINE END OTHER
+%token COMMENT
 
 %token IF ENDIF
 %token GOTO REPEAT
@@ -72,9 +73,11 @@
 %left '+' '-'
 %left '*' '/'
 
-%%
+%%    
+
 prog:
-  lines
+  lines YYEOF {printf("%lu tracks written to %s!\n",tid,config.track_list_csv);}
+  | YYEOF     { printf("File %s is empty!\n",config.mpf_file); }
 ;
 
 lines:

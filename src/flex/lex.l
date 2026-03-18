@@ -119,6 +119,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 "\r\n"         {set_var("line", get_var_val("line") + 1); return NEWLINE;}
 "\n"           {set_var("line", get_var_val("line") + 1); return NEWLINE;}
 ","            {return yytext[0];}
+
 .      		     {return OTHER;}
 
 %%

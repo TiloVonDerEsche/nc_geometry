@@ -168,13 +168,17 @@ expr:
                          }
   | assignment
   | LABEL              {
-                        if(!skip){
+                        if(!skip && ret_jump_label != NULL){
                           if(strcmp($1,ret_jump_label) == 0) {
                             jump_requested = 1;
                             skip = 1;
 
                             target_line = ret_line;
                             target_byte_offset = ret_byte_offset;
+
+                            //ensures only one return to REPEAT
+                            free(ret_jump_label);
+                            ret_jump_label = NULL;
                           }
                         }
                        }

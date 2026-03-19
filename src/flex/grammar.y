@@ -4,7 +4,7 @@
 
   #include "helper.h"
 
-  extern Config config;   
+  extern Config config;
   extern int debug;
   extern strfloat_t* h;
 
@@ -16,13 +16,14 @@
   extern void yyrestart(FILE*);
   //struct yy_buffer_state;
   //typedef struct yy_buffer_state *YY_BUFFER_STATE;
-  //extern YY_BUFFER_STATE yy_current_buffer; 
+  //extern YY_BUFFER_STATE yy_current_buffer;
 
   //#define YY_CURRENT_BUFFER yy_current_buffer
 
   int yylex (void);
   int yyerror(char* s);
-  void jump(char*);
+  void request_jump(char*);
+  void jump(size_t,long);
 
   vec3D rot_point();
 
@@ -33,11 +34,20 @@
   void write_track_line();
   int is_coord(char);
 
-  char* pending_jump_label = NULL;
+
+  size_t target_line = 0;
+  long target_byte_offset = 0;
+
+  char* ret_jump_label = NULL;
+  size_t ret_line = 0;
+  long ret_byte_offset = 0;
+
+
   int jump_requested = 0;
-  int incr_mode = 0;
   int skip = 0;
-  int track_written = 0;
+  int incr_mode = 0;
+
+  int track_written = 0; //bad name, this is a counter to skip lines
 
   size_t tid = 0;
   vec3D A = {0,0,0};
@@ -73,7 +83,7 @@
 %left '+' '-'
 %left '*' '/'
 
-%%    
+%%
 
 prog:
   lines YYEOF {printf("%lu tracks written to %s!\n",tid,config.track_list_csv);}
@@ -97,10 +107,7 @@ line:
      if (jump_requested) {
           jump_requested = 0;
           skip = 0;
-          char* target = pending_jump_label;
-          pending_jump_label = NULL;
-          jump(target);
-          free(target);
+          jump(target_line,target_byte_offset);
      }
     }
   | error
@@ -160,14 +167,29 @@ expr:
                           }
                          }
   | assignment
-  | LABEL                //already handled in find_labels.h
-  | GOTO SEP MISC_ID   {if(!skip){
-                          pending_jump_label = strdup($3);
-                          jump_requested = 1;
+  | LABEL              {
+                        if(!skip){
+                          if(strcmp($1,ret_jump_label) == 0) {
+                            jump_requested = 1;
+                            skip = 1;
 
-                          // Increment skip so the parser ignores everything
-                          // until it reaches the end of the current IF or line
-                          skip = 1;
+                            target_line = ret_line;
+                            target_byte_offset = ret_byte_offset;
+                          }
+                        }
+                       }
+  | GOTO SEP MISC_ID   {if(!skip){
+                          request_jump($3);
+                          }
+                        }
+  | REPEAT SEP MISC_ID SEP MISC_ID
+                        {
+                          if(!skip){
+                            request_jump($3);
+
+                            ret_jump_label = strdup($5);
+                            ret_byte_offset = ftell(yyin);
+                            ret_line = (size_t)get_var_val("line");
                           }
                         }
   | SPECIAL_CMD          {
@@ -259,7 +281,7 @@ bool_expr:
 
 %%
 
-void jump(char* label_name) {
+/*void jump(char* label_name) {
 
     float offset = get_var_val(label_name);
 
@@ -282,6 +304,31 @@ void jump(char* label_name) {
         yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
         //yy_flush_buffer(YY_CURRENT_BUFFER);
     }
+}*/
+void request_jump(char* target) {
+  jump_requested = 1;
+  skip = 1;
+
+  char line_label[32+6];
+  snprintf(line_label, sizeof(line_label), "%s_line", target);
+  target_line = (size_t)get_var_val(line_label);
+  target_byte_offset = get_var_val(target);
+}
+
+void jump(size_t target_line,long target_byte_offset) {
+  if (target_byte_offset >= 0) {
+      set_var("line", target_line);
+      skip = 0;
+      jump_requested = 0;
+
+      if(debug){
+        printf("Jumping to line=%lu, offset=%ld\n\n",
+        target_line,target_byte_offset);
+      }
+
+      fseek(yyin, target_byte_offset, SEEK_SET);
+      yyrestart(yyin);
+  }
 }
 
 void write_track_line() {

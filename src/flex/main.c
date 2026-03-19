@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "helper.h"
 
-extern Config config;   
+extern Config config;
 extern int debug;
 extern strfloat_t* h;
 
@@ -39,7 +39,6 @@ main(int argc, char *argv[])
   //--------Preprocessor for Labels
   label_finder(mpf);
   rewind(mpf);
-  print_hashmap(h, stdout);
   //--------Bison Interpreter
   yyin = mpf;
 

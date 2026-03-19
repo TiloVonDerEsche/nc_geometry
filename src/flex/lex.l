@@ -4,7 +4,7 @@
 
   void set_var(char*, float);
   float get_var_val(char*);
-  
+
   extern int debug;
 %}
 
@@ -111,7 +111,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 [()]      {return yytext[0];}
 
-"\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",yytext); } return STRING;}
+"\""[^\"]*"\"" { if(debug || 1){ printf("A string: %s\n",yytext); } return STRING;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 

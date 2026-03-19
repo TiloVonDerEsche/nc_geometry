@@ -192,8 +192,12 @@ expr:
                             request_jump($3);
 
                             ret_jump_label = strdup($5);
-                            ret_byte_offset = ftell(yyin);
                             ret_line = (size_t)get_var_val("line");
+                            ret_byte_offset = ftell(yyin);
+
+
+                            printf("ret_line=%lu, ret_byte_offset=%ld\n",
+                              ret_line,ret_byte_offset);
                           }
                         }
   | SPECIAL_CMD          {
@@ -325,7 +329,7 @@ void jump(size_t target_line,long target_byte_offset) {
       skip = 0;
       jump_requested = 0;
 
-      if(debug){
+      if(debug || 1){
         printf("Jumping to line=%lu, offset=%ld\n\n",
         target_line,target_byte_offset);
       }

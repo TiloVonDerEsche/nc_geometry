@@ -289,30 +289,6 @@ bool_expr:
 
 %%
 
-/*void jump(char* label_name) {
-
-    float offset = get_var_val(label_name);
-
-    if (offset >= 0) {
-        char line_label[256];
-        snprintf(line_label, sizeof(line_label), "%s_line", label_name);
-        float original_line = get_var_val(line_label);
-
-        set_var("line", original_line); //reset line to line of label
-        //byte_counter = offset;          //reset byte_counter to offset of label
-        skip = 0;
-        jump_requested = 0;
-
-        if(debug){
-          printf("Jumping to line=%d, offset=%d\n\n",
-                (int)original_line,(int)offset);
-        }
-
-        fseek(yyin, (long)offset, SEEK_SET);
-        yyrestart(yyin); //Tells Flex to flush buffers and read from yyin again
-        //yy_flush_buffer(YY_CURRENT_BUFFER);
-    }
-}*/
 void request_jump(char* target) {
   jump_requested = 1;
   skip = 1;

@@ -39,6 +39,7 @@ main(int argc, char *argv[])
   //--------Preprocessor for Labels
   label_finder(mpf);
   rewind(mpf);
+  print_hashmap(h,stdout);
   //--------Bison Interpreter
   yyin = mpf;
 

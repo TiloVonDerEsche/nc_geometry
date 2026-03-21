@@ -31,7 +31,7 @@ strfloat_t* init_hashmap() {
 
   k = strfloat_put(h, "line", &absent);
   kh_key(h, k) = strdup("line");
-  kh_val(h, k) = 0;
+  kh_val(h, k) = 1;
 
   k = strfloat_put(h, "laser", &absent);
   kh_key(h, k) = strdup("laser");

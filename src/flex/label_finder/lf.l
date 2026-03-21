@@ -10,6 +10,7 @@
   #define MAX_LINE_LEN 1024
 
   int lfwrap();
+  size_t line = 1;
 %}
 
 /* label finder */
@@ -26,6 +27,12 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 %%
 
+"REPEAT" {
+  char line_label[MAX_LINE_LEN]; //non-sense size for now
+  snprintf(line_label, sizeof(line_label), "REPEAT_%lu", line);
+  set_var(line_label, (float)byte_counter);
+}
+
 {letter}{id}":" {
                 char* s = lftext;
                 s[strlen(s) - 1] = '\0';
@@ -40,15 +47,15 @@ id       [A-Za-z][_A-Za-z0-9]*
 
                 char line_label[MAX_LINE_LEN+5];
                 snprintf(line_label, sizeof(line_label), "%s_line", label_id);
-                set_var(line_label, (float)get_var_val("line"));
+                set_var(line_label, (float)line);
                 }
 
 "\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",lftext); }}
 ";"[^\n]*      {if(debug){ printf("A comment: %s\n", lftext); }}
 
 [ \t]          {}
-"\r\n"         {set_var("line", get_var_val("line") + 1);}
-"\n"           {set_var("line", get_var_val("line") + 1);}
+"\r\n"         {line++;}
+"\n"           {line++;}
 <<EOF>>        {return 0;}
 
 .	       {}

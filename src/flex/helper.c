@@ -1,7 +1,7 @@
 #include "helper.h"
- 
-Config config = {0};
 
+ //---helper.c is the owner of the shared global vars--//
+Config config = {0};
 int debug = 0;
 
 strfloat_t* h = NULL;
@@ -9,12 +9,24 @@ strfloat_t* h = NULL;
 FILE* hmhis = NULL;
 FILE* tl = NULL;
 
-//---khashmap_helper-----//
+//===========Functions===========//
+//file functions
+FILE* init_file(char* f_path, char* f_header) {
+  printf("Opening: %s in write mode...\n",f_path);
+  FILE* fp = fopen(f_path, "w");
+  if (fp == NULL) {
+      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",f_path);
+      exit(-1);
+  }
 
+  fprintf(fp,"%s\n",f_header);
+
+  return fp;
+}
+//hashmap functions
 strfloat_t* init_hashmap() {
   khint_t k;
   int absent;
-
   strfloat_t* h = strfloat_init();
 
   k = strfloat_put(h, "line", &absent);
@@ -39,25 +51,12 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
           fprintf(destination,"\"%s\":\"%f\",", kh_key(h, k), kh_val(h, k));
       }
   }
-
   //only works if destination is seekable, a pipe f.e. is not
   fseek(destination, -1, SEEK_CUR); //move to pos of last redundant comma
   fprintf(destination,"},\n"); //replace last comma
 }
 
-FILE* init_file(char* f_path, char* f_header) {
-  printf("Opening: %s in write mode...\n",f_path);
-  FILE* fp = fopen(f_path, "w");
-  if (fp == NULL) {
-      fprintf(stderr, "Error: Could not open %s (in write mode)!\n",f_path);
-      exit(-1);
-  }
-
-  fprintf(fp,"%s\n",f_header);
-
-  return fp;
-}
-////////////////////////////////////////////////////////////
+//set_var_incr in grammar.y
 
 void set_var(char* varname, float fnum) {
   khint_t k;
@@ -207,7 +206,7 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "hmhis_to_file") == 0) {
             config->hmhis_to_file = atoi(value);
         }
-        else if (strcmp(key, "tracks_def_by_laser") == 0) { 
+        else if (strcmp(key, "tracks_def_by_laser") == 0) {
             config->tracks_def_by_laser = atoi(value);
         }
          else if (strcmp(key, "track_mid_len") == 0) {

@@ -191,9 +191,14 @@ expr:
                           if(!skip){
                             request_jump($3);
 
+                            size_t line = (size_t)get_var_val("line");;
+
+                            char label[1024]; //non-sense size for now
+                            snprintf(label, sizeof(label), "REPEAT_%lu", line);
+
                             ret_jump_label = strdup($5);
-                            ret_line = (size_t)get_var_val("line");
-                            ret_byte_offset = ftell(yyin);
+                            ret_line = line;
+                            ret_byte_offset = (long)get_var_val(label);
 
 
                             printf("ret_line=%lu, ret_byte_offset=%ld\n",

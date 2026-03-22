@@ -3,6 +3,7 @@
   #include <math.h>
 
   #include "helper.h"
+  #include "stack.c"
 
   extern Config config;
   extern int debug;
@@ -79,6 +80,8 @@
 %nterm <float> fn
 %nterm <float> arith_expr
 %nterm <int> bool_expr
+%nterm <int> lines
+%nterm <int> prog
 
 %left '+' '-'
 %left '*' '/'
@@ -86,13 +89,17 @@
 %%
 
 prog:
-  lines YYEOF {printf("%lu tracks written to %s!\n",tid,config.track_list_csv);}
-  | YYEOF     { printf("Warning: File %s is empty!\n",config.mpf_file); }
+  lines YYEOF {
+    printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
+    if ($1 == 0) {
+      printf("Warning: File %s is empty!\n",config.mpf_file);
+    }
+  }
 ;
 
 lines:
-  %empty
-  | lines line NEWLINE
+  %empty {$$ = 0;}
+  | lines line NEWLINE {$$=$1+1;}
 ;
 
 line:

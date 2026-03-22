@@ -56,33 +56,3 @@ char* peek(Stack *stack) {
     }
     return stack->arr[stack->top];
 }
-
-int main() {
-    Stack stack;
-    initialize(&stack);
-
-    char* str1 = "JUPA";
-    char* str2 = "CON1";
-    char* str3 = "CON2";
-    char* str4 = "BOUCLE";
-
-    push(&stack, str1);
-    printf("Top element: %s\n", peek(&stack));
-
-    push(&stack, str2);
-    printf("Top element: %s\n", peek(&stack));
-
-    push(&stack, str3);
-    printf("Top element: %s\n", peek(&stack));
-
-    push(&stack, str4);
-    printf("Top element: %s\n", peek(&stack));
-
-    while (!is_empty(&stack)) {
-        printf("Top element: %s\n", peek(&stack));
-        printf("Popped element: %s\n", pop(&stack));
-    }
-    printf("Popped element: %s\n", pop(&stack));
-
-    return 0;
-}

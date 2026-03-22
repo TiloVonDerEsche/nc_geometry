@@ -15,8 +15,7 @@ extern int yyparse();
 
 int
 main(int argc, char *argv[])
-{
-
+{  
   // Read the config file
   if (read_config("config.txt", &config) != 0) {
     return 1;

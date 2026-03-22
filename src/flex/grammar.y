@@ -54,6 +54,7 @@
   vec3D A = {0,0,0};
   vec3D B = {0,0,0};
 
+  Stack ret_stack;
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -85,6 +86,11 @@
 
 %left '+' '-'
 %left '*' '/'
+
+%initial-action {
+    init_stack(&ret_stack);
+    //h = init_hashmap();
+}
 
 %%
 
@@ -175,17 +181,19 @@ expr:
                          }
   | assignment
   | LABEL              {
-                        if(!skip && ret_jump_label != NULL){
-                          if(strcmp($1,ret_jump_label) == 0) {
+                        if(!skip && !is_empty(&ret_stack)){
+
+                          Elem top;
+                          peek(&ret_stack, &top);
+
+                          if(strcmp($1,top.label) == 0) {
                             jump_requested = 1;
                             skip = 1;
 
-                            target_line = ret_line;
-                            target_byte_offset = ret_byte_offset;
+                            target_line = top.line;
+                            target_byte_offset = top.byte_offset;
 
-                            //ensures only one return to REPEAT
-                            free(ret_jump_label);
-                            ret_jump_label = NULL;
+                            pop(&ret_stack, &top);
                           }
                         }
                        }
@@ -203,13 +211,17 @@ expr:
                             char label[1024]; //non-sense size for now
                             snprintf(label, sizeof(label), "REPEAT_%lu", line);
 
-                            ret_jump_label = strdup($5);
-                            ret_line = line;
-                            ret_byte_offset = (long)get_var_val(label);
+                            push(&ret_stack,
+                              strdup($5), //return label
+                              line,       //return line
+                              (long)get_var_val(label) //return byte_offset
+                            );
 
-
-                            printf("ret_line=%lu, ret_byte_offset=%ld\n",
-                              ret_line,ret_byte_offset);
+                            Elem temp;
+                            if (peek(&ret_stack, &temp)) {
+                                printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
+                                        temp.label, temp.line, temp.byte_offset);
+                            }
                           }
                         }
   | SPECIAL_CMD          {
@@ -300,7 +312,6 @@ bool_expr:
 
 
 %%
-
 void request_jump(char* target) {
   jump_requested = 1;
   skip = 1;

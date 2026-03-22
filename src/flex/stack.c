@@ -1,20 +1,22 @@
-//https://www.geeksforgeeks.org/c/implement-stack-in-c/
-//removed bool type and renamed some vars
-//also changed stored vars from int to char[STR_LEN]
-
 #include <stdio.h>
 #include <string.h>
 
 #define STACK_SIZE 100
 #define STR_LEN 32 //32 chars for labels allowed, 1 char for \0
 
+typedef struct {
+    char label[STR_LEN+1];
+    size_t line;
+    long byte_offset;
+} Elem;
+
 // Define a structure for the stack
 typedef struct {
-    char arr[STACK_SIZE][STR_LEN+1];
+    Elem arr[STACK_SIZE];
     int top;
 } Stack;
 
-void initialize(Stack *stack) {
+void init_stack(Stack *stack) {
     stack->top = -1;
 }
 
@@ -26,33 +28,34 @@ int is_full(Stack *stack) {
     return stack->top >= STACK_SIZE - 1;
 }
 
-void push(Stack *stack, char* value) {
+int push(Stack *stack, char* label, size_t line, long byte_offset) { //Elem value) {
     if (is_full(stack)) {
         printf("Stack Overflow\n");
-        return;
+        return 0;
     }
+    stack->top++;
+    strncpy(stack->arr[stack->top].label, label, STR_LEN);
+    stack->arr[stack->top].label[STR_LEN] = '\0';
 
-    strncpy(stack->arr[++stack->top], value, STR_LEN);
-    stack->arr[stack->top][STR_LEN] = '\0';
-    printf("Pushed %s onto the stack\n", value);
+    stack->arr[stack->top].line = line;
+    stack->arr[stack->top].byte_offset = byte_offset;
+    //printf("Pushed %s onto the stack\n", value);
+    return 1;
 }
 
-char* pop(Stack *stack) {
+int pop(Stack *stack, Elem *out) {
     if (is_empty(stack)) {
         printf("Stack Underflow\n");
-        return NULL;
-    }
-
-    char* popped = stack->arr[stack->top];
-    stack->top--;
-    printf("Popped %s from the stack\n", popped);
-    return popped;
+        return 0;}
+    *out = stack->arr[stack->top--];
+    return 1;
 }
 
-char* peek(Stack *stack) {
+int peek(Stack *stack,  Elem *out) {
     if (is_empty(stack)) {
         printf("Stack is empty\n");
-        return NULL;
-    }
-    return stack->arr[stack->top];
+        return 0;}
+
+    *out = stack->arr[stack->top];
+    return 1;
 }

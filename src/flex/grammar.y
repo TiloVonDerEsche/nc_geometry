@@ -15,11 +15,6 @@
   extern FILE* yyin;
 
   extern void yyrestart(FILE*);
-  //struct yy_buffer_state;
-  //typedef struct yy_buffer_state *YY_BUFFER_STATE;
-  //extern YY_BUFFER_STATE yy_current_buffer;
-
-  //#define YY_CURRENT_BUFFER yy_current_buffer
 
   int yylex (void);
   int yyerror(char* s);
@@ -35,14 +30,8 @@
   void write_track_line();
   int is_coord(char);
 
-
   size_t target_line = 0;
   long target_byte_offset = 0;
-
-  char* ret_jump_label = NULL;
-  size_t ret_line = 0;
-  long ret_byte_offset = 0;
-
 
   int jump_requested = 0;
   int skip = 0;
@@ -217,10 +206,12 @@ expr:
                               (long)get_var_val(label) //return byte_offset
                             );
 
-                            Elem temp;
-                            if (peek(&ret_stack, &temp)) {
-                                printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
-                                        temp.label, temp.line, temp.byte_offset);
+                            if (debug) {
+                              Elem temp;
+                              if (peek(&ret_stack, &temp)) {
+                                  printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
+                                          temp.label, temp.line, temp.byte_offset);
+                              }
                             }
                           }
                         }
@@ -328,7 +319,7 @@ void jump(size_t target_line,long target_byte_offset) {
       skip = 0;
       jump_requested = 0;
 
-      if(debug || 1){
+      if(debug){
         printf("Jumping to line=%lu, offset=%ld\n\n",
         target_line,target_byte_offset);
       }

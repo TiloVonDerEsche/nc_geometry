@@ -53,7 +53,7 @@
 
 %token IF ENDIF
 %token GOTO REPEAT
-%token CALL
+%token MSG
 %token <char*> MISC_ID
 
 %token <char*> LABEL
@@ -228,7 +228,7 @@ expr:
                             write_track_line();
                           }
                          }
-  | CALL SEP STRING
+  | MSG SEP STRING
   | MISC_ID
   | fn
   | COMMENT
@@ -247,10 +247,10 @@ if_element:
 
 
 assignment:
-  CMD opt_seps '=' opt_seps arith_expr        {if(!skip){set_var_incr($1,$5);}}
-  | VAR opt_seps '=' opt_seps arith_expr          {if(!skip){set_var($1,$5);}}
+  CMD opt_seps '=' opt_seps arith_expr          {if(!skip){set_var_incr($1,$5);}}
+  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
-  | CUSTOM_VAR SEP arith_expr {if(!skip){set_var($1,$3);}}
+  | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -291,8 +291,8 @@ arith_expr:
 ;
 
 bool_expr:
-  arith_expr '<' arith_expr {$$=$1<$3;}
-  | arith_expr '>' arith_expr {$$=$1>$3;}
+  arith_expr '<' arith_expr       {$$=$1<$3;}
+  | arith_expr '>' arith_expr     {$$=$1>$3;}
   | arith_expr '=' '=' arith_expr {$$=$1==$4;}
   | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
   | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
@@ -321,8 +321,7 @@ void jump(size_t target_line,long target_byte_offset) {
 
       if(debug){
         printf("Jumping to line=%lu, offset=%ld\n\n",
-        target_line,target_byte_offset);
-      }
+        target_line,target_byte_offset);}
 
       fseek(yyin, target_byte_offset, SEEK_SET);
       yyrestart(yyin);

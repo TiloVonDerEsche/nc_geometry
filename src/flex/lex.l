@@ -83,8 +83,9 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 if(debug){ puts("A REPEAT!"); }
                 return REPEAT;
               }
-              else if(strcmp(yytext,"CALL") == 0) {
-                return CALL;
+              else if(strcmp(yytext,"CALL") == 0 ||
+                      strcmp(yytext,"MSG") == 0) {
+                return MSG;
               }
               else {
                 if(debug){ printf("A MISC_ID: %s\n",yytext); }

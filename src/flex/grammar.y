@@ -78,7 +78,7 @@
 
 %initial-action {
     init_stack(&ret_stack);
-    //h = init_hashmap();
+    //h = init_hashmap(); //h is global in helper.c for now
 }
 
 %%

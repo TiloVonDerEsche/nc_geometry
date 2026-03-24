@@ -42,7 +42,6 @@ id       [A-Za-z][_A-Za-z0-9]*
                 strncpy(label_id, s, strlen(s));
                 label_id[strlen(s)] = '\0';
 
-
 		            set_var(label_id, (float)byte_counter);
 
                 char line_label[MAX_LINE_LEN+5];

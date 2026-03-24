@@ -4,7 +4,7 @@ hmhis_to_file = 0;
 tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase
 
-mpf_file = "./data/nc_code/test/repeat/wall.mpf";
+mpf_file = "./data/nc_code/test/repeat/windmill.mpf";
 //mpf_file = "./data/nc_code/test/goto/3.mpf";
 //mpf_file = "./data/nc_code/test/dummy/1.mpf"
 //mpf_file = "./data/nc_code/test/abc/CoordSys3D.mpf";

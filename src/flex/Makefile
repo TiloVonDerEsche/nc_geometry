@@ -1,7 +1,7 @@
 # Default to Linux GCC
 CC = gcc
 EXE = .bin
-SUFFIX =
+SUFFIX = _64
 # Change this for different targets (e.g., make TARGET=XP)
 ifeq ($(TARGET), XP)
     CC = i686-w64-mingw32-gcc

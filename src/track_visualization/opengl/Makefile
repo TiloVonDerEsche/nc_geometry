@@ -2,7 +2,7 @@
 SRC = ./t_vis_color.c
 ROOT_DIR = ./../../../
 MXE_PATH = /home/tilo/res/mxe
-
+SUFFIX = _64
 # --- Default Target Logic ---
 # Usage: 
 #   make              (Builds Linux)
@@ -14,18 +14,19 @@ ifeq ($(TARGET), WIN64)
     ARCH = x86_64-w64-mingw32.static
     CC = $(MXE_PATH)/usr/bin/$(ARCH)-gcc
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
-    OUT = $(ROOT_DIR)3d_track_visualizer_64.exe
+    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
     # Windows-specific flags
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`
     LIBS = `$(PKG_CONFIG) --libs --static glut glew` -lopengl32 -lglu32 -lm
     LDFLAGS = -static -Wl,--subsystem,windows
     
 else ifeq ($(TARGET), XP)
+    SUFFIX = _32
     # Note: Ensure you have the i686 target installed in MXE
     ARCH = i686-w64-mingw32.static
     CC = $(MXE_PATH)/usr/bin/$(ARCH)-gcc
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
-    OUT = $(ROOT_DIR)3d_track_visualizer_32.exe
+    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`
     LIBS = `$(PKG_CONFIG) --libs --static glut glew` -lopengl32 -lglu32 -lm
     LDFLAGS = -static -Wl,--subsystem,windows
@@ -33,7 +34,7 @@ else ifeq ($(TARGET), XP)
 else
     # Default: Linux (Mint)
     CC = gcc
-    OUT = $(ROOT_DIR)3d_track_visualizer.bin
+    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).bin
     CFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
     LIBS = -L/home/tilo/res/freeglut/build/lib -L/home/tilo/res/glew/lib \
            -lglut -lGLEW -lGL -lGLU -lm

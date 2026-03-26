@@ -1,6 +1,7 @@
 #!/bin/bash
 echo "Compiling generate_track_list.exe..."
-make -C ./src/flex windows
+make -C ./src/flex TARGET=WIN64
+make -C ./src/flex clean
 
 # Check for errors
 if [ $? -eq 0 ]; then

@@ -1,19 +1,22 @@
 # Default to Linux GCC
 CC = gcc
 EXE = .bin
+SUFFIX =
 # Change this for different targets (e.g., make TARGET=XP)
 ifeq ($(TARGET), XP)
     CC = i686-w64-mingw32-gcc
     EXE = .exe
     LDFLAGS = -static
+    SUFFIX = _32
 else ifeq ($(TARGET), WIN64)
     CC = x86_64-w64-mingw32-gcc
     EXE = .exe
     LDFLAGS = -static
+    SUFFIX = _64
 endif
 
 OBJS = main.o lex.yy.o lf.yy.o label_finder.o grammar.tab.o helper.o
-OUT = ./../../generate_track_list$(EXE)
+OUT = ./../../generate_track_list$(SUFFIX)$(EXE)
 
 $(OUT): $(OBJS)
 	$(CC) $(OBJS) -o $(OUT) -lm $(LDFLAGS)

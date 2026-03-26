@@ -1,6 +1,6 @@
 # --- Configuration ---
 SRC = ./t_vis_color.c
-ROOT_DIR = ./../../../../
+ROOT_DIR = ./../../../
 MXE_PATH = /home/tilo/res/mxe
 
 # --- Default Target Logic ---
@@ -8,6 +8,7 @@ MXE_PATH = /home/tilo/res/mxe
 #   make              (Builds Linux)
 #   make TARGET=WIN64 (Builds Windows 64-bit via MXE)
 #   make TARGET=XP    (Builds Windows 32-bit via MXE)
+# Requires MXE to be installed and properly setup locally!!!
 
 ifeq ($(TARGET), WIN64)
     ARCH = x86_64-w64-mingw32.static

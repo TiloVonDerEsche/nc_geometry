@@ -1,5 +1,4 @@
 #!/bin/bash
-clear
 echo "Compiling generate_track_list.exe..."
 make -C ./src/flex windows
 
@@ -11,4 +10,5 @@ else
 fi
 echo ""
 
-./src/track_visualization/opengl/mult_color/crosscompile_to_win.sh
+make -C ./src/track_visualization/opengl TARGET=WIN64
+make -C ./src/track_visualization/opengl clean

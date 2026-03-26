@@ -1,5 +1,4 @@
 #!/bin/bash
-clear
 echo "Compiling for Windows XP (32-bit)..."
 
 # Call make with the XP target
@@ -10,3 +9,6 @@ if [ $? -eq 0 ]; then
 else
   echo "Compilation failed."
 fi
+
+make -C ./src/track_visualization/opengl TARGET=XP
+make -C ./src/track_visualization/opengl clean

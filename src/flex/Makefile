@@ -40,4 +40,4 @@ label_finder.o: ./label_finder/label_finder.c
 	$(CC) -c ./label_finder/label_finder.c -o label_finder.o
 
 clean:
-	rm -f *.o *.yy.c *.tab.c *.tab.h *.output ./label_finder/*.yy.c $(OUT)
+	rm -f *.o *.yy.c *.tab.c *.tab.h *.output ./label_finder/*.yy.c

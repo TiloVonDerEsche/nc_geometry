@@ -36,6 +36,7 @@
   int jump_requested = 0;
   int skip = 0;
   int incr_mode = 0;
+  int rot_mode = 0;
 
   int track_written = 0; //bad name, this is a counter to skip lines
 
@@ -50,15 +51,16 @@
 
 %token SEP NEWLINE END OTHER
 %token COMMENT
+%token MSG
 
 %token IF ENDIF
 %token GOTO REPEAT
-%token MSG
+%token ROT
 %token <char*> MISC_ID
 
 %token <char*> LABEL
-%token <char*> CMD
 %token <char*> VAR
+%token <char*> CMD
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
 
@@ -101,6 +103,7 @@ line:
   opt_seps
   | opt_seps opt_skip exprs opt_seps
     {
+     rot_mode = 0; //reset linewise
      track_written--; //counter for how many lines not to print_track
 
      if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
@@ -156,18 +159,29 @@ expr:
                                 default: break;
                               }
                             }
-                            else if(is_coord($1[0])
-                              && !config.tracks_def_by_laser && !(track_written>0)) {
-                              B = rot_point();
-                              write_track_line();
-                              A = rot_point();
-                              //prevent mult writes in line with mult coord cmds
-                              track_written = config.track_mid_len;
+                            else if (is_coord($1[0])) {
+                              if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
+                                && rot_mode) {
+                                  char rot_coord[6];
+                                  snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", $1[0]);
+                                  set_var(rot_coord, $2);
+                              }
+
+                              else if (!config.tracks_def_by_laser && !(track_written>0))
+                              {
+                                B = rot_point();
+                                write_track_line();
+                                A = rot_point();
+                                //prevent mult writes in line with mult coord cmds
+                                track_written = config.track_mid_len;
+                              }
                             }
 
-                            set_var($1,$2);
+                            if (!rot_mode) {
+                            set_var($1,$2);}
                           }
                          }
+  | ROT SEP            {rot_mode = 1;}
   | assignment
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){

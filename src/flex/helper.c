@@ -119,8 +119,8 @@ vec3D rot_z(vec3D p, float t) {
    };
 }
 
-vec3D rot_xyz(vec3D p, vec3D abc) {
-   return rot_x(rot_y(rot_z(p,abc.z),abc.y),abc.x);
+vec3D rot_xyz(vec3D p, vec3D rot) {
+   return rot_x(rot_y(rot_z(p,rot.z),rot.y),rot.x);
 }
 
 vec3D rot_point() {
@@ -128,12 +128,12 @@ vec3D rot_point() {
           get_var_val("X"),
           get_var_val("Y"),
           get_var_val("Z")};
-    vec3D abc = {
-          get_var_val("A"),
-          get_var_val("B"),
-          get_var_val("C")};
+    vec3D rot = {
+          get_var_val("ROT_X"),
+          get_var_val("ROT_Y"),
+          get_var_val("ROT_Z")};
 
-    return rot_xyz(p,abc);
+    return rot_xyz(p,rot);
 }
 
 //------------String Functions--------------//

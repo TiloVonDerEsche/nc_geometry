@@ -120,9 +120,11 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
-[ \t]      		 {return SEP;}
-"\r\n"         {set_var("line", get_var_val("line") + 1); return NEWLINE;}
-"\n"           {set_var("line", get_var_val("line") + 1); return NEWLINE;}
+[ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
+"\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}
+                set_var("line", get_var_val("line") + 1); return NEWLINE;}
+"\n"           {if(debug){ printf("A NEWLINE!\n\n");}
+                set_var("line", get_var_val("line") + 1); return NEWLINE;}
 ","            {return yytext[0];}
 
 .      		     {return OTHER;}

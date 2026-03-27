@@ -150,7 +150,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-  | CMD arith_expr       {
+  | CMD arith_expr       { puts("YES");
                           if(!skip){
                             if($1[0] == 'G') {
                               switch((int)$2) {
@@ -160,8 +160,10 @@ expr:
                               }
                             }
                             else if (is_coord($1[0])) {
+                              puts("is_coord!");
                               if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
                                 && rot_mode) {
+                                  puts("rot_coord being created!!!");
                                   char rot_coord[6];
                                   snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", $1[0]);
                                   set_var(rot_coord, $2);
@@ -181,7 +183,7 @@ expr:
                             set_var($1,$2);}
                           }
                          }
-  | ROT SEP            {rot_mode = 1;}
+  | ROT                {rot_mode = 1;puts("rot_mode=1!\n");}
   | assignment
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){

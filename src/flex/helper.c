@@ -4,7 +4,7 @@
 Config config = {0};
 int debug = 0;
 
-//vec3D origin_offset;
+vec3D origin_offset = {0,0,0};
 strfloat_t* h = NULL;
 
 FILE* hmhis = NULL;
@@ -194,6 +194,19 @@ vec3D rot_point() {
 
     return rot_xyz(p,rot);
 }
+
+vec3D to_world_coords(vec3D local_pt) {
+  vec3D global_pt = local_pt + origin_offset;
+
+  vec3D abc = {
+        get_var_val("A"),
+        get_var_val("B"),
+        get_var_val("C")};
+  global_pt = rot_xyz(global_pt, abc);
+
+  return global_pt;
+}
+
 
 //------------String Functions--------------//
 int is_coord(char c) {

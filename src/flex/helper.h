@@ -37,6 +37,7 @@ KHASHL_MAP_INIT(KH_LOCAL,
 extern Config config;
 extern int debug;
 
+extern vec3D origin_offset;
 extern strfloat_t* h;
 
 extern FILE* hmhis;

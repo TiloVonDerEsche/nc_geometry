@@ -1362,7 +1362,7 @@ yyreduce:
 
   case 19: /* expr: ROT  */
 #line 188 "grammar.y"
-                       {rot_mode = 1;puts("rot_mode=1!\n");}
+                       {rot_mode = 1;}
 #line 1367 "grammar.tab.c"
     break;
 
@@ -1863,18 +1863,26 @@ vec3D rot_tracks(vec3D rot) {
 */
 
 void modify_tl() {
+    FILE *fr = fopen("./data/track_list.csv", "rb");
     FILE *fw = fopen("./data/temp_tl.csv", "w"); // Write to a temporary file
 
     if (!fw) return;
 
+    char line[2048];
     size_t tid = 0;
     vec3D A = {0}, B = {0};
     float puis_laser = 0, vit_tir = 0;
 
-    // %*f tells fscanf to read the float but NOT store it in a variable
     const char* read_fmt = "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %*f, %*f, %*f, %*f, %*f\n";
-    rewind(tl);
-    while (fscanf(tl, read_fmt, &tid, &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir) == 9) {
+
+    //Header
+    fgets(line, sizeof(line), fr);
+    fprintf("%s",line);
+
+    while (fgets(line, sizeof(line), fr)) {
+        int found = sscanf(line, read_fmt, &tid,
+          &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir);
+        if (found!=9) {continue;}
 
         // 1. Modify your vectors here
         A.x += 1.0f;

@@ -91,6 +91,7 @@
 prog:
   lines YYEOF {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
+    modify_tl();
     if ($1 == 0) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
     }
@@ -153,7 +154,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-  | CMD arith_expr       { puts("YES");
+  | CMD arith_expr       {
                           if(!skip){
                             if($1[0] == 'G') {
                               switch((int)$2) {
@@ -163,10 +164,8 @@ expr:
                               }
                             }
                             else if (is_coord($1[0])) {
-                              puts("is_coord!");
                               if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
                                 && rot_mode) {
-                                  puts("rot_coord being created!!!");
                                   char rot_coord[6];
                                   snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", $1[0]);
                                   set_var(rot_coord, $2);
@@ -186,7 +185,7 @@ expr:
                             set_var($1,$2);}
                           }
                          }
-  | ROT                {rot_mode = 1;puts("rot_mode=1!\n");}
+  | ROT                {rot_mode = 1;}
   | assignment
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){
@@ -399,7 +398,7 @@ void modify_tl() {
 
     // %*f tells fscanf to read the float but NOT store it in a variable
     const char* read_fmt = "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %*f, %*f, %*f, %*f, %*f\n";
-
+    rewind(tl);
     while (fscanf(tl, read_fmt, &tid, &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir) == 9) {
 
         // 1. Modify your vectors here
@@ -409,6 +408,10 @@ void modify_tl() {
         // 2. Write back in the original format
         // Note: You'll need to decide what to put for the values you skipped
         // during reading (here I used 0.0 for the laser/config vars)
+        printf("Writing: %lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
+                //coll_vec,
+                config.hrad, config.vrad);
         fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
                 tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
                 //coll_vec,

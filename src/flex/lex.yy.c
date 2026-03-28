@@ -885,7 +885,7 @@ case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
 #line 119 "lex.l"
-{ if(debug || 1){ printf("A string: %s\n",yytext); } return STRING;}
+{ if(debug){ printf("A string: %s\n",yytext); } return STRING;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP

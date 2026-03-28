@@ -586,13 +586,13 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    92,    92,   101,   102,   106,   107,   121,   125,   126,
-     130,   131,   135,   136,   140,   141,   145,   145,   156,   189,
-     190,   191,   208,   212,   237,   250,   251,   252,   253,   257,
-     258,   262,   263,   264,   269,   270,   271,   272,   277,   281,
-     285,   286,   290,   294,   295,   296,   297,   298,   302,   303,
-     304,   305,   306,   307,   308,   309,   313,   314,   315,   316,
-     317,   318,   319,   320
+       0,    92,    92,   102,   103,   107,   108,   122,   126,   127,
+     131,   132,   136,   137,   141,   142,   146,   146,   157,   188,
+     189,   190,   207,   211,   236,   249,   250,   251,   252,   256,
+     257,   261,   262,   263,   268,   269,   270,   271,   276,   280,
+     284,   285,   289,   293,   294,   295,   296,   297,   301,   302,
+     303,   304,   305,   306,   307,   308,   312,   313,   314,   315,
+     316,   317,   318,   319
 };
 #endif
 
@@ -1264,27 +1264,28 @@ yyreduce:
 #line 92 "grammar.y"
               {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
+    modify_tl();
     if ((yyvsp[-1].lines) == 0) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
     }
   }
-#line 1272 "grammar.tab.c"
+#line 1273 "grammar.tab.c"
     break;
 
   case 3: /* lines: %empty  */
-#line 101 "grammar.y"
+#line 102 "grammar.y"
          {(yyval.lines) = 0;}
-#line 1278 "grammar.tab.c"
+#line 1279 "grammar.tab.c"
     break;
 
   case 4: /* lines: lines line NEWLINE  */
-#line 102 "grammar.y"
+#line 103 "grammar.y"
                        {(yyval.lines)=(yyvsp[-2].lines)+1;}
-#line 1284 "grammar.tab.c"
+#line 1285 "grammar.tab.c"
     break;
 
   case 6: /* line: opt_seps opt_skip exprs opt_seps  */
-#line 108 "grammar.y"
+#line 109 "grammar.y"
     {
      rot_mode = 0; //reset linewise
      track_written--; //counter for how many lines not to print_track
@@ -1298,34 +1299,34 @@ yyreduce:
           jump(target_line,target_byte_offset);
      }
     }
-#line 1302 "grammar.tab.c"
+#line 1303 "grammar.tab.c"
     break;
 
   case 16: /* $@1: %empty  */
-#line 145 "grammar.y"
+#line 146 "grammar.y"
                    {
       if (!(yyvsp[0].bool_expr)) {
           skip++;
           if(debug) {printf("Skip=%d\n",skip);}
       }
   }
-#line 1313 "grammar.tab.c"
+#line 1314 "grammar.tab.c"
     break;
 
   case 17: /* expr: IF SEP bool_expr $@1 if_body ENDIF  */
-#line 150 "grammar.y"
+#line 151 "grammar.y"
                   {
       if (skip > 0) {
         skip--;
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-#line 1324 "grammar.tab.c"
+#line 1325 "grammar.tab.c"
     break;
 
   case 18: /* expr: CMD arith_expr  */
-#line 156 "grammar.y"
-                         { puts("YES");
+#line 157 "grammar.y"
+                         {
                           if(!skip){
                             if((yyvsp[-1].CMD)[0] == 'G') {
                               switch((int)(yyvsp[0].arith_expr)) {
@@ -1335,10 +1336,8 @@ yyreduce:
                               }
                             }
                             else if (is_coord((yyvsp[-1].CMD)[0])) {
-                              puts("is_coord!");
                               if (((yyvsp[-1].CMD)[0] == 'X' || (yyvsp[-1].CMD)[0] == 'Y' || (yyvsp[-1].CMD)[0] == 'Z' )
                                 && rot_mode) {
-                                  puts("rot_coord being created!!!");
                                   char rot_coord[6];
                                   snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", (yyvsp[-1].CMD)[0]);
                                   set_var(rot_coord, (yyvsp[0].arith_expr));
@@ -1358,17 +1357,17 @@ yyreduce:
                             set_var((yyvsp[-1].CMD),(yyvsp[0].arith_expr));}
                           }
                          }
-#line 1362 "grammar.tab.c"
+#line 1361 "grammar.tab.c"
     break;
 
   case 19: /* expr: ROT  */
-#line 189 "grammar.y"
+#line 188 "grammar.y"
                        {rot_mode = 1;puts("rot_mode=1!\n");}
-#line 1368 "grammar.tab.c"
+#line 1367 "grammar.tab.c"
     break;
 
   case 21: /* expr: LABEL  */
-#line 191 "grammar.y"
+#line 190 "grammar.y"
                        {
                         if(!skip && !is_empty(&ret_stack)){
 
@@ -1386,20 +1385,20 @@ yyreduce:
                           }
                         }
                        }
-#line 1390 "grammar.tab.c"
+#line 1389 "grammar.tab.c"
     break;
 
   case 22: /* expr: GOTO SEP MISC_ID  */
-#line 208 "grammar.y"
+#line 207 "grammar.y"
                        {if(!skip){
                           request_jump((yyvsp[0].MISC_ID));
                           }
                         }
-#line 1399 "grammar.tab.c"
+#line 1398 "grammar.tab.c"
     break;
 
   case 23: /* expr: REPEAT SEP MISC_ID SEP MISC_ID  */
-#line 213 "grammar.y"
+#line 212 "grammar.y"
                         {
                           if(!skip){
                             request_jump((yyvsp[-2].MISC_ID));
@@ -1424,11 +1423,11 @@ yyreduce:
                             }
                           }
                         }
-#line 1428 "grammar.tab.c"
+#line 1427 "grammar.tab.c"
     break;
 
   case 24: /* expr: SPECIAL_CMD  */
-#line 237 "grammar.y"
+#line 236 "grammar.y"
                          {
                           if(strcmp((yyvsp[0].SPECIAL_CMD),"LASER_ON") == 0) {
                             set_var("laser",1);
@@ -1442,167 +1441,167 @@ yyreduce:
                             write_track_line();
                           }
                          }
-#line 1446 "grammar.tab.c"
+#line 1445 "grammar.tab.c"
     break;
 
   case 34: /* assignment: CMD opt_seps '=' opt_seps arith_expr  */
-#line 269 "grammar.y"
+#line 268 "grammar.y"
                                                 {if(!skip){set_var_incr((yyvsp[-4].CMD),(yyvsp[0].arith_expr));}}
-#line 1452 "grammar.tab.c"
+#line 1451 "grammar.tab.c"
     break;
 
   case 35: /* assignment: VAR opt_seps '=' opt_seps arith_expr  */
-#line 270 "grammar.y"
+#line 269 "grammar.y"
                                                 {if(!skip){set_var((yyvsp[-4].VAR),(yyvsp[0].arith_expr));}}
-#line 1458 "grammar.tab.c"
+#line 1457 "grammar.tab.c"
     break;
 
   case 36: /* assignment: CUSTOM_VAR opt_seps '=' opt_seps arith_expr  */
-#line 271 "grammar.y"
+#line 270 "grammar.y"
                                                 {if(!skip){set_var((yyvsp[-4].CUSTOM_VAR),(yyvsp[0].arith_expr));}}
-#line 1464 "grammar.tab.c"
+#line 1463 "grammar.tab.c"
     break;
 
   case 37: /* assignment: CUSTOM_VAR SEP arith_expr  */
-#line 272 "grammar.y"
+#line 271 "grammar.y"
                                                 {if(!skip){set_var((yyvsp[-2].CUSTOM_VAR),(yyvsp[0].arith_expr));}}
-#line 1470 "grammar.tab.c"
+#line 1469 "grammar.tab.c"
     break;
 
   case 38: /* val: VAR  */
-#line 277 "grammar.y"
+#line 276 "grammar.y"
                  {
                   /*printf("Getting VAR=%s\n",$1);*/
                   (yyval.val) = get_var_val((yyvsp[0].VAR));
                  }
-#line 1479 "grammar.tab.c"
+#line 1478 "grammar.tab.c"
     break;
 
   case 39: /* val: CUSTOM_VAR  */
-#line 281 "grammar.y"
+#line 280 "grammar.y"
                  {
                   /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
                   (yyval.val) = get_var_val((yyvsp[0].CUSTOM_VAR));
                  }
-#line 1488 "grammar.tab.c"
+#line 1487 "grammar.tab.c"
     break;
 
   case 40: /* val: INT  */
-#line 285 "grammar.y"
+#line 284 "grammar.y"
                  {(yyval.val)=(yyvsp[0].INT);}
-#line 1494 "grammar.tab.c"
+#line 1493 "grammar.tab.c"
     break;
 
   case 41: /* val: FLOAT  */
-#line 286 "grammar.y"
+#line 285 "grammar.y"
                  {(yyval.val)=(yyvsp[0].FLOAT);}
-#line 1500 "grammar.tab.c"
+#line 1499 "grammar.tab.c"
     break;
 
   case 42: /* fn: MISC_ID '(' params ')'  */
-#line 290 "grammar.y"
+#line 289 "grammar.y"
                          {(yyval.fn)=0;}
-#line 1506 "grammar.tab.c"
+#line 1505 "grammar.tab.c"
     break;
 
   case 48: /* arith_expr: val  */
-#line 302 "grammar.y"
+#line 301 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].val);}
-#line 1512 "grammar.tab.c"
+#line 1511 "grammar.tab.c"
     break;
 
   case 49: /* arith_expr: fn  */
-#line 303 "grammar.y"
+#line 302 "grammar.y"
               {(yyval.arith_expr)=(yyvsp[0].fn);}
-#line 1518 "grammar.tab.c"
+#line 1517 "grammar.tab.c"
     break;
 
   case 50: /* arith_expr: arith_expr '+' arith_expr  */
-#line 304 "grammar.y"
+#line 303 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)+(yyvsp[0].arith_expr); /*printf("%f+%f=%f\n", $1,$3,$$);*/}
-#line 1524 "grammar.tab.c"
+#line 1523 "grammar.tab.c"
     break;
 
   case 51: /* arith_expr: arith_expr '-' arith_expr  */
-#line 305 "grammar.y"
+#line 304 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)-(yyvsp[0].arith_expr);}
-#line 1530 "grammar.tab.c"
+#line 1529 "grammar.tab.c"
     break;
 
   case 52: /* arith_expr: arith_expr '*' arith_expr  */
-#line 306 "grammar.y"
+#line 305 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)*(yyvsp[0].arith_expr);}
-#line 1536 "grammar.tab.c"
+#line 1535 "grammar.tab.c"
     break;
 
   case 53: /* arith_expr: arith_expr '/' arith_expr  */
-#line 307 "grammar.y"
+#line 306 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-2].arith_expr)/(yyvsp[0].arith_expr);}
-#line 1542 "grammar.tab.c"
+#line 1541 "grammar.tab.c"
     break;
 
   case 54: /* arith_expr: '(' arith_expr ')'  */
-#line 308 "grammar.y"
+#line 307 "grammar.y"
                               {(yyval.arith_expr)=(yyvsp[-1].arith_expr);}
-#line 1548 "grammar.tab.c"
+#line 1547 "grammar.tab.c"
     break;
 
   case 55: /* arith_expr: '-' arith_expr  */
-#line 309 "grammar.y"
+#line 308 "grammar.y"
                               {(yyval.arith_expr)=-(yyvsp[0].arith_expr);}
-#line 1554 "grammar.tab.c"
+#line 1553 "grammar.tab.c"
     break;
 
   case 56: /* bool_expr: arith_expr '<' arith_expr  */
-#line 313 "grammar.y"
+#line 312 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-2].arith_expr)<(yyvsp[0].arith_expr);}
-#line 1560 "grammar.tab.c"
+#line 1559 "grammar.tab.c"
     break;
 
   case 57: /* bool_expr: arith_expr '>' arith_expr  */
-#line 314 "grammar.y"
+#line 313 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-2].arith_expr)>(yyvsp[0].arith_expr);}
-#line 1566 "grammar.tab.c"
+#line 1565 "grammar.tab.c"
     break;
 
   case 58: /* bool_expr: arith_expr '=' '=' arith_expr  */
-#line 315 "grammar.y"
+#line 314 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-3].arith_expr)==(yyvsp[0].arith_expr);}
-#line 1572 "grammar.tab.c"
+#line 1571 "grammar.tab.c"
     break;
 
   case 59: /* bool_expr: arith_expr '!' '=' arith_expr  */
-#line 316 "grammar.y"
+#line 315 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-3].arith_expr)!=(yyvsp[0].arith_expr);}
-#line 1578 "grammar.tab.c"
+#line 1577 "grammar.tab.c"
     break;
 
   case 60: /* bool_expr: arith_expr '<' '=' arith_expr  */
-#line 317 "grammar.y"
+#line 316 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-3].arith_expr)<=(yyvsp[0].arith_expr);}
-#line 1584 "grammar.tab.c"
+#line 1583 "grammar.tab.c"
     break;
 
   case 61: /* bool_expr: arith_expr '>' '=' arith_expr  */
-#line 318 "grammar.y"
+#line 317 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-3].arith_expr)>=(yyvsp[0].arith_expr);}
-#line 1590 "grammar.tab.c"
+#line 1589 "grammar.tab.c"
     break;
 
   case 62: /* bool_expr: '!' bool_expr  */
-#line 319 "grammar.y"
+#line 318 "grammar.y"
                                   {(yyval.bool_expr)=!(yyvsp[0].bool_expr);}
-#line 1596 "grammar.tab.c"
+#line 1595 "grammar.tab.c"
     break;
 
   case 63: /* bool_expr: '(' bool_expr ')'  */
-#line 320 "grammar.y"
+#line 319 "grammar.y"
                                   {(yyval.bool_expr)=(yyvsp[-1].bool_expr);}
-#line 1602 "grammar.tab.c"
+#line 1601 "grammar.tab.c"
     break;
 
 
-#line 1606 "grammar.tab.c"
+#line 1605 "grammar.tab.c"
 
       default: break;
     }
@@ -1795,7 +1794,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 324 "grammar.y"
+#line 323 "grammar.y"
 
 void request_jump(char* target) {
   jump_requested = 1;
@@ -1874,7 +1873,7 @@ void modify_tl() {
 
     // %*f tells fscanf to read the float but NOT store it in a variable
     const char* read_fmt = "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %*f, %*f, %*f, %*f, %*f\n";
-
+    rewind(tl);
     while (fscanf(tl, read_fmt, &tid, &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir) == 9) {
 
         // 1. Modify your vectors here
@@ -1884,6 +1883,10 @@ void modify_tl() {
         // 2. Write back in the original format
         // Note: You'll need to decide what to put for the values you skipped
         // during reading (here I used 0.0 for the laser/config vars)
+        printf("Writing: %lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
+                //coll_vec,
+                config.hrad, config.vrad);
         fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
                 tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
                 //coll_vec,

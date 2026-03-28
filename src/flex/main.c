@@ -15,7 +15,7 @@ extern int yyparse();
 
 int
 main(int argc, char *argv[])
-{  
+{
   // Read the config file
   if (read_config("config.txt", &config) != 0) {
     return 1;
@@ -38,7 +38,7 @@ main(int argc, char *argv[])
   //--------Preprocessor for Labels
   label_finder(mpf);
   rewind(mpf);
-  print_hashmap(h,stdout);
+  //print_hashmap(h,stdout);
   //--------Bison Interpreter
   yyin = mpf;
 

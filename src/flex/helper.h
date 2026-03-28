@@ -61,11 +61,15 @@ void set_var(char* varname, float fnum);
 float get_var_val(char* varname);
 
 //------Math Functions------//
+vec3D vec3D_add(vec3D p1, vec3D p2);
 vec3D rot_x(vec3D p, float t);
 vec3D rot_y(vec3D p, float t);
 vec3D rot_z(vec3D p, float t);
 vec3D rot_xyz(vec3D p, vec3D abc);
-vec3D rot_point(); //rots XYZ by ABC, uses get_var_val from hashmap
+vec3D rot_point(vec3D p); //rots XYZ by ABC, uses get_var_val from hashmap
+vec3D abc_point(vec3D p);
+vec3D to_world_coords(vec3D local_p);
+vec3D net_point();
 //------------String Functions--------------//
 int is_coord(char c);
 char* trim(char* str);

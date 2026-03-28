@@ -20,7 +20,7 @@
   int yyerror(char* s);
 
   int is_coord(char);
-  vec3D rot_point();
+  vec3D net_point();
 
   strfloat_t* init_hashmap();
   float get_var_val(char*);
@@ -165,7 +165,7 @@ expr:
                             }
                             else if (is_coord($1[0])) {
                               if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
-                                && rot_mode) {
+                                && rot_mode) { 
                                   char rot_coord[6];
                                   snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", $1[0]);
                                   set_var(rot_coord, $2);
@@ -173,9 +173,9 @@ expr:
 
                               else if (!config.tracks_def_by_laser && !(track_written>0))
                               {
-                                B = rot_point();
+                                B = net_point();
                                 write_track_line();
-                                A = rot_point();
+                                A = net_point();
                                 //prevent mult writes in line with mult coord cmds
                                 track_written = config.track_mid_len;
                               }
@@ -236,12 +236,12 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                            if (config.tracks_def_by_laser){A=rot_point();}
+                            if (config.tracks_def_by_laser){A=net_point();}
 
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
-                            if (config.tracks_def_by_laser){B=rot_point();}
+                            if (config.tracks_def_by_laser){B=net_point();}
 
                             write_track_line();
                           }

@@ -143,6 +143,15 @@ float get_var_val(char* varname) {
 
 //------Math Functions------//
 
+vec3D vec3D_add(vec3D p1, vec3D p2) {
+  return (vec3D) {
+    p1.x + p2.x,
+    p1.y + p2.y,
+    p1.z + p2.z};
+}
+
+
+
 vec3D rot_x(vec3D p, float t) {
    float rad = TO_RAD(t);
    float st = sin(rad);
@@ -182,29 +191,39 @@ vec3D rot_xyz(vec3D p, vec3D rot) {
    return rot_x(rot_y(rot_z(p,rot.z),rot.y),rot.x);
 }
 
-vec3D rot_point() {
-    vec3D p = {
-          get_var_val("X"),
-          get_var_val("Y"),
-          get_var_val("Z")};
+vec3D rot_point(vec3D p) {
     vec3D rot = {
           get_var_val("ROT_X"),
           get_var_val("ROT_Y"),
           get_var_val("ROT_Z")};
-
     return rot_xyz(p,rot);
 }
 
-vec3D to_world_coords(vec3D local_pt) {
-  vec3D global_pt = local_pt + origin_offset;
-
+vec3D abc_point(vec3D p) {
   vec3D abc = {
         get_var_val("A"),
         get_var_val("B"),
         get_var_val("C")};
-  global_pt = rot_xyz(global_pt, abc);
+  return rot_xyz(p, abc);
+}
 
-  return global_pt;
+//only works if machine swivel point is at global origin (0,0,0)
+vec3D to_world_coords(vec3D local_p) {
+  //rotate with ROT in local space
+  local_p = rot_point(local_p);
+
+  vec3D global_p = vec3D_add(local_p, origin_offset);
+  //rotate with ABC in global space
+  global_p = abc_point(global_p);
+  return global_p;
+}
+
+vec3D net_point() {
+  vec3D p = {
+        get_var_val("X"),
+        get_var_val("Y"),
+        get_var_val("Z")};
+  return to_world_coords(p);
 }
 
 

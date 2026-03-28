@@ -92,7 +92,6 @@
 prog:
   lines YYEOF {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
-    modify_tl();
     if ($1 == 0) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
     }

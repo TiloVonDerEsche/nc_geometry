@@ -24,6 +24,7 @@
 
   strfloat_t* init_hashmap();
   float get_var_val(char*);
+  void set_var_rot(char, float);
   void set_var_incr(char*, float);
   void set_var(char*, float);
 
@@ -165,10 +166,8 @@ expr:
                             }
                             else if (is_coord($1[0])) {
                               if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
-                                && rot_mode) { 
-                                  char rot_coord[6];
-                                  snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", $1[0]);
-                                  set_var(rot_coord, $2);
+                                && rot_mode) {
+                                  set_var_rot($1[0], $2);
                               }
 
                               else if (!config.tracks_def_by_laser && !(track_written>0))
@@ -265,7 +264,14 @@ if_element:
 
 
 assignment:
-  CMD opt_seps '=' opt_seps arith_expr          {if(!skip){set_var_incr($1,$5);}}
+  CMD opt_seps '=' opt_seps arith_expr
+  {if(!skip){
+    if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' ) && rot_mode) {
+      set_var_rot($1[0],$5);
+    }
+    else {
+     set_var_incr($1,$5);
+  }}}
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
@@ -354,38 +360,6 @@ void write_track_line() {
   config.hrad, config.vrad);
 }
 
-/*
-void rot_track_list() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-  //coll_vec,
-  config.hrad, config.vrad);
-
-  vec3D rot = {
-        get_var_val("A"),
-        get_var_val("B"),
-        get_var_val("C")};
-
-  rot_tracks(rot);
-
-}
-
-vec3D rot_tracks(vec3D rot) {
-
-
-
-    //look up X,Y,Z of current tid
-    vec3D p = {
-          get_var_val("X"),
-          get_var_val("Y"),
-          get_var_val("Z")};
-
-
-
-    return rot_xyz(p,rot);
-}
-*/
 
 void set_var_incr(char* varname, float fnum) {
     if (incr_mode && is_coord(varname[0])) {

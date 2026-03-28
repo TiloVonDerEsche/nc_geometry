@@ -60,8 +60,8 @@ void modify_tl() {
           }
 
         // 1. Modify your vectors here
-        A.x += 1.0f;
-        B.z *= 2.0f;
+        //A.x += 1.0f;
+        //B.z *= 2.0f;
 
         // 2. Write back in the original format
         // Note: You'll need to decide what to put for the values you skipped
@@ -228,6 +228,12 @@ vec3D net_point() {
 
 
 //------------String Functions--------------//
+void set_var_rot(char c, float val) {
+    char rot_coord[6];
+    snprintf(rot_coord, sizeof(rot_coord), "ROT_%c", c);
+    set_var(rot_coord, val);
+}
+
 int is_coord(char c) {
   return (c == 'X' || c == 'Y' || c == 'Z' || c == 'A' || c == 'B' || c == 'C');
 }

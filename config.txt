@@ -5,18 +5,19 @@ tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase
 
 //mpf_file = "./data/nc_code/test/repeat/windmill.mpf";
-//mpf_file = "./data/nc_code/test/goto/3.mpf";
-//mpf_file = "./data/nc_code/test/rot/1.mpf"
-mpf_file = "./data/nc_code/test/abc/CoordSys3D.mpf";
+//mpf_file = "./data/nc_code/test/abc/CoordSys3D.mpf";
+mpf_file = "./data/nc_code/test/polygon/polygon.mpf";
 
+//mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
 //mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
 //mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
+
 
 track_list_csv = "./data/track_list.csv";
 hmhis_json = "./data/hmhis.json";
 
-//tracks_to_plot = "./data/track_list.csv";
-tracks_to_plot = "./data/temp_tl.csv";
+tracks_to_plot = "./data/track_list.csv";
+//tracks_to_plot = "./data/temp_tl.csv";
 
 
 //=============not used===============//

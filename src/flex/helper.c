@@ -10,7 +10,7 @@ FILE* hmhis = NULL;
 FILE* tl = NULL;
 
 //===========Functions===========//
-//file functions
+//-----file functions-----//
 FILE* init_file(char* f_path, char* f_header) {
   printf("Opening: %s in write mode...\n",f_path);
   FILE* fp = fopen(f_path, "w");
@@ -23,7 +23,12 @@ FILE* init_file(char* f_path, char* f_header) {
 
   return fp;
 }
-//hashmap functions
+
+
+
+
+
+//-----hashmap functions-----//
 strfloat_t* init_hashmap() {
   khint_t k;
   int absent;

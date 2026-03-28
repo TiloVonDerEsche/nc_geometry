@@ -18,17 +18,20 @@
 
   int yylex (void);
   int yyerror(char* s);
-  void request_jump(char*);
-  void jump(size_t,long);
 
+  int is_coord(char);
   vec3D rot_point();
 
+  strfloat_t* init_hashmap();
+  float get_var_val(char*);
   void set_var_incr(char*, float);
   void set_var(char*, float);
-  float get_var_val(char*);
-  strfloat_t* init_hashmap();
+
   void write_track_line();
-  int is_coord(char);
+  void modify_tl();
+
+  void request_jump(char*);
+  void jump(size_t,long);
 
   size_t target_line = 0;
   long target_byte_offset = 0;
@@ -351,6 +354,70 @@ void write_track_line() {
   //coll_vec,
   config.hrad, config.vrad);
 }
+
+/*
+void rot_track_list() {
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
+  //coll_vec,
+  config.hrad, config.vrad);
+
+  vec3D rot = {
+        get_var_val("A"),
+        get_var_val("B"),
+        get_var_val("C")};
+
+  rot_tracks(rot);
+
+}
+
+vec3D rot_tracks(vec3D rot) {
+
+
+
+    //look up X,Y,Z of current tid
+    vec3D p = {
+          get_var_val("X"),
+          get_var_val("Y"),
+          get_var_val("Z")};
+
+
+
+    return rot_xyz(p,rot);
+}
+*/
+
+void modify_tl() {
+    FILE *fw = fopen("./data/temp_tl.csv", "w"); // Write to a temporary file
+
+    if (!fw) return;
+
+    size_t tid = 0;
+    vec3D A = {0}, B = {0};
+    float puis_laser = 0, vit_tir = 0;
+
+    // %*f tells fscanf to read the float but NOT store it in a variable
+    const char* read_fmt = "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %*f, %*f, %*f, %*f, %*f\n";
+
+    while (fscanf(tl, read_fmt, &tid, &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir) == 9) {
+
+        // 1. Modify your vectors here
+        A.x += 1.0f;
+        B.z *= 2.0f;
+
+        // 2. Write back in the original format
+        // Note: You'll need to decide what to put for the values you skipped
+        // during reading (here I used 0.0 for the laser/config vars)
+        fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
+                //coll_vec,
+                config.hrad, config.vrad);
+    }
+
+    fclose(fw);
+}
+
 
 void set_var_incr(char* varname, float fnum) {
     if (incr_mode && is_coord(varname[0])) {

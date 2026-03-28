@@ -1,5 +1,5 @@
-debug_prints = 1;
-hmhis_to_stdout = 1;
+debug_prints = 0;
+hmhis_to_stdout = 0;
 hmhis_to_file = 0;
 tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase

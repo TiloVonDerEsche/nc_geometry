@@ -45,9 +45,12 @@ extern FILE* yyin;
 
 //===========Functions===========//
 //file functions
-void close_hmhis();
-void write_track_line();
+
+
 FILE* init_file(char* f_path, char* f_header);
+void close_hmhis();
+//void write_track_line(); //in grammar.y
+void modify_tl();
 
 //hashmap functions
 strfloat_t* init_hashmap();

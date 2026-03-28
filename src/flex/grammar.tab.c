@@ -1862,49 +1862,6 @@ vec3D rot_tracks(vec3D rot) {
 }
 */
 
-void modify_tl() {
-    FILE *fr = fopen("./data/track_list.csv", "rb");
-    FILE *fw = fopen("./data/temp_tl.csv", "w"); // Write to a temporary file
-
-    if (!fw) return;
-
-    char line[2048];
-    size_t tid = 0;
-    vec3D A = {0}, B = {0};
-    float puis_laser = 0, vit_tir = 0;
-
-    const char* read_fmt = "%lu, %f, %f, %f, %f, %f, %f, %f, %f, %*f, %*f, %*f, %*f, %*f\n";
-
-    //Header
-    fgets(line, sizeof(line), fr);
-    fprintf("%s",line);
-
-    while (fgets(line, sizeof(line), fr)) {
-        int found = sscanf(line, read_fmt, &tid,
-          &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir);
-        if (found!=9) {continue;}
-
-        // 1. Modify your vectors here
-        A.x += 1.0f;
-        B.z *= 2.0f;
-
-        // 2. Write back in the original format
-        // Note: You'll need to decide what to put for the values you skipped
-        // during reading (here I used 0.0 for the laser/config vars)
-        printf("Writing: %lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
-                //coll_vec,
-                config.hrad, config.vrad);
-        fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
-                //coll_vec,
-                config.hrad, config.vrad);
-    }
-
-    fclose(fw);
-}
-
-
 void set_var_incr(char* varname, float fnum) {
     if (incr_mode && is_coord(varname[0])) {
       set_var(varname, get_var_val(varname)+fnum);
@@ -1912,13 +1869,6 @@ void set_var_incr(char* varname, float fnum) {
     else {
       set_var(varname,fnum);
     }
-}
-
-void close_hmhis() {
-  //delete last redundant comma
-  fseek(hmhis, -3, SEEK_CUR);
-  fprintf(hmhis,"]");
-  fclose(hmhis);
 }
 
 int yyerror(char* s) {

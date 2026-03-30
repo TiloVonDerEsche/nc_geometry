@@ -78,6 +78,7 @@
 %nterm <int> bool_expr
 %nterm <int> lines
 %nterm <int> prog
+%nterm <char*> repeat_params
 
 %left '+' '-'
 %left '*' '/'
@@ -105,7 +106,7 @@ lines:
 
 line:
   opt_seps
-  | opt_seps opt_skip exprs opt_seps
+  | opt_seps opt_skip expr_line opt_seps
     {
      rot_mode = 0; //reset linewise
      track_written--; //counter for how many lines not to print_track
@@ -137,9 +138,14 @@ seps:
   | seps SEP
 ;
 
+expr_line:
+  exprs
+  | sa_expr
+;
+
 exprs:
   expr
-  | exprs seps expr;
+  | exprs seps expr
 ;
 
 expr:
@@ -212,31 +218,6 @@ expr:
                           request_jump($3);
                           }
                         }
-  | REPEAT SEP MISC_ID SEP MISC_ID
-                        {
-                          if(!skip){
-                            request_jump($3);
-
-                            size_t line = (size_t)get_var_val("line");;
-
-                            char label[1024]; //non-sense size for now
-                            snprintf(label, sizeof(label), "REPEAT_%lu", line);
-
-                            push(&ret_stack,
-                              strdup($5), //return label
-                              line,       //return line
-                              (long)get_var_val(label) //return byte_offset
-                            );
-
-                            if (debug) {
-                              Elem temp;
-                              if (peek(&ret_stack, &temp)) {
-                                  printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
-                                          temp.label, temp.line, temp.byte_offset);
-                              }
-                            }
-                          }
-                        }
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
@@ -254,6 +235,35 @@ expr:
   | MISC_ID
   | fn
   | COMMENT
+;
+
+sa_expr:
+REPEAT SEP MISC_ID
+| REPEAT SEP MISC_ID SEP MISC_ID
+                      {
+                        if(!skip){
+                          request_jump($3);
+
+                          size_t line = (size_t)get_var_val("line");;
+
+                          char label[1024]; //non-sense size for now
+                          snprintf(label, sizeof(label), "REPEAT_%lu", line);
+
+                          push(&ret_stack,
+                            strdup($5), //return label
+                            line,       //return line
+                            (long)get_var_val(label) //return byte_offset
+                          );
+
+                          if (debug) {
+                            Elem temp;
+                            if (peek(&ret_stack, &temp)) {
+                                printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
+                                        temp.label, temp.line, temp.byte_offset);
+                            }
+                          }
+                        }
+                      }
 ;
 
 if_body:
@@ -307,6 +317,7 @@ params:
   | params ',' arith_expr
   | params ',' MISC_ID
 ;
+
 
 arith_expr:
   val         {$$=$1;}

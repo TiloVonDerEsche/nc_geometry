@@ -12,6 +12,7 @@ typedef struct {
 
 typedef struct {
   int debug_prints;
+  int print_strs;
   int hmhis_to_stdout;
   int hmhis_to_file;
   int tracks_def_by_laser;
@@ -36,6 +37,7 @@ KHASHL_MAP_INIT(KH_LOCAL,
 
 extern Config config;
 extern int debug;
+extern int print_strs;
 
 extern vec3D origin_offset;
 extern strfloat_t* h;

@@ -3,6 +3,7 @@
 
 extern Config config;
 extern int debug;
+extern int print_strs;
 extern strfloat_t* h;
 
 extern FILE* hmhis;
@@ -26,6 +27,7 @@ main(int argc, char *argv[])
   printf("track_list_csv=%s\n", config.track_list_csv);
 
   debug = config.debug_prints;
+  print_strs = config.print_strs;
 
   h = init_hashmap();
   FILE* mpf = fopen(config.mpf_file, "rb");

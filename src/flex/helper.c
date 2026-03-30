@@ -3,6 +3,7 @@
  //---helper.c is the owner of the shared global vars--//
 Config config = {0};
 int debug = 0;
+int print_strs = 0;
 
 vec3D origin_offset = {0,0,0};
 strfloat_t* h = NULL;
@@ -297,6 +298,9 @@ int read_config(const char* fpath, Config* config) {
         if (strcmp(key, "debug_prints") == 0) {
             config->debug_prints = atoi(value);
         }
+        else if (strcmp(key, "print_strs") == 0) {
+            config->print_strs = atoi(value);
+        }
         else if (strcmp(key, "hmhis_to_stdout") == 0) {
             config->hmhis_to_stdout = atoi(value);
         }
@@ -342,60 +346,3 @@ int read_config(const char* fpath, Config* config) {
     fclose(file);
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//csv nonsense
-
-//print one line of hmhis, which is fnums seperated by ','
-// void print_values_to_hmhis(strfloat_t* h, FILE* hmhis) {
-//   //Print all variables from hashmap
-//   khint_t k;
-//   kh_foreach(h, k) {
-//       if (k < kh_end(h)) {  // Check if found (k != end iterator)
-//           printf("Printing k=%d: value=%f\n", k, kh_val(h, k));
-//           fprintf(hmhis,"%f,", kh_val(h, k));
-//       }
-//   }
-//
-//   fprintf(hmhis,"\n");
-// }

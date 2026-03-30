@@ -10,5 +10,5 @@ else
 fi
 echo ""
 
-make -C ./src/track_visualization/opengl
-make -C ./src/track_visualization/opengl clean
+# make -C ./src/track_visualization/opengl
+# make -C ./src/track_visualization/opengl clean

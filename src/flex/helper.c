@@ -4,7 +4,7 @@
 Config config = {0};
 int debug = 0;
 
-vec3D origin_offset = {10,0,0};
+vec3D origin_offset = {0,0,0};
 strfloat_t* h = NULL;
 
 FILE* hmhis = NULL;

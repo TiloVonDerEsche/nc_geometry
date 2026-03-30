@@ -158,6 +158,12 @@ expr:
                           if(!skip){
                             if($1[0] == 'G') {
                               switch((int)$2) {
+                                case 54: origin_offset=(vec3D){0,0,0};break;
+                                case 55: origin_offset=(vec3D){10,0,0};break;
+                                case 56: origin_offset=(vec3D){0,10,0};break;
+                                case 57: origin_offset=(vec3D){0,0,10};break;
+                                case 58: origin_offset=(vec3D){10,15,0};break;
+                                case 59: origin_offset=(vec3D){0,10,20};break;
                                 case 90: incr_mode=0;break;
                                 case 91: incr_mode=1;break;
                                 default: break;

@@ -83,13 +83,19 @@
 %left '+' '-'
 %left '*' '/'
 
+
+%nonassoc HIGH_PREC
 %nonassoc LOW_PREC
 %left SEP
+
+
 
 %initial-action {
     init_stack(&ret_stack);
     //h = init_hashmap(); //h is global in helper.c for now
 }
+
+%glr-parser
 
 %%
 
@@ -200,13 +206,17 @@ expr:
 
                           Elem top;
                           peek(&ret_stack, &top);
-
+                          printf("LABEL=%s, top.label=%s\n",$1,top.label);
                           if(strcmp($1,top.label) == 0) {
                             jump_requested = 1;
                             skip = 1;
 
                             target_line = top.line;
                             target_byte_offset = top.byte_offset;
+
+                            printf("Jump Requested!\
+                            \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
+                            target_line, target_byte_offset);
 
                             pop(&ret_stack, &top);
                           }
@@ -218,10 +228,11 @@ expr:
                         }
   | REPEAT SEP MISC_ID %prec LOW_PREC
                         {if(!skip){
-                            handle_repeat($3,"END_LABEL");
+                            char* el = "END_LABEL";
+                            handle_repeat($3,strdup(el));
                           }
                         }
-  | REPEAT SEP MISC_ID SEP MISC_ID
+  | REPEAT SEP MISC_ID SEP MISC_ID %prec HIGH_PREC
                         {if(!skip){
                             handle_repeat($3,$5);
                           }
@@ -352,7 +363,7 @@ void handle_repeat(char* start_label, char* end_label) {
 
   size_t line = (size_t)get_var_val("line");;
 
-  char label[1024]; //non-sense size for now
+  char label[32];
   snprintf(label, sizeof(label), "REPEAT_%lu", line);
 
   push(&ret_stack,
@@ -361,10 +372,12 @@ void handle_repeat(char* start_label, char* end_label) {
     (long)get_var_val(label) //return byte_offset
   );
 
-  if (debug) {
+  printf("repeat_label=%s\n",label);
+
+  if (debug || 1) {
     Elem temp;
     if (peek(&ret_stack, &temp)) {
-        printf("Return: Label %s, Line: %zu, Offset: %ld)\n",
+        printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
                 temp.label, temp.line, temp.byte_offset);
     }
   }

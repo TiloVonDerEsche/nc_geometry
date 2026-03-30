@@ -38,7 +38,7 @@ id       [A-Za-z][_A-Za-z0-9]*
   set_var(line_label, (float)byte_counter);
 }
 
-"END_LABEL:"
+
 
 {letter}{id}":" {
                 char* s = lftext;

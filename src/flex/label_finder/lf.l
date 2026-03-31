@@ -12,6 +12,7 @@
 
   int lfwrap();
   size_t line = 1;
+  char active_label[MAX_LABEL_LEN+1];
 %}
 
 /* label finder */
@@ -39,22 +40,27 @@ id       [A-Za-z][_A-Za-z0-9]*
 }
 
 
+"END_LABEL:" {
+  char label[MAX_LABEL_LEN+11];
+  snprintf(label, sizeof(label), "%s_END_LABEL", active_label);
+  set_var(label, (float)line);
+
+}
 
 {letter}{id}":" {
-                char* s = lftext;
-                s[strlen(s) - 1] = '\0';
-                if(debug){ printf("A label: %s, len=%lu \n", s,strlen(s)); }
+  char* s = lftext;
+  s[strlen(s) - 1] = '\0';
+  if(debug){ printf("A label: %s, len=%lu \n", s,strlen(s)); }
 
-                char label_id[MAX_LABEL_LEN+1]; //+1 for '\0'
-                strncpy(label_id, s, strlen(s));
-                label_id[strlen(s)] = '\0';
+  strncpy(active_label, s, strlen(s));
+  active_label[strlen(s)] = '\0';
 
-		            set_var(label_id, (float)byte_counter);
+  set_var(active_label, (float)byte_counter);
 
-                char line_label[MAX_LABEL_LEN+6];
-                snprintf(line_label, sizeof(line_label), "%s_line", label_id);
-                set_var(line_label, (float)line);
-                }
+  char line_label[MAX_LABEL_LEN+6];
+  snprintf(line_label, sizeof(line_label), "%s_line", active_label);
+  set_var(line_label, (float)line);
+  }
 
 "\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",lftext); }}
 ";"[^\n]*      {if(debug){ printf("A comment: %s\n", lftext); }}

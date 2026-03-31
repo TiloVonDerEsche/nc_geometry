@@ -203,7 +203,21 @@ expr:
                           Elem top;
                           peek(&ret_stack, &top);
                           printf("LABEL=%s, top.label=%s\n",$1,top.label);
-                          if(strcmp($1,top.label) == 0) {
+
+                          if((strcmp($1,"END_LABEL") == 0)) {
+                            int d = get_var_val("line")-get_var_val(top.label);
+                            if(abs(d)<=1) {
+                             printf("'END_LABEL' found!\n");
+                             goto end_label_found;
+                            }
+                          }
+                          else if (strcmp($1,top.label) == 0) {
+                            goto end_label_found;
+                          }
+                          else {
+                            goto not_found;}
+
+                          end_label_found:
                             jump_requested = 1;
                             skip = 1;
 
@@ -215,16 +229,18 @@ expr:
                             target_line, target_byte_offset);
 
                             pop(&ret_stack, &top);
-                          }
+
+                          not_found:
                         }
                        }
   | GOTO SEP MISC_ID   {if(!skip){
-                          request_jump($3);
-                          }
+                          request_jump($3);}
                         }
   | REPEAT SEP MISC_ID %prec LOW_PREC
                         {if(!skip){
-                            handle_repeat($3,"END_LABEL",(size_t)get_var_val("line")-1);}
+                            char end_label[32+11];
+                            snprintf(end_label, sizeof(end_label), "%s_END_LABEL", $3);
+                            handle_repeat($3,end_label,(size_t)get_var_val("line"));}
                         }
   | REPEAT SEP MISC_ID SEP MISC_ID
                         {if(!skip){
@@ -352,18 +368,26 @@ void jump(size_t target_line,long target_byte_offset) {
 }
 
 void handle_repeat(char* start_label, char* end_label, size_t line) {
-  request_jump(start_label);
-
   char label[32];
   snprintf(label, sizeof(label), "REPEAT_%lu", line);
+  printf("repeat_label=%s, line param=%lu, line var_val=%lu\n",
+  label,line,(size_t)get_var_val("line"));
+
+  long byte_offset = (long)get_var_val(label);
+  if (byte_offset <= 0) {
+    if (debug || 1) {
+      printf("Error: REPEAT return byte_offset=%ld\n",byte_offset);
+    }
+    return;
+  }
 
   push(&ret_stack,
     strdup(end_label), //return label
     line,       //return line
-    (long)get_var_val(label) //return byte_offset
+    byte_offset //return byte_offset
   );
 
-  printf("repeat_label=%s\n",label);
+  request_jump(start_label);
 
   if (debug || 1) {
     Elem temp;

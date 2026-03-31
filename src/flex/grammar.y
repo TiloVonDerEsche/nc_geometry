@@ -54,27 +54,27 @@
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
 
-%token SEP NEWLINE END OTHER
+%token NEWLINE OTHER
 %token COMMENT
 %token MSG
 
 %token IF ENDIF
 %token GOTO REPEAT
 %token ROT
-%token <char*> MISC_ID
+
+%token <char*> ID
 
 %token <char*> LABEL
 %token <char*> VAR
 %token <char*> CMD
-%token <char*> SPECIAL_CMD
-%token <char*> CUSTOM_VAR
 
 %token <char*> STRING
 %token <int> INT
 %token <float> FLOAT
 
-%nterm <float> val
 %nterm <float> fn
+%nterm <float> params
+%nterm <float> val
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 %nterm <int> lines
@@ -82,13 +82,6 @@
 
 %left '+' '-'
 %left '*' '/'
-
-
-%nonassoc HIGH_PREC
-%nonassoc LOW_PREC
-%left SEP
-
-
 
 %initial-action {
     init_stack(&ret_stack);
@@ -114,8 +107,8 @@ lines:
 ;
 
 line:
-  opt_seps
-  | opt_seps opt_skip exprs opt_seps
+  opt_skip
+  | opt_skip exprs
     {
      rot_mode = 0; //reset linewise
      track_written--; //counter for how many lines not to print_track
@@ -137,24 +130,29 @@ opt_skip:
     | '/'
 ;
 
-opt_seps:
-  %empty
-  | seps
-;
-
-seps:
-  SEP
-  | seps SEP
-;
-
 exprs:
   expr
-  | exprs seps expr
+  | exprs expr
 ;
 
 expr:
-  IF SEP bool_expr {
-      if (!$3) {
+  ID %dprec 1    {
+                        if(strcmp($1,"LASER_ON") == 0) {
+                          set_var("laser",1);
+                          if (config.tracks_def_by_laser){A=net_point();}
+
+                        }
+                        else if(strcmp($1,"LASER_OFF") == 0) {
+                          set_var("laser",0);
+                          if (config.tracks_def_by_laser){B=net_point();}
+
+                          write_track_line();
+                        }
+                       }
+  | assignment %dprec 2
+  | fn %dprec 3
+  | IF bool_expr {
+      if (!$2) {
           skip++;
           if(debug) {printf("Skip=%d\n",skip);}
       }
@@ -200,7 +198,6 @@ expr:
                           }
                          }
   | ROT                {rot_mode = 1;}
-  | assignment
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){
 
@@ -222,37 +219,22 @@ expr:
                           }
                         }
                        }
-  | GOTO SEP MISC_ID   {if(!skip){
-                          request_jump($3);
+  | GOTO ID   {if(!skip){
+                          request_jump($2);
                           }
                         }
-  | REPEAT SEP MISC_ID %prec LOW_PREC
+  | REPEAT ID %dprec 1
                         {if(!skip){
                             char* el = "END_LABEL";
-                            handle_repeat($3,strdup(el));
+                            handle_repeat($2,strdup(el));
                           }
                         }
-  | REPEAT SEP MISC_ID SEP MISC_ID %prec HIGH_PREC
+  | REPEAT ID ID %dprec 2
                         {if(!skip){
-                            handle_repeat($3,$5);
+                            handle_repeat($2,$3);
                           }
                         }
-  | SPECIAL_CMD          {
-                          if(strcmp($1,"LASER_ON") == 0) {
-                            set_var("laser",1);
-                            if (config.tracks_def_by_laser){A=net_point();}
-
-                          }
-                          else if(strcmp($1,"LASER_OFF") == 0) {
-                            set_var("laser",0);
-                            if (config.tracks_def_by_laser){B=net_point();}
-
-                            write_track_line();
-                          }
-                         }
-  | MSG SEP STRING
-  | MISC_ID
-  | fn
+  | MSG STRING
   | COMMENT
 ;
 
@@ -263,23 +245,22 @@ if_body:
 
 if_element:
   expr
-  | SEP
   | NEWLINE
 ;
 
 
 assignment:
-  CMD opt_seps '=' opt_seps arith_expr
+  ID '=' arith_expr {if(!skip){set_var($1,$3);}}
+  | ID arith_expr   {if(!skip){set_var($1,$2);}}
+  | CMD '=' arith_expr
   {if(!skip){
     if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' ) && rot_mode) {
-      set_var_rot($1[0],$5);
+      set_var_rot($1[0],$3);
     }
     else {
-     set_var_incr($1,$5);
+     set_var_incr($1,$3);
   }}}
-  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
-  | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
-  | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
+  | VAR '=' arith_expr        {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -288,30 +269,28 @@ val:
                   /*printf("Getting VAR=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
-  | CUSTOM_VAR   {
+  | ID   {
                   /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
+  | fn        {$$=$1;}
   | INT          {$$=$1;}
   | FLOAT        {$$=$1;}
 ;
 
 fn:
-  MISC_ID '(' params ')' {$$=0;}
+  ID '(' params ')' {$$=$3;}
 ;
 
 params:
-  %empty
-  | arith_expr
-  | MISC_ID
-  | params ',' arith_expr
-  | params ',' MISC_ID
+  %empty       {$$=0;}
+  | arith_expr {$$=$1;}
+  | params ',' arith_expr {$$=$1;}
 ;
 
 
 arith_expr:
   val         {$$=$1;}
-  | fn        {$$=$1;}
   | arith_expr '+' arith_expr {$$=$1+$3; /*printf("%f+%f=%f\n", $1,$3,$$);*/}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}

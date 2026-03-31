@@ -48,25 +48,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 }
 
 {letter}{id} {
-              if(strcmp(yytext,"LASER_ON") == 0 ||
-                 strcmp(yytext,"LASER_OFF") == 0 ) {
-                yylval.SPECIAL_CMD = strdup(yytext);
-                return SPECIAL_CMD;
-              }
-              else if(strcmp(yytext,"PUIS_LASER") == 0 ||
-                 strcmp(yytext,"MODE_LASER") == 0 ||
-                 strcmp(yytext,"VIT_TIR") == 0 ||
-                 strcmp(yytext,"Flow_gas_2") == 0 ||
-                 strcmp(yytext,"Flow_gas_3") == 0 ||
-                 strcmp(yytext,"Feeder_Speed_2") == 0 ||
-                 strcmp(yytext,"Feeder_Speed_3") == 0 ||
-                 strcmp(yytext,"TOFFL") == 0) {
-
-                yylval.CUSTOM_VAR = strdup(yytext);
-                if(debug){ printf("A custom Variable: %s\n", yytext); }
-                return CUSTOM_VAR;
-              }
-              else if(strcmp(yytext,"IF") == 0) {
+              if(strcmp(yytext,"IF") == 0) {
                 if(debug){ puts("An IF!"); }
                 return IF;
               }
@@ -93,9 +75,9 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                 return MSG;
               }
               else {
-                if(debug){ printf("A MISC_ID: %s\n",yytext); }
-                yylval.MISC_ID = strdup(yytext);
-                return MISC_ID;
+                if(debug){ printf("An ID: %s\n",yytext); }
+                yylval.ID = strdup(yytext);
+                return ID;
               }
 
              }
@@ -106,8 +88,8 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
                }
 
 "_"{id}   {
-        if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
-        return MISC_ID;
+        if(debug){ printf("A hidden ID: %s\n",yytext); }
+        return ID;
        }
 
 
@@ -121,7 +103,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 
-[ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
+[ \t]+      		 { if(debug){ printf("A SEP!\n");}}
 "\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 "\n"           {if(debug){ printf("A NEWLINE!\n\n");}

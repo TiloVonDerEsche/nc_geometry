@@ -135,4 +135,5 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 int yywrap(){
     return 1;
+    //set_var("line", get_var_val("line") + 1);
 }

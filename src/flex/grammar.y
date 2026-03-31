@@ -33,7 +33,7 @@
 
   void request_jump(char*);
   void jump(size_t,long);
-  void handle_repeat(char*, char*);
+  void handle_repeat(char*, char*, size_t);
 
   size_t target_line = 0;
   long target_byte_offset = 0;
@@ -77,14 +77,11 @@
 %nterm <float> fn
 %nterm <float> arith_expr
 %nterm <int> bool_expr
-%nterm <int> lines
 %nterm <int> prog
 
 %left '+' '-'
 %left '*' '/'
 
-
-%nonassoc HIGH_PREC
 %nonassoc LOW_PREC
 %left SEP
 
@@ -95,22 +92,21 @@
     //h = init_hashmap(); //h is global in helper.c for now
 }
 
-%glr-parser
 
 %%
 
 prog:
   lines YYEOF {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
-    if ($1 == 0) {
+    if (get_var_val("line") <= 1) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
     }
   }
 ;
 
 lines:
-  %empty {$$ = 0;}
-  | lines line NEWLINE {$$=$1+1;}
+  %empty
+  | lines line NEWLINE
 ;
 
 line:
@@ -168,8 +164,8 @@ expr:
                           if(!skip){
                             if($1[0] == 'G') {
                               switch((int)$2) {
-                                case 54: origin_offset=(vec3D){0,0,0};break;
-                                case 55: origin_offset=(vec3D){10,0,0};break;
+                                case 54: origin_offset=(vec3D){0,0,139.4};break;
+                                case 55: origin_offset=(vec3D){0,0,124.4};break;
                                 case 56: origin_offset=(vec3D){0,10,0};break;
                                 case 57: origin_offset=(vec3D){0,0,10};break;
                                 case 58: origin_offset=(vec3D){10,15,0};break;
@@ -228,14 +224,11 @@ expr:
                         }
   | REPEAT SEP MISC_ID %prec LOW_PREC
                         {if(!skip){
-                            char* el = "END_LABEL";
-                            handle_repeat($3,strdup(el));
-                          }
+                            handle_repeat($3,"END_LABEL",(size_t)get_var_val("line")-1);}
                         }
-  | REPEAT SEP MISC_ID SEP MISC_ID %prec HIGH_PREC
+  | REPEAT SEP MISC_ID SEP MISC_ID
                         {if(!skip){
-                            handle_repeat($3,$5);
-                          }
+                            handle_repeat($3,$5,(size_t)get_var_val("line"));}
                         }
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
@@ -358,10 +351,8 @@ void jump(size_t target_line,long target_byte_offset) {
   }
 }
 
-void handle_repeat(char* start_label, char* end_label) {
+void handle_repeat(char* start_label, char* end_label, size_t line) {
   request_jump(start_label);
-
-  size_t line = (size_t)get_var_val("line");;
 
   char label[32];
   snprintf(label, sizeof(label), "REPEAT_%lu", line);

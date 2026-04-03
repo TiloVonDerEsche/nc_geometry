@@ -279,21 +279,11 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    // Enable lighting
-    // glEnable(GL_LIGHTING);
-    // glEnable(GL_LIGHT0);
-    // glEnable(GL_COLOR_MATERIAL);
-    // glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);  // glColor3f affects ambient and diffuse
-
-    // Set global ambient light
-    GLfloat ambient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
-
     // Set material properties for specular highlights
-    GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat shininess[] = {50.0f};
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+    //GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    //GLfloat shininess[] = {50.0f};
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    //glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
     // GLUT callbacks
     glutDisplayFunc(display);

@@ -367,19 +367,42 @@ void jump(size_t target_line,long target_byte_offset) {
   }
 }
 
-void handle_repeat(char* start_label, char* end_label, size_t line) {
-  char label[32];
-  snprintf(label, sizeof(label), "REPEAT_%lu", line);
-  printf("repeat_label=%s, line param=%lu, line var_val=%lu\n",
-  label,line,(size_t)get_var_val("line"));
+void handle_repeat(char* start_label, char* end_label, size_t linep) {
+  char labelp[32]; //search towards +inf dir
+  char labeln[32]; //search towards -inf dir
 
-  long byte_offset = (long)get_var_val(label);
-  if (byte_offset <= 0) {
-    if (debug || 1) {
-      printf("Error: REPEAT return byte_offset=%ld\n",byte_offset);
+  size_t linen = linep;
+  size_t line=-1;
+  size_t byte_offset=-1;
+  //ball search
+  while (0<linen) {
+    snprintf(labelp, sizeof(labelp), "REPEAT_%lu", linep);
+    snprintf(labeln, sizeof(labeln), "REPEAT_%lu", linen);
+
+    long byte_offsetp = (long)get_var_val(labelp);
+    long byte_offsetn = (long)get_var_val(labeln);
+
+    printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
+      labelp,labeln,linep,linen,(size_t)get_var_val("line"));
+    if (byte_offsetp <= 0 && byte_offsetn <= 0) {
+      if (debug) {
+        printf("Error: REPEAT return byte_offset=%ld\n",byte_offset);
+      }
     }
-    return;
+    else {
+      if (byte_offsetp > 0) {
+        byte_offset=byte_offsetp;
+        line=linep;
+     }
+     else if (byte_offsetn > 0) {
+       byte_offset=byte_offsetn;
+       line=linen;
+     }
+     break; //REPEAT found, we are finished
+    }
+    linen--;linep++;
   }
+  printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);
 
   push(&ret_stack,
     strdup(end_label), //return label

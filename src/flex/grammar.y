@@ -204,20 +204,27 @@ expr:
                           peek(&ret_stack, &top);
                           printf("LABEL=%s, top.label=%s\n",$1,top.label);
 
+                          printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
                           if((strcmp($1,"END_LABEL") == 0)) {
                             int d = get_var_val("line")-get_var_val(top.label);
+                            printf("d=%d\n",d);
                             if(abs(d)<=1) {
                              printf("'END_LABEL' found!\n");
-                             goto end_label_found;
+
+                             jump_requested = 1;
+                             skip = 1;
+
+                             target_line = top.line;
+                             target_byte_offset = top.byte_offset;
+
+                             printf("Jump Requested!\
+                             \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
+                             target_line, target_byte_offset);
+
+                             pop(&ret_stack, &top);
                             }
                           }
                           else if (strcmp($1,top.label) == 0) {
-                            goto end_label_found;
-                          }
-                          else {
-                            goto not_found;}
-
-                          end_label_found:
                             jump_requested = 1;
                             skip = 1;
 
@@ -229,8 +236,14 @@ expr:
                             target_line, target_byte_offset);
 
                             pop(&ret_stack, &top);
+                          }
+                          //else:
+                          //goto not_found;
 
-                          not_found:
+                          //end_label_found:
+
+
+                          //not_found:
                         }
                        }
   | GOTO SEP MISC_ID   {if(!skip){

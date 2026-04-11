@@ -117,7 +117,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 [()]      {return yytext[0];}
 
-"\""[^\"]*"\"" { if(print_strs){ printf("A string: %s\n",yytext); } return STRING;}
+"\""[^\"]*"\"" { if(print_strs){ printf("A string: %s\n",yytext);puts("..."); } return STRING;}
 
 ";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
 

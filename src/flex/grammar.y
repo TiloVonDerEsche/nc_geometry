@@ -123,6 +123,7 @@ line:
           jump_requested = 0;
           skip = 0;
           jump(target_line,target_byte_offset);
+          printf("Jumped to line=%lu, byte=%ld\n\n",target_line, target_byte_offset);
      }
     }
   | error
@@ -202,26 +203,26 @@ expr:
 
                           Elem top;
                           peek(&ret_stack, &top);
-                          printf("LABEL=%s, top.label=%s\n",$1,top.label);
+                          printf("$1_LABEL=%s, ret_stack_top.label=%s\n",$1,top.label);
 
                           printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
                           if((strcmp($1,"END_LABEL") == 0)) {
                             int d = get_var_val("line")-get_var_val(top.label);
-                            printf("d=%d\n",d);
+                            printf("d=%d\n...\n",d);
                             if(abs(d)<=1) {
-                             printf("'END_LABEL' found!\n");
+                               printf("'END_LABEL' found! top.label=%s\n",top.label);
 
-                             jump_requested = 1;
-                             skip = 1;
+                               jump_requested = 1;
+                               skip = 1;
 
-                             target_line = top.line;
-                             target_byte_offset = top.byte_offset;
+                               target_line = top.line;
+                               target_byte_offset = top.byte_offset;
 
-                             printf("Jump Requested!\
-                             \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
-                             target_line, target_byte_offset);
+                               printf("Jump Requested!\
+                               \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
+                               target_line, target_byte_offset);
 
-                             pop(&ret_stack, &top);
+                               pop(&ret_stack, &top);
                             }
                           }
                           else if (strcmp($1,top.label) == 0) {

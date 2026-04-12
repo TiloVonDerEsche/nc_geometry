@@ -49,7 +49,7 @@ Requirements: <br>
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
 # Download
-Under the Releases tab you can download the latest binaries (executables) and the corresponding source code in a .zip if interested.
+Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a .zip, if interested.
 [Download from Releases](releases) <br>
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
 

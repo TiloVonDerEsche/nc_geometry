@@ -41,7 +41,8 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.1`** Basic NC cmds f.e. X,Y,Z, variables and arithmetic & boolean expressions.
 - **`0.2`** IF COND THEN BODY ENDIF Block. GOTOB jump command.
 - **`0.3`** A,B,C work-plain rotation & GOTOF, GOTO and REPEAT.
-- **`0.4`** Complex user-variable types and functions.
+- **`0.4`** GLR Parsing -> Expand Look-Ahead-buffer (currently size 1)
+- **`0.5`** Complex user-variable types and functions.
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements: <br>

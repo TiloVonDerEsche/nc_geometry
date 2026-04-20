@@ -38,7 +38,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
    You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.
    
 # Version-Features of **`generate_track_list.exe`**:
-- **`0.1`** Basic NC cmds f.e. X,Y,Z, variables and arithmetic & boolean expressions.
+- **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions,which can used in assignments of variables. 
 - **`0.2`** IF COND THEN BODY ENDIF Block. GOTOB jump command.
 - **`0.3`** A,B,C work-plain rotation & GOTOF, GOTO and REPEAT.
 - **`0.4`** Binary benchmarking tool.

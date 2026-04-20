@@ -1,11 +1,14 @@
 [![Linux build generate_track_list.bin](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml/badge.svg)](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml) <br>
 # Info
-This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter `generate_track_list.exe`, that reads a NC `.mpf` file and outputs a `track_list.csv` file. <br>
+This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC (f.e.:`.mpf` or `.nc`) file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
 - `track_index`
 -  start `point A`, end `point B` of a welding track
+- laser_power (PUIS_LASER)
+- machine_speed (VIT_TIR)
+- overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)
 <br>
-A track is detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
+A track is traditionally detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
 <br>
 The NC Interpreter is designed around the dialect of the AddUp M400 machine. <br>
 The following Sinumerik manual seems to describe that dialect: <br>

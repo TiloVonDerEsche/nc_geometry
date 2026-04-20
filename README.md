@@ -1,6 +1,6 @@
 [![Linux build generate_track_list.bin](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml/badge.svg)](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml) <br>
 # Info
-This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC (f.e.:`.mpf` or `.nc`) file and outputs a `track_list.csv` file. <br>
+This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
 - `track_index`
 -  start `point A`, end `point B` of a welding track
@@ -16,8 +16,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 # Guide to using the project
 1. **Setup a root folder** for the project.
-2. In the root folder **create another folder** named `data`.
-3. **Populate the `data` folder** with NC code (`.mpf`) files.
+2. **Put the `NC code` files, `config.txt` and the `generate_track_list.exe` somewhere within that root folder.
 4. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.

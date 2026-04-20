@@ -19,12 +19,12 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 2. In the root folder **create another folder** named `data`.
 3. **Populate the `data` folder** with NC code (`.mpf`) files.
 4. **Set the desired values** for the vars in **`config.txt`**:
-   - **`debug_prints`** — Enables token ident and jump info debug prints, when set to 1.
-   - **`hmhis_to_stdout`** — Enables var hashmap snapshot printing to stdout, for every .mpf line, when set to 1.
-   - **`hmhis_to_file`** — Enables var hashmap snapshot printing to hmhis.json file, for every .mpf line, when set to 1
-   - **`mpf_file`** — Sets the path of the `.mpf` file.
+   - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
+   - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.
+   - **`hmhis_to_file`** — Enables hashmap (memory of variables) snapshot printing to hmhis.json file, for every NC code line, when set to 1
+   - **`nc_file`** — Sets the path of the NC code file.
    - **`track_list_csv`** — Sets the path of the `track_list.csv` output file.
-   - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which should be read by the `3d_track_visualizer.exe`.
+   - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which then will be read by the `3d_track_visualizer.exe`.
 5. Build **`generate_track_list.exe`** by navigating to **`./src/flex`** and executing **`make`**.
    Alternativly you can just **execute the commands**, which are specified in the Makefile:
    - **`flex -l lex.l`**

@@ -16,7 +16,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 # Guide to using the project
 1. **Setup a root folder** for the project.
-2. **Put the `NC code` files, `config.txt` and the `generate_track_list.exe` somewhere within that root folder.
+2. Put the `NC code` files, `config.txt` and the `generate_track_list.exe` somewhere within that root folder.
 4. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.

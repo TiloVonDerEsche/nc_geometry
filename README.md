@@ -15,16 +15,18 @@ The following Sinumerik manual seems to describe that dialect: <br>
 https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf <br>
 
 # Guide to using the project
-1. **Setup a root folder** for the project.
-2. Put the `NC code` files, `config.txt` and the `generate_track_list.exe` somewhere within that root folder.
+1. Put `config.txt` into the same folder as `generate_track_list.exe`.
 4. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
+   - **`print_strs`** — Prints the strings of the NC Code, which are denoted by '"'<Str_Content>'"', when set to 1.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.
    - **`hmhis_to_file`** — Enables hashmap (memory of variables) snapshot printing to hmhis.json file, for every NC code line, when set to 1
-   - **`nc_file`** — Sets the path of the NC code file.
+   - **`tracks_def_by_laser`** — Enables experimental track defined by track_mid_len and coordinate-modification-lines (coord-lines), when set to 0.
+   - **`track_mid_len`** — Defines how many coord-lines to ignore, between track start- A, and end-point B, when using `tracks_def_by_laser=0`.
+   - **`nc_file`** — Sets the path of the NC code file. 'mpf_file' is the deprecated name for 'nc_file'.
    - **`track_list_csv`** — Sets the path of the `track_list.csv` output file.
    - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which then will be read by the `3d_track_visualizer.exe`.
-5. Build **`generate_track_list.exe`** by navigating to **`./src/flex`** and executing **`make`**.
+6. Build **`generate_track_list.exe`** by navigating to **`./src/flex`** and executing **`make`**.
    Alternativly you can just **execute the commands**, which are specified in the Makefile:
    - **`flex -l lex.l`**
 	- **`bison -dv grammar.y`**

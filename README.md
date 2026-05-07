@@ -25,8 +25,13 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
    - **`track_mid_len`** — Defines how many coord-lines to ignore, between track start- A, and end-point B, when using `tracks_def_by_laser=0`.
    - **`nc_file`** — Sets the path of the NC code file. 'mpf_file' is the deprecated name for 'nc_file'.
    - **`track_list_csv`** — Sets the path of the `track_list.csv` output file.
+   - **`hmhis_json`** — When hmhis_to_file=1, then it sets the path of the strfloat Hashmap Snapshot History (Trace) writing target.
    - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which then will be read by the `3d_track_visualizer.exe`.
-6. Build **`generate_track_list.exe`** by navigating to **`./src/flex`** and executing **`make`**.
+
+   - **`horizontal_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
+   - **`vertical_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
+   - **`track_accel_margin`** — Section-length from the end and start of a track, where the CNC machine (de-/)accelerates. WIP!
+6. Build **`generate_track_list.exe`**  — by navigating to **`./src/flex`** and executing **`make`**.
    Alternativly you can just **execute the commands**, which are specified in the Makefile:
    - **`flex -l lex.l`**
 	- **`bison -dv grammar.y`**

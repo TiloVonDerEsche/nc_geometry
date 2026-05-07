@@ -1,4 +1,3 @@
-
 debug_prints = 0;
 print_strs = 1;
 hmhis_to_stdout = 0;
@@ -6,29 +5,19 @@ hmhis_to_file = 0;
 tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase
 
-//mpf_file = "./data/nc_code/test/repeat/rect.mpf";
-//mpf_file = "./data/nc_code/test/dummy/3.mpf";
-//mpf_file = "./data/nc_code/test/abc/CoordSys3D.mpf";
+//nc_file = "./data/nc_code/Bahnen_Z_Abs_Test_316L.MPF";
 mpf_file = "./data/nc_code/Bahnen_Z_Abs_Test_316L.MPF";
-
-//mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
-//mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
-//mpf_file = "./data/nc_code/Niere/test.mpf";
-
 
 track_list_csv = "./data/track_list.csv";
 hmhis_json = "./data/hmhis.json";
 
 tracks_to_plot = "./data/track_list.csv";
-//tracks_to_plot = "./data/temp_tl.csv";
-
-
-//=============not used===============//
-interpolation_csv = "./data/interpolation/_intpol.csv";
 
 //radii of welding track
 horizontal_radius= 0.49;
 vertical_radius=0.31;
 
 track_accel_margin=0.02;
+//=============not used===============//
+interpolation_csv = "./data/interpolation/_intpol.csv";
 step_distance = 1; //step distance of interpolation in mm

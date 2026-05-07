@@ -1,3 +1,4 @@
+
 debug_prints = 0;
 print_strs = 1;
 hmhis_to_stdout = 0;
@@ -5,10 +6,10 @@ hmhis_to_file = 0;
 tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase
 
-mpf_file = "./data/nc_code/test/repeat/rect.mpf";
+//mpf_file = "./data/nc_code/test/repeat/rect.mpf";
 //mpf_file = "./data/nc_code/test/dummy/3.mpf";
 //mpf_file = "./data/nc_code/test/abc/CoordSys3D.mpf";
-//mpf_file = "./data/nc_code/test/origin/polygon.mpf";
+mpf_file = "./data/nc_code/Bahnen_Z_Abs_Test_316L.MPF";
 
 //mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
 //mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";

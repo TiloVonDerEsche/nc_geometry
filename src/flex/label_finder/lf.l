@@ -41,9 +41,11 @@ id       [A-Za-z][_A-Za-z0-9]*
 
 
 "END_LABEL:" {
-  char label[MAX_LABEL_LEN+11];
-  snprintf(label, sizeof(label), "%s_END_LABEL", active_label);
-  set_var(label, (float)line);
+  char start_end_l[MAX_LABEL_LEN+11];
+  //construct label="<start_label>_END_LABEL"
+  snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", active_label);
+  //save the line of this END_LABEL under: "<start_label>_END_LABEL"
+  set_var(start_end_l, (float)line);
 
 }
 

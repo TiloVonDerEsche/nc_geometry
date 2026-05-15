@@ -152,12 +152,16 @@ exprs:
 expr:
   IF SEP bool_expr {
       if (!$3) {
-          skip++;
+          skip++; //ignore code lines, if condition is false
           if(debug) {printf("Skip=%d\n",skip);}
       }
   } if_body ENDIF {
       if (skip > 0) {
-        skip--;
+        skip--; //decr skip, to resume to normal code line execution
+        //we are using skip as a counter, to allow nested false IF blocks
+        //ToDo: Are nested false IF blocks possible?
+        //Can't we just ignore the inner IF blocks, if the outer is false
+        //-> I guess?
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
@@ -208,11 +212,14 @@ expr:
                         if(!skip && !is_empty(&ret_stack)){
 
                           Elem top;
+                          //Get stack top, without removing it from the stack
                           peek(&ret_stack, &top);
                           printf("$1_LABEL=%s, ret_stack_top.label=%s\n",$1,top.label);
 
+                          //if the currently read LABEL="END_LABEL"
                           printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
                           if((strcmp($1,"END_LABEL") == 0)) {
+                            //d->distance btw current line_num and 
                             int d = get_var_val("line")-get_var_val(top.label);
                             printf("d=%d\n...\n",d);
                             if(abs(d)<=1) {

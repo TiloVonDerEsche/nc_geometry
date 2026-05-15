@@ -180,12 +180,13 @@ expr:
                                 default: break;
                               }
                             }
-                            //handle special use cases of coords (X,Y,Z) (& (A,B,C))
-                            else if (is_coord($1[0])) {
-                              //handle (X,Y,Z) assignment after ROT command
+
+                            if (!rot_mode) {
+                              //Save the value of every CMD token in the hashmap.
+                              set_var($1,$2);
 
                               //handle (X,Y,Z) in the experimental tracks_def_by_coord_lines mode
-                              else if (!config.tracks_def_by_laser && !(track_written>0))
+                              if (!config.tracks_def_by_laser && !(track_written>0))
                               {
                                 B = net_point();
                                 write_track_line();
@@ -194,18 +195,13 @@ expr:
                                 track_written = config.track_mid_len;
                               }
                             }
-
-
-                            if (!rot_mode) {
-                              //Save the value of every CMD token in the hashmap.
-                              set_var($1,$2);}
-                            }
                             //Don't save (X,Y,Z) values, if they are part of a ROT cmd:
                             //f.e.: ROT X15 Z5, should NOT modify X=15 & Z=5
-                            else if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
+                            else if ($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z') {
                               set_var_rot($1[0], $2);
                             }
                          }
+                       }
   | ROT                {rot_mode = 1;}
   | assignment
   | LABEL              {

@@ -46,7 +46,6 @@ id       [A-Za-z][_A-Za-z0-9]*
   snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", active_label);
   //save the line of this END_LABEL under: "<start_label>_END_LABEL"
   set_var(start_end_l, (float)line);
-
 }
 
 {letter}{id}":" {
@@ -62,7 +61,7 @@ id       [A-Za-z][_A-Za-z0-9]*
   char line_label[MAX_LABEL_LEN+6];
   snprintf(line_label, sizeof(line_label), "%s_line", active_label);
   set_var(line_label, (float)line);
-  }
+}
 
 "\""[^\"]*"\"" { if(debug){ printf("A string: %s\n",lftext); }}
 ";"[^\n]*      {if(debug){ printf("A comment: %s\n", lftext); }}
@@ -72,7 +71,7 @@ id       [A-Za-z][_A-Za-z0-9]*
 "\n"           {line++;}
 <<EOF>>        {return 0;}
 
-.	       {}
+.	             {}
 
 %%
 

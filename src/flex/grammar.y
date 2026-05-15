@@ -219,10 +219,18 @@ expr:
                           //if the currently read LABEL="END_LABEL"
                           printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
                           if((strcmp($1,"END_LABEL") == 0)) {
-                            //d->distance btw current line_num and 
+                            //d->distance btw
+                            //current runtime line and
+                            //noted line of "<start_label>_END_LABEL" construct
                             int d = get_var_val("line")-get_var_val(top.label);
                             printf("d=%d\n...\n",d);
+
+                            //lf -> label_finder
+                            //tolerate off by one error, btw runtime- and lf-line
                             if(abs(d)<=1) {
+                               //if the lines of "<start_label>_END_LABEL" construct,
+                               //and the runtime line match, then we found the END_LABEL,
+                               //to the currently active REPEAT block
                                printf("'END_LABEL' found! top.label=%s\n",top.label);
 
                                jump_requested = 1;

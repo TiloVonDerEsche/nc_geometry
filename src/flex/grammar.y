@@ -163,25 +163,28 @@ expr:
     }
   | CMD arith_expr       {
                           if(!skip){
+                            //handle G codes
                             if($1[0] == 'G') {
                               switch((int)$2) {
+                                //Nullpunktverschiebung (NPV) =^ origin_offset
                                 case 54: origin_offset=(vec3D){0,0,139.4};break; //
                                 case 55: origin_offset=(vec3D){0,0,124.4};break; //
                                 case 56: origin_offset=(vec3D){0,10,0};break;
                                 case 57: origin_offset=(vec3D){0,0,10};break;
                                 case 58: origin_offset=(vec3D){10,15,0};break;
                                 case 59: origin_offset=(vec3D){0,10,20};break;
-                                case 90: incr_mode=0;break;
-                                case 91: incr_mode=1;break;
+                                //(Un-)Set incr_mode ->
+                                //assingments of coords is absolute or relative
+                                case 90: incr_mode=0;break; //absolute
+                                case 91: incr_mode=1;break; //relative
                                 default: break;
                               }
                             }
+                            //handle special use cases of coords (X,Y,Z) (& (A,B,C))
                             else if (is_coord($1[0])) {
-                              if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
-                                && rot_mode) {
-                                  set_var_rot($1[0], $2);
-                              }
+                              //handle (X,Y,Z) assignment after ROT command
 
+                              //handle (X,Y,Z) in the experimental tracks_def_by_coord_lines mode
                               else if (!config.tracks_def_by_laser && !(track_written>0))
                               {
                                 B = net_point();
@@ -192,9 +195,16 @@ expr:
                               }
                             }
 
+
                             if (!rot_mode) {
-                            set_var($1,$2);}
-                          }
+                              //Save the value of every CMD token in the hashmap.
+                              set_var($1,$2);}
+                            }
+                            //Don't save (X,Y,Z) values, if they are part of a ROT cmd:
+                            //f.e.: ROT X15 Z5, should NOT modify X=15 & Z=5
+                            else if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' )
+                              set_var_rot($1[0], $2);
+                            }
                          }
   | ROT                {rot_mode = 1;}
   | assignment

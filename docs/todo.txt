@@ -1,106 +1,14 @@
-linuxCNC approach:
-Afterwards perhaps split parser logic, to avoid programming
-CUSTOM_VARs SPECIAL_CMD etc. per hand in switch case
-simple parser for old school linear NC code
-bison parser for IF cond goto statements and arith_expr & bool_expr
-
-Distinguish between a program flow mode and motion mode ()
-Merge btw simple CSV like G-Code and Assembly like programming
-
 |=======================================================|
-
-First finish our approach:
-"
-GOTOF LOOP1
-
-LOOP1:
-"
-REPEAT
-
-
 Fix line off by one error
+-> Stop with ball search non-sense
+!Our runtime line should not be wrong!
 
 Exprs before ENDIF don't seem to execute
 
-G Codes:
-If not G1 & G2 used "Z coord without move"
-this.planeAxes = ['X', 'Y', 'Z']
-if (plane === 'G18') {
-    this.planeAxes = ['Z', 'X', 'Y']
-}
-if (plane === 'G19') {
-    this.planeAxes = ['Y', 'Z', 'X']
-}
-
-DIAM ON / OFF / 90
-
-    if (pole.type) {
-        if (pole.X && View.sinumerikView.parseData.diamon) {
-            pole.X *= 2
-        }
-        if (pole.type == 'G110') {
-            if (pole.X != undefined) {
-                View.sinumerikView.parseData.pole.X = coordsInFrame.X + pole.X;
-            }
-            if (pole.Y != undefined) {
-                View.sinumerikView.parseData.pole.X = coordsInFrame.Y + pole.Y;
-            }
-            if (pole.Z != undefined) {
-                View.sinumerikView.parseData.pole.Z = coordsInFrame.Z + pole.Z;
-            }
-        }
-        if (pole.type == 'G111') {
-            if (pole.X != undefined) {
-                View.sinumerikView.parseData.pole.X = pole.X;
-            }
-            if (pole.Y != undefined) {
-                View.sinumerikView.parseData.pole.Y = pole.Y;
-            }
-            if (pole.Z != undefined) {
-                View.sinumerikView.parseData.pole.Z = pole.Z;
-            }
-        }
-        if (pole.type == 'G112') {
-            if (pole.X != undefined) {
-                View.sinumerikView.parseData.pole.X = View.sinumerikView.parseData.pole.X + pole.X;
-            }
-            if (pole.Y != undefined) {
-                View.sinumerikView.parseData.pole.Y = View.sinumerikView.parseData.pole.Y + pole.Y;
-            }
-            if (pole.Z != undefined) {
-                View.sinumerikView.parseData.pole.Z = View.sinumerikView.parseData.pole.Z + pole.Z;
-            }
-        }
-
 
 |===============Stress Tests===============|
-When spam starting the .exe, sometimes it gets stuck in an endless loop, on the
-start timer string.
-
-When setting hmhis_to_file to 1, the LOOP_CUBE program only builds
-8 tracks in right angle form (like 2 tracks at 90°)
-
-Non-determinism problem.
-Semingly jumping fseek in a reduction rule can cause a race condition
-Adding yyclearin after yyrestart makes it worse.
--> A fix could be to preload the mpf file
-  into a str array and jump with line indices
+Build or find a simple benchmarking tool.
+Construct Test Cases (Assertions)
+./src/benchmark/run_tests.bin
 
 |=======================================================|
-Optimizations, Third Release:
-
-Only print the vars in the hashmap that changed their value
-(term: delta encoding)
-cJSON or equivalents doesn't seem to have historical lookup as built in feat
-
-
-hmhis.json optional debug output
-Additional live hashmap.
-One hashmap for current state one for previous state.
-
--> Live track detection and filling of track_list
-
-- Merge hmhis generation and track detection into ONE pass
-- Keep OpenGL viewer separate (good modular design)
-- Make hmhis.json optional debug output
-- Use prev vs current state in memory for change detection

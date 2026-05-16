@@ -178,7 +178,7 @@ expr:
                                 case 58: origin_offset=(vec3D){10,15,0};break;
                                 case 59: origin_offset=(vec3D){0,10,20};break;
                                 //(Un-)Set incr_mode ->
-                                //assingments of coords is absolute or relative
+                                //assingments of coords happens absolute or relative
                                 case 90: incr_mode=0;break; //absolute
                                 case 91: incr_mode=1;break; //relative
                                 default: break;
@@ -189,7 +189,8 @@ expr:
                               //Save the value of every CMD token in the hashmap.
                               set_var($1,$2);
 
-                              //handle (X,Y,Z) in the experimental tracks_def_by_coord_lines mode
+                              //handle (X,Y,Z) points rotated
+                              //in the experimental tracks_def_by_coord_lines mode
                               if (!config.tracks_def_by_laser && !(track_written>0))
                               {
                                 B = net_point();
@@ -273,9 +274,9 @@ expr:
                         }
   | REPEAT SEP MISC_ID %prec LOW_PREC
                         {if(!skip){
-                            char end_label[32+11];
-                            snprintf(end_label, sizeof(end_label), "%s_END_LABEL", $3);
-                            handle_repeat($3,end_label,(size_t)get_var_val("line"));}
+                            char start_end_l[32+11];
+                            snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $3);
+                            handle_repeat($3,start_end_l,(size_t)get_var_val("line"));}
                         }
   | REPEAT SEP MISC_ID SEP MISC_ID
                         {if(!skip){
@@ -447,7 +448,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
 
   request_jump(start_label);
 
-  if (debug || 1) {
+  if (debug > 0) {
     Elem temp;
     if (peek(&ret_stack, &temp)) {
         printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
@@ -466,6 +467,7 @@ void write_track_line() {
 
 
 void set_var_incr(char* varname, float fnum) {
+    //incr_mode only applies to (X,Y,Z) & (A,B,C), which we call coords
     if (incr_mode && is_coord(varname[0])) {
       set_var(varname, get_var_val(varname)+fnum);
     }

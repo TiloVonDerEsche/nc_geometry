@@ -240,16 +240,6 @@ void motion(int x, int y) {
     }
 }
 
-/*
-void keyboard(unsigned char key, int x, int y) {
-    float speed = 1.0f;
-    if (key == 'w') camZ -= speed;
-    if (key == 's') camZ += speed;
-    if (key == 'a') camX -= speed;
-    if (key == 'd') camX += speed;
-    glutPostRedisplay();
-}*/
-
 void keyboard(unsigned char key, int x, int y) {
     float speed = 1.0f;
 
@@ -280,6 +270,12 @@ void keyboard(unsigned char key, int x, int y) {
     if (key == 'd') {
         camX += rightX * speed;
         camZ += rightZ * speed;
+    }
+    if (key == ' ') {
+        camY += speed;
+    }
+    if (key == 'c') {
+        camY -= speed;
     }
 
     glutPostRedisplay();

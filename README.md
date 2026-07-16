@@ -34,8 +34,8 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
    
-4. Start `3d_track_visualizer.exe` — This should open a window with a 3D model of the tracks, which are drawn as elliptical cylinders.  
-   You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.
+4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks, which are drawn as cylinders, with an elliptical base.  
+   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around.
    
 # Version-Features of **`generate_track_list.exe`**:
 - **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables. 
@@ -47,6 +47,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 - # Version-Features of **`3d_track_visualizer.exe`**:
 - **`0.1`** Seperate GitHub Repo.
+- **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements: <br>

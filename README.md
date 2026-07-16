@@ -59,8 +59,8 @@ Requirements: <br>
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
    Alternativly you can just **execute the commands**, which are specified in the Makefile:
    - **`flex -l lex.l`**
-	- **`bison -dv grammar.y`**
-	- **`gcc -o ./../../generate_track_list main.c`**
+   - **`bison -dv grammar.y`**
+   - **`gcc -o ./../../generate_track_list main.c`**
 # Download
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a .zip, if interested.
 [Download from Releases](releases) <br>

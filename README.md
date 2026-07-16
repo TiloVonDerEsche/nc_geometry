@@ -1,4 +1,3 @@
-[![Linux build generate_track_list.bin](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml/badge.svg)](https://github.com/TiloVonDerEsche/nc_geometry/actions/workflows/linux_compile.yml) <br>
 # Info
 This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
@@ -18,7 +17,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 1. Put `config.txt` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
 2. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
-   - **`print_strs`** — Prints the strings of the NC Code, which are denoted by '"'<Str_Content>'"', when set to 1.
+   - **`print_strs`** — Puts strings of the NC Code, which are denoted by these quotation marks: "A valid String!", when set to 1, on stdout.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.
    - **`hmhis_to_file`** — Enables hashmap (memory of variables) snapshot printing to hmhis.json file, for every NC code line, when set to 1
    - **`tracks_def_by_laser`** — Enables experimental track defined by track_mid_len and coordinate-modification-lines (coord-lines), when set to 0.
@@ -34,8 +33,8 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
    
-4. Start `3d_track_visualizer.exe` — This should open a window with a 3D model of the tracks, which are drawn as elliptical cylinders.  
-   You can traverse this 3D space using the **WASD** keys and holding down the **left mouse button**.
+4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks, which are drawn as cylinders, with an elliptical base.  
+   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around.
    
 # Version-Features of **`generate_track_list.exe`**:
 - **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables. 
@@ -45,23 +44,23 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.5`** GLR Parsing -> Expand Look-Ahead-buffer (currently size 1)
 - **`0.6`** Complex user-variable types and functions.
 
-- # Version-Features of **`3d_track_visualizer.exe`**:
-- **`0.1`** Seperate GitHub Repo.
+# Version-Features of **`3d_track_visualizer.exe`**:
+- **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend
 
 # Building **`generate_track_list.exe`** yourself:
-Requirements: <br>
+Requirements:
 - **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
-- `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
-<br>
+- **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
+
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
-   Alternativly you can just **execute the commands**, which are specified in the Makefile:
-   - **`flex -l lex.l`**
-	- **`bison -dv grammar.y`**
-	- **`gcc -o ./../../generate_track_list main.c`**
+Alternativly you can just **execute the commands**, which are specified in the Makefile:
+- **`flex -l lex.l`**
+- **`bison -dv grammar.y`**
+- **`gcc -o ./../../generate_track_list main.c`**
 # Download
-Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a .zip, if interested.
-[Download from Releases](releases) <br>
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
+Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested.
+[Download from Releases](releases), or <br>
+Click here: [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
 

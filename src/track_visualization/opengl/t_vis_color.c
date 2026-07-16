@@ -171,9 +171,9 @@ void display() {
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
     // Camera setup
-    glTranslatef(-camX, -camY, -camZ);
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
+    glTranslatef(-camX, -camY, -camZ);
 
 
     // Draw tracks with color based on z-position
@@ -240,6 +240,7 @@ void motion(int x, int y) {
     }
 }
 
+/*
 void keyboard(unsigned char key, int x, int y) {
     float speed = 1.0f;
     if (key == 'w') camZ -= speed;
@@ -247,7 +248,43 @@ void keyboard(unsigned char key, int x, int y) {
     if (key == 'a') camX -= speed;
     if (key == 'd') camX += speed;
     glutPostRedisplay();
+}*/
+
+void keyboard(unsigned char key, int x, int y) {
+    float speed = 1.0f;
+
+    // Convert yaw from degrees to radians for math.h functions
+    float yawRad = camYaw * M_PI / 180.0f;
+
+    // Calculate forward and right vectors based on current Yaw
+    float forwardX = sinf(yawRad);
+    float forwardZ = -cosf(yawRad);
+    float rightX = cosf(yawRad);
+    float rightZ = sinf(yawRad);
+
+    // 'W' and 'S' move forward/backward along the gaze direction
+    if (key == 'w') {
+        camX += forwardX * speed;
+        camZ += forwardZ * speed;
+    }
+    if (key == 's') {
+        camX -= forwardX * speed;
+        camZ -= forwardZ * speed;
+    }
+
+    // 'A' and 'D' strafe left/right relative to the gaze direction
+    if (key == 'a') {
+        camX -= rightX * speed;
+        camZ -= rightZ * speed;
+    }
+    if (key == 'd') {
+        camX += rightX * speed;
+        camZ += rightZ * speed;
+    }
+
+    glutPostRedisplay();
 }
+
 
 int main(int argc, char** argv) {
     read_config("config.txt",&config);

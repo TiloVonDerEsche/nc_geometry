@@ -9,7 +9,7 @@ This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC I
 - overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)
 <br>
 A track is traditionally detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
-
+<br>
 The NC Interpreter is designed around the dialect of the AddUp M400 machine. <br>
 The following Sinumerik manual seems to describe that dialect: <br>
 https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf <br>
@@ -55,9 +55,9 @@ Requirements: <br>
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
-
+<br>
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
-
+<br>
 Alternativly you can just **execute the commands**, which are specified in the Makefile: <br>
 - **`flex -l lex.l`**
 - **`bison -dv grammar.y`**

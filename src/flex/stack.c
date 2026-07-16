@@ -30,7 +30,7 @@ int is_full(Stack *stack) {
 
 int push(Stack *stack, char* label, size_t line, long byte_offset) { //Elem value) {
     if (is_full(stack)) {
-        printf("Stack Overflow\n");
+        printf("Stack is full!\n");
         return 0;
     }
     stack->top++;
@@ -45,7 +45,7 @@ int push(Stack *stack, char* label, size_t line, long byte_offset) { //Elem valu
 
 int pop(Stack *stack, Elem *out) {
     if (is_empty(stack)) {
-        printf("Stack Underflow\n");
+        printf("Stack is empty!\n");
         return 0;}
     *out = stack->arr[stack->top--];
     return 1;

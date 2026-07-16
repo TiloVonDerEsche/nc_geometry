@@ -49,15 +49,14 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.1`** Seperate GitHub Repo.
 - **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend
 
-# Building **`generate_track_list.exe`** yourself:
-Requirements: <br>
+# Building **`generate_track_list.exe`** yourself
+Requirements:
 - **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
-<br>
+
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
-<br>
 Alternativly you can just **execute the commands**, which are specified in the Makefile:
 - **`flex -l lex.l`**
 - **`bison -dv grammar.y`**

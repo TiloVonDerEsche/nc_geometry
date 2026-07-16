@@ -62,6 +62,6 @@ Alternativly you can just **execute the commands**, which are specified in the M
 - **`gcc -o ./../../generate_track_list main.c`**
 # Download
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested.
-[Download from Releases](releases) <br>
+[Download from Releases](releases), or click here: <br>
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
 

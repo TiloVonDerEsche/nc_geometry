@@ -18,7 +18,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 1. Put `config.txt` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
 2. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
-   - **`print_strs`** — Prints the strings of the NC Code, which are denoted by '"'<Str_Content>'"', when set to 1.
+   - **`print_strs`** — Prints the strings of the NC Code, which are denoted by these quotation marks: "A valid String!", when set to 1.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.
    - **`hmhis_to_file`** — Enables hashmap (memory of variables) snapshot printing to hmhis.json file, for every NC code line, when set to 1
    - **`tracks_def_by_laser`** — Enables experimental track defined by track_mid_len and coordinate-modification-lines (coord-lines), when set to 0.

@@ -58,7 +58,7 @@ Requirements: <br>
 <br>
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
 <br>
-Alternativly you can just **execute the commands**, which are specified in the Makefile: <br>
+Alternativly you can just **execute the commands**, which are specified in the Makefile:
 - **`flex -l lex.l`**
 - **`bison -dv grammar.y`**
 - **`gcc -o ./../../generate_track_list main.c`**

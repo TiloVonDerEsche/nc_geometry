@@ -38,7 +38,7 @@ else
     CFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
     LIBS = -L/home/tilo/res/freeglut/build/lib -L/home/tilo/res/glew/lib \
            -lglut -lGLEW -lGL -lGLU -lm
-    LDFLAGS = 
+    LDFLAGS =
 endif
 
 # --- Rules ---

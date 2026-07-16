@@ -171,9 +171,9 @@ void display() {
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
     // Camera setup
+    glRotatef(camRoll, 0, 0, 1);
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
-    glRotatef(camRoll, 0, 0, 1);
     glTranslatef(-camX, -camY, -camZ);
 
 
@@ -233,51 +233,94 @@ void motion(int x, int y) {
     if (buttonDown) {
         camYaw += (x - lastX) * 0.1f;
         camPitch += (y - lastY) * 0.1f;
-        if (camPitch > 89.0f) camPitch = 89.0f;
-        if (camPitch < -89.0f) camPitch = -89.0f;
+        //if (camPitch > 89.0f) camPitch = 89.0f;
+        //if (camPitch < -89.0f) camPitch = -89.0f;
         lastX = x;
         lastY = y;
         glutPostRedisplay();
     }
 }
 
+// Helper to calculate camera's local axes based on Yaw, Pitch, and Roll
+void getCameraAxes(float yawDeg, float pitchDeg, float rollDeg,
+                      float* rx, float* ry, float* rz,  // Right vector
+                      float* ux, float* uy, float* uz,  // Up vector
+                      float* fx, float* fy, float* fz)  // Forward vector
+{
+    // Convert angles to radians
+    float y = yawDeg * M_PI / 180.0f;
+    float p = pitchDeg * M_PI / 180.0f;
+    float r = rollDeg * M_PI / 180.0f;
+
+    // Precompute sine and cosine values
+    float cy = cosf(y), sy = sinf(y);
+    float cp = cosf(p), sp = sinf(p);
+    float cr = cosf(r), sr = sinf(r);
+
+    // This computes the columns of the combined rotation matrix: R = R_yaw * R_pitch * R_roll
+    // 1. Local Forward (F) direction (gaze vector)
+    *fx = sy * cp;
+    *fy = -sp;
+    *fz = -cy * cp;
+
+    // 2. Local Right (R) direction (for strafing)
+    *rx = cy * cr + sy * sp * sr;
+    *ry = cp * sr;
+    *rz = sy * cr - cy * sp * sr;
+
+    // 3. Local Up (U) direction (for vertical movement)
+    *ux = -cy * sr + sy * sp * cr;
+    *uy = cp * cr;
+    *uz = -sy * sr - cy * sp * cr;
+}
+
 void keyboard(unsigned char key, int x, int y) {
     float speed = 1.0f;
 
-    // Convert yaw from degrees to radians for math.h functions
-    float yawRad = camYaw * M_PI / 180.0f;
+    // Get the exact, current 3D local axes of the camera
+    float rx, ry, rz; // Right
+    float ux, uy, uz; // Up
+    float fx, fy, fz; // Forward
 
-    // Calculate forward and right vectors based on current Yaw
-    float forwardX = sinf(yawRad);
-    float forwardZ = -cosf(yawRad);
-    float rightX = cosf(yawRad);
-    float rightZ = sinf(yawRad);
+    getCameraAxes(camYaw, camPitch, camRoll, &rx, &ry, &rz, &ux, &uy, &uz, &fx, &fy, &fz);
 
-    // 'W' and 'S' move forward/backward along the gaze direction
+    // 'W' and 'S': Move along local Forward vector
     if (key == 'w') {
-        camX += forwardX * speed;
-        camZ += forwardZ * speed;
+        camX += fx * speed;
+        camY += fy * speed;
+        camZ += fz * speed;
     }
     if (key == 's') {
-        camX -= forwardX * speed;
-        camZ -= forwardZ * speed;
+        camX -= fx * speed;
+        camY -= fy * speed;
+        camZ -= fz * speed;
     }
 
-    // 'A' and 'D' strafe left/right relative to the gaze direction
+    // 'A' and 'D': Move along local Right vector (Strafe)
     if (key == 'a') {
-        camX -= rightX * speed;
-        camZ -= rightZ * speed;
+        camX -= rx * speed;
+        camY -= ry * speed;
+        camZ -= rz * speed;
     }
     if (key == 'd') {
-        camX += rightX * speed;
-        camZ += rightZ * speed;
+        camX += rx * speed;
+        camY += ry * speed;
+        camZ += rz * speed;
     }
+
+    // Space and 'C': Move along local Up vector (Ascend/Descend relative to camera roll/pitch!)
     if (key == ' ') {
-        camY += speed;
+        camX += ux * speed;
+        camY += uy * speed;
+        camZ += uz * speed;
     }
     if (key == 'c') {
-        camY -= speed;
+        camX -= ux * speed;
+        camY -= uy * speed;
+        camZ -= uz * speed;
     }
+
+    // Roll controls
     if (key == 'q') {
         camRoll += speed;
     }
@@ -287,7 +330,6 @@ void keyboard(unsigned char key, int x, int y) {
 
     glutPostRedisplay();
 }
-
 
 int main(int argc, char** argv) {
     read_config("config.txt",&config);

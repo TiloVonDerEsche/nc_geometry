@@ -171,10 +171,10 @@ void display() {
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
     // Camera setup
-    glTranslatef(0, 0, -camZ);
+    glTranslatef(-camX, -camY, -camZ);
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
-    glTranslatef(-camX, -camY, 0);
+
 
     // Draw tracks with color based on z-position
     for (int i = 0; i < numTracks; i++) {

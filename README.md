@@ -54,13 +54,14 @@ Requirements: <br>
 - **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
-- `make` (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
+- **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
 <br>
 Navigate to **`./src/flex`** and executing **`make`** in a terminal.
-   Alternativly you can just **execute the commands**, which are specified in the Makefile:
-   - **`flex -l lex.l`**
-   - **`bison -dv grammar.y`**
-   - **`gcc -o ./../../generate_track_list main.c`**
+<br>
+Alternativly you can just **execute the commands**, which are specified in the Makefile:
+- **`flex -l lex.l`**
+- **`bison -dv grammar.y`**
+- **`gcc -o ./../../generate_track_list main.c`**
 # Download
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a .zip, if interested.
 [Download from Releases](releases) <br>

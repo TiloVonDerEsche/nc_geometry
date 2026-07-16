@@ -45,7 +45,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.5`** GLR Parsing -> Expand Look-Ahead-buffer (currently size 1)
 - **`0.6`** Complex user-variable types and functions.
 
-- # Version-Features of **`3d_track_visualizer.exe`**:
+# Version-Features of **`3d_track_visualizer.exe`**:
 - **`0.1`** Seperate GitHub Repo.
 - **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend
 

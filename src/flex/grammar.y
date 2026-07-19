@@ -187,8 +187,8 @@ expr:
                                 default: break;
                               }
                             }
-
-                            if (!rot_mode) {
+                            //TODO untangle this mess, into ABC_CMD and XYZ_CMD case
+                            if (!rot_mode) { //TODO also obv, handle rot_mode in XYZ_CMD case
                               //Save the value of every CMD token in the hashmap.
                               set_var($1,$2);
 
@@ -196,9 +196,9 @@ expr:
                               //in the experimental tracks_def_by_coord_lines mode
                               if (!config.tracks_def_by_laser && !(track_written>0))
                               {
-                                B = net_point();
+                                B = net_point(); //TODO Better names for track-start /-end
                                 write_track_line();
-                                A = net_point();
+                                A = net_point(); //TODO perhaps cleaner sol, than net_point weird global var inline function
                                 //prevent mult writes in line with mult coord cmds
                                 track_written = config.track_mid_len;
                               }

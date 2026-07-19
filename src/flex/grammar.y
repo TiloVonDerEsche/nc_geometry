@@ -63,9 +63,12 @@
 %token ROT
 %token <char*> MISC_ID
 
+%token <char*> VAR //TODO make type char
+%token <char*> CMD //TODO make type char
+%token <char> XYZ_CMD
+%token <char> ABC_CMD
+
 %token <char*> LABEL
-%token <char*> VAR
-%token <char*> CMD
 %token <char*> SPECIAL_CMD
 %token <char*> CUSTOM_VAR
 

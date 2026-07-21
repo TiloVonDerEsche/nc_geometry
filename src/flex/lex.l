@@ -99,7 +99,7 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
              }
 
-G        {yyval.G_CMD = yytext[0]; return G_CMD;}
+[G]      {yylval.G_CMD = yytext[0]; return G_CMD;}
 [XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
 [ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
 {letter} {yylval.CMD = yytext[0];

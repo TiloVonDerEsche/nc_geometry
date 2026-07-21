@@ -34,6 +34,7 @@
   void request_jump(char*);
   void jump(size_t,long);
   void handle_repeat(char*, char*, size_t);
+  void handle_tracks_def_by_coord_lines();
 
   size_t target_line = 0;
   long target_byte_offset = 0;
@@ -282,12 +283,12 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser",1);
-                            if (config.tracks_def_by_laser){A=net_point();}
+                            if (config.tracks_def_by_laser){t_start=net_point();}
 
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
                             set_var("laser",0);
-                            if (config.tracks_def_by_laser){B=net_point();}
+                            if (config.tracks_def_by_laser){t_end=net_point();}
 
                             write_track_line();
                           }
@@ -311,14 +312,16 @@ if_element:
 
 
 assignment:
-  CMD opt_seps '=' opt_seps arith_expr
+  XYZ_CMD opt_seps '=' opt_seps arith_expr
   {if(!skip){
-    if (($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z' ) && rot_mode) {
-      set_var_rot($1[0],$5);
+    if (rot_mode) {
+      set_var_rot($1,$5);
     }
     else {
      set_var_incr($1,$5);
   }}}
+  //NOTE do ABC respond to incr_mode?
+  | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr($1,$5);}}
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
@@ -469,7 +472,7 @@ void handle_tracks_def_by_coord_lines() {
 
 void write_track_line() {
   fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-  tid++, A.x, A.y, A.z, B.x, B.y, B.z,
+  tid++, t_start.x, t_start.y, t_start.z, t_end.x, t_end.y, t_end.z,
   get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
   //coll_vec,
   config.hrad, config.vrad);
@@ -478,7 +481,7 @@ void write_track_line() {
 
 void set_var_incr(char* varname, float fnum) {
     //incr_mode only applies to (X,Y,Z) & (A,B,C), which we call coords
-    if (incr_mode && is_coord(varname[0])) {
+    if (incr_mode) {
       set_var(varname, get_var_val(varname)+fnum);
     }
     else {

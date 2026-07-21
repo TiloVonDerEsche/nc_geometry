@@ -67,16 +67,17 @@ extern int yydebug;
     ROT = 268,                     /* ROT  */
     MISC_ID = 269,                 /* MISC_ID  */
     VAR = 270,                     /* VAR  */
-    CMD = 271,                     /* CMD  */
+    G_CMD = 271,                   /* G_CMD  */
     XYZ_CMD = 272,                 /* XYZ_CMD  */
     ABC_CMD = 273,                 /* ABC_CMD  */
-    LABEL = 274,                   /* LABEL  */
-    SPECIAL_CMD = 275,             /* SPECIAL_CMD  */
-    CUSTOM_VAR = 276,              /* CUSTOM_VAR  */
-    STRING = 277,                  /* STRING  */
-    INT = 278,                     /* INT  */
-    FLOAT = 279,                   /* FLOAT  */
-    LOW_PREC = 280                 /* LOW_PREC  */
+    CMD = 274,                     /* CMD  */
+    LABEL = 275,                   /* LABEL  */
+    SPECIAL_CMD = 276,             /* SPECIAL_CMD  */
+    CUSTOM_VAR = 277,              /* CUSTOM_VAR  */
+    STRING = 278,                  /* STRING  */
+    INT = 279,                     /* INT  */
+    FLOAT = 280,                   /* FLOAT  */
+    LOW_PREC = 281                 /* LOW_PREC  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -85,11 +86,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
+  char VAR;                                /* VAR  */
+  char G_CMD;                              /* G_CMD  */
   char XYZ_CMD;                            /* XYZ_CMD  */
   char ABC_CMD;                            /* ABC_CMD  */
+  char CMD;                                /* CMD  */
   char* MISC_ID;                           /* MISC_ID  */
-  char* VAR;                               /* VAR  */
-  char* CMD;                               /* CMD  */
   char* LABEL;                             /* LABEL  */
   char* SPECIAL_CMD;                       /* SPECIAL_CMD  */
   char* CUSTOM_VAR;                        /* CUSTOM_VAR  */
@@ -102,7 +104,7 @@ union YYSTYPE
   int prog;                                /* prog  */
   int bool_expr;                           /* bool_expr  */
 
-#line 106 "grammar.tab.h"
+#line 108 "grammar.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

@@ -193,14 +193,14 @@ expr:
       if(rot_mode) {
         set_var_rot($1, $2);
       } else {
-        set_var($1,$2);
+        set_var((char[]){$1, '\0'},$2);
         handle_tracks_def_by_coord_lines();
       }
     }
   }
   | ABC_CMD arith_expr {
     if(!skip) {
-      set_var($1,$2);
+      set_var((char[]){$1, '\0'},$2);
       handle_tracks_def_by_coord_lines();
     }
   }
@@ -318,11 +318,11 @@ assignment:
       set_var_rot($1,$5);
     }
     else {
-     set_var_incr($1,$5);
+     set_var_incr((char[]){$1, '\0'},$5);
   }}}
   //NOTE do ABC respond to incr_mode?
-  | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr($1,$5);}}
-  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
+  | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
+  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var((char[]){$1, '\0'},$5);}}
   | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
 ;
@@ -331,7 +331,7 @@ assignment:
 val:
   VAR            {
                   /*printf("Getting VAR=%s\n",$1);*/
-                  $$ = get_var_val($1);
+                  $$ = get_var_val((char[]){$1, '\0'});
                  }
   | CUSTOM_VAR   {
                   /*printf("Getting CUSTOM_VAR=%s\n",$1);*/

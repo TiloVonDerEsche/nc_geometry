@@ -1360,7 +1360,7 @@ yyreduce:
       if(rot_mode) {
         set_var_rot((yyvsp[-1].XYZ_CMD), (yyvsp[0].arith_expr));
       } else {
-        set_var((yyvsp[-1].XYZ_CMD),(yyvsp[0].arith_expr));
+        set_var((char[]){(yyvsp[-1].XYZ_CMD), '\0'},(yyvsp[0].arith_expr));
         handle_tracks_def_by_coord_lines();
       }
     }
@@ -1372,7 +1372,7 @@ yyreduce:
 #line 201 "grammar.y"
                        {
     if(!skip) {
-      set_var((yyvsp[-1].ABC_CMD),(yyvsp[0].arith_expr));
+      set_var((char[]){(yyvsp[-1].ABC_CMD), '\0'},(yyvsp[0].arith_expr));
       handle_tracks_def_by_coord_lines();
     }
   }
@@ -1507,20 +1507,20 @@ yyreduce:
       set_var_rot((yyvsp[-4].XYZ_CMD),(yyvsp[0].arith_expr));
     }
     else {
-     set_var_incr((yyvsp[-4].XYZ_CMD),(yyvsp[0].arith_expr));
+     set_var_incr((char[]){(yyvsp[-4].XYZ_CMD), '\0'},(yyvsp[0].arith_expr));
   }}}
 #line 1513 "grammar.tab.c"
     break;
 
   case 39: /* assignment: ABC_CMD opt_seps '=' opt_seps arith_expr  */
 #line 324 "grammar.y"
-                                                {if(!skip){set_var_incr((yyvsp[-4].ABC_CMD),(yyvsp[0].arith_expr));}}
+                                                {if(!skip){set_var_incr((char[]){(yyvsp[-4].ABC_CMD), '\0'},(yyvsp[0].arith_expr));}}
 #line 1519 "grammar.tab.c"
     break;
 
   case 40: /* assignment: VAR opt_seps '=' opt_seps arith_expr  */
 #line 325 "grammar.y"
-                                                {if(!skip){set_var((yyvsp[-4].VAR),(yyvsp[0].arith_expr));}}
+                                                {if(!skip){set_var((char[]){(yyvsp[-4].VAR), '\0'},(yyvsp[0].arith_expr));}}
 #line 1525 "grammar.tab.c"
     break;
 
@@ -1540,7 +1540,7 @@ yyreduce:
 #line 332 "grammar.y"
                  {
                   /*printf("Getting VAR=%s\n",$1);*/
-                  (yyval.val) = get_var_val((yyvsp[0].VAR));
+                  (yyval.val) = get_var_val((char[]){(yyvsp[0].VAR), '\0'});
                  }
 #line 1546 "grammar.tab.c"
     break;

@@ -6,8 +6,9 @@
 *.json
 *.mpf
 *.zip
-
-
+*.output
+*.tab.*
+*.yy.*
 
 data/
 backup/

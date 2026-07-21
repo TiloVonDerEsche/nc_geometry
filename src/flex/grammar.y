@@ -46,8 +46,8 @@
   int track_written = 0; //bad name, this is a counter to skip lines
 
   size_t tid = 0;
-  vec3D A = {0,0,0};
-  vec3D B = {0,0,0};
+  vec3D t_start = {0,0,0};
+  vec3D t_end = {0,0,0};
 
   Stack ret_stack;
 %}
@@ -63,10 +63,11 @@
 %token ROT
 %token <char*> MISC_ID
 
-%token <char*> VAR //TODO make type char
-%token <char*> CMD //TODO make type char
+%token <char> VAR
+%token <char> G_CMD
 %token <char> XYZ_CMD
 %token <char> ABC_CMD
+%token <char> CMD
 
 %token <char*> LABEL
 %token <char*> SPECIAL_CMD
@@ -168,48 +169,41 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-  | CMD arith_expr       {
-                          if(!skip){
-                            //handle G codes
-                            if($1[0] == 'G') {
-                              switch((int)$2) {
-                                //Nullpunktverschiebung (NPV) =^ origin_offset
-                                case 54: origin_offset=(vec3D){0,0,139.4};break; //
-                                case 55: origin_offset=(vec3D){0,0,124.4};break; //
-                                case 56: origin_offset=(vec3D){0,10,0};break;
-                                case 57: origin_offset=(vec3D){0,0,10};break;
-                                case 58: origin_offset=(vec3D){10,15,0};break;
-                                case 59: origin_offset=(vec3D){0,10,20};break;
-                                //(Un-)Set incr_mode ->
-                                //assingments of coords happens absolute or relative
-                                case 90: incr_mode=0;break; //absolute
-                                case 91: incr_mode=1;break; //relative
-                                default: break;
-                              }
-                            }
-                            //TODO untangle this mess, into ABC_CMD and XYZ_CMD case
-                            if (!rot_mode) { //TODO also obv, handle rot_mode in XYZ_CMD case
-                              //Save the value of every CMD token in the hashmap.
-                              set_var($1,$2);
-
-                              //handle (X,Y,Z) points rotated
-                              //in the experimental tracks_def_by_coord_lines mode
-                              if (!config.tracks_def_by_laser && !(track_written>0))
-                              {
-                                B = net_point(); //TODO Better names for track-start /-end
-                                write_track_line();
-                                A = net_point(); //TODO perhaps cleaner sol, than net_point weird global var inline function
-                                //prevent mult writes in line with mult coord cmds
-                                track_written = config.track_mid_len;
-                              }
-                            }
-                            //Don't save (X,Y,Z) values, if they are part of a ROT cmd:
-                            //f.e.: ROT X15 Z5, should NOT modify X=15 & Z=5
-                            else if ($1[0] == 'X' || $1[0] == 'Y' || $1[0] == 'Z') {
-                              set_var_rot($1[0], $2);
-                            }
-                         }
-                       }
+  | G_CMD arith_expr {if(!skip){
+      //handle G codes
+      switch((int)$2) {
+        //Nullpunktverschiebung (NPV) =^ origin_offset
+        case 54: origin_offset=(vec3D){0,0,139.4};break; //
+        case 55: origin_offset=(vec3D){0,0,124.4};break; //
+        case 56: origin_offset=(vec3D){0,10,0};break;
+        case 57: origin_offset=(vec3D){0,0,10};break;
+        case 58: origin_offset=(vec3D){10,15,0};break;
+        case 59: origin_offset=(vec3D){0,10,20};break;
+        //(Un-)Set incr_mode ->
+        //assingments of coords happens absolute or relative
+        case 90: incr_mode=0;break; //absolute
+        case 91: incr_mode=1;break; //relative
+        default: break;
+      }
+    }
+  }
+  | XYZ_CMD arith_expr {
+    if(!skip) {
+      if(rot_mode) {
+        set_var_rot($1, $2);
+      } else {
+        set_var($1,$2);
+        handle_tracks_def_by_coord_lines();
+      }
+    }
+  }
+  | ABC_CMD arith_expr {
+    if(!skip) {
+      set_var($1,$2);
+      handle_tracks_def_by_coord_lines();
+    }
+  }
+  | CMD arith_expr       {}
   | ROT                {rot_mode = 1;}
   | assignment
   | LABEL              {
@@ -457,6 +451,19 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
         printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
                 temp.label, temp.line, temp.byte_offset);
     }
+  }
+}
+
+void handle_tracks_def_by_coord_lines() {
+  //handle (X,Y,Z) points rotated
+  //in the experimental tracks_def_by_coord_lines mode
+  if (!rot_mode && !config.tracks_def_by_laser && !(track_written>0))
+  {
+    t_end = net_point();
+    write_track_line();
+    t_start = net_point(); //TODO perhaps cleaner sol, than net_point weird global var inline function
+    //prevent mult writes in line with mult coord cmds
+    track_written = config.track_mid_len;
   }
 }
 

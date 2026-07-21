@@ -35,8 +35,8 @@ id       [A-Za-z][_A-Za-z0-9]*
         return FLOAT;
         }
 
-R{inum} {yylval.VAR = strdup(yytext); return VAR;}
-H{inum} {yylval.VAR = strdup(yytext); return VAR;}
+R{inum} {yylval.VAR = yytext[0]; return VAR;}
+H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
 {letter}{id}":" {
                 char* s = yytext;
@@ -99,12 +99,13 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
              }
 
-[XYZ]{fnum}  {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
-[ABC]{fnum}  {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
-{letter}     {yylval.CMD = strdup(yytext);
-                if(debug){ printf("A command: %s\n", yytext); }
-                return CMD;
-             }
+G        {yyval.G_CMD = yytext[0]; return G_CMD;}
+[XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
+[ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
+{letter} {yylval.CMD = yytext[0];
+          if(debug){ printf("A command: %c\n", yytext[0]); }
+          return CMD;
+         }
 
 "_"{id}   {
         if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }

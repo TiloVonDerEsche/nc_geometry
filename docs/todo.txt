@@ -12,3 +12,18 @@ Construct Test Cases (Assertions)
 ./src/benchmark/run_tests.bin
 
 |=======================================================|
+Better syntax error msgs
+Currently only "Error: syntax error, in line: %lld" gets omited.
+A description of what partial rule was taken, would be helpful.
+
+Better WASD and Paning Control in 3d_vis
+WASD moves in very discrete steps,
+The timer for repeating WASD when holding a key is way to long
+-> It should be SMOOTH! Perhaps no noticable discrete teleports
+
+Diagonal movement not possible with WASD!
+Perhaps key is only allowed to have one value,
+and therefore overwritten if two keys are pressed / held
+
+-> Paning is awkward while holding a mouse button,
+   perhaps allow paning just with mouse movement

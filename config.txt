@@ -5,11 +5,11 @@ hmhis_to_file = 0;
 tracks_def_by_laser = 1;
 track_mid_len = 10; //10 for Vase
 
-//mpf_file = "./data/nc_code/SKI/01_SKI_L_1_8_12_CuAL.mpf"
+mpf_file = "./data/nc_code/SKI/01_SKI_L_1_8_12_CuAL.mpf"
 //mpf_file = "./data/nc_code/Bahnen_Z_Abs_Test_316L.MPF";
 //mpf_file = "./data/nc_code/Niere/POS_051_KERN_SG_V5.mpf";
 //mpf_file = "./data/nc_code/test/repeat/windmill.mpf";
-mpf_file = "./data/nc_code/test/dummy/1.mpf";
+//mpf_file = "./data/nc_code/test/dummy/1.mpf";
 
 track_list_csv = "./data/track_list.csv";
 hmhis_json = "./data/hmhis.json";

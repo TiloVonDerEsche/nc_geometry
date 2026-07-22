@@ -17,7 +17,7 @@
   extern void yyrestart(FILE*);
 
   int yylex (void);
-  int yyerror(char* s);
+  int yyerror(const char* s);
 
   int is_coord(char);
   vec3D net_point();
@@ -54,6 +54,7 @@
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
+%define parse.error detailed //bison v3.6+
 
 %token SEP NEWLINE END OTHER
 %token COMMENT
@@ -489,7 +490,7 @@ void set_var_incr(char* varname, float fnum) {
     }
 }
 
-int yyerror(char* s) {
+int yyerror(const char* s) {
 	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
 	return 0;
 }

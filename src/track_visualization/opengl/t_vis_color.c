@@ -231,7 +231,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void motion(int x, int y) {
-    if (buttonDown) {
+    if (buttonDown) { //only allows LMB
         camYaw += (x - lastX) * 0.1f;
         camPitch += (y - lastY) * 0.1f;
         if (camPitch > 89.0f) camPitch = 89.0f;
@@ -239,7 +239,7 @@ void motion(int x, int y) {
         lastX = x;
         lastY = y;
         glutPostRedisplay();
-    }
+     }
 }
 
 //Expected signature for keyboard functions:
@@ -253,7 +253,7 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void handle_movement(int garbage) {
-    float speed = 1.0f;
+    float speed = 0.3f;
 
     // Convert yaw from degrees to radians for math.h functions
     float yawRad = camYaw * M_PI / 180.0f;

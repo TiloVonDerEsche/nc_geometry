@@ -23,9 +23,7 @@ typedef struct {
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
-
 int buttonDown = 0;
-int keys[256] = {0};
 
 // Track data
 Track* tracks = NULL;
@@ -242,17 +240,7 @@ void motion(int x, int y) {
     }
 }
 
-//Expected signature for keyboard functions:
-//glutKeyboardFunc( void (* callback)( unsigned char, int, int ) );
-void keyDown(unsigned char key, int x, int y) { //int x,y needed for signature
-  keys[key] = 1;
-}
-
-void keyUp(unsigned char key, int x, int y) {
-  keys[key] = 0;
-}
-
-void handle_movement(int garbage) {
+void keyboard(unsigned char key, int x, int y) {
     float speed = 1.0f;
 
     // Convert yaw from degrees to radians for math.h functions
@@ -265,35 +253,32 @@ void handle_movement(int garbage) {
     float rightZ = sinf(yawRad);
 
     // 'W' and 'S' move forward/backward along the gaze direction
-    if (keys['w'] || keys['W']) {
+    if (key == 'w') {
         camX += forwardX * speed;
         camZ += forwardZ * speed;
     }
-    if (keys['s'] || keys['S']) {
+    if (key == 's') {
         camX -= forwardX * speed;
         camZ -= forwardZ * speed;
     }
 
     // 'A' and 'D' strafe left/right relative to the gaze direction
-    if (keys['a'] || keys['A']) {
+    if (key == 'a') {
         camX -= rightX * speed;
         camZ -= rightZ * speed;
     }
-    if (keys['d'] || keys['D']) {
+    if (key == 'd') {
         camX += rightX * speed;
         camZ += rightZ * speed;
     }
-    if (keys[' ']) {
+    if (key == ' ') {
         camY += speed;
     }
-    if (keys['c'] || keys['C']) {
+    if (key == 'c') {
         camY -= speed;
     }
 
-    // Request frame redraw
     glutPostRedisplay();
-    // Re-register timer callback for ~60 FPS (16 ms)
-    glutTimerFunc(16, handle_movement, 0);
 }
 
 
@@ -338,10 +323,7 @@ int main(int argc, char** argv) {
     glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
-
-    glutKeyboardFunc(keyDown);
-    glutKeyboardUpFunc(keyUp);
-    glutTimerFunc(0, handle_movement, 0);
+    glutKeyboardFunc(keyboard);
 
     glutMainLoop();
 

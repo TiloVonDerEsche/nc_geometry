@@ -173,7 +173,6 @@ void display() {
     // Camera setup
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
-    glRotatef(camRoll, 0, 0, 1);
     glTranslatef(-camX, -camY, -camZ);
 
 
@@ -277,12 +276,6 @@ void keyboard(unsigned char key, int x, int y) {
     }
     if (key == 'c') {
         camY -= speed;
-    }
-    if (key == 'q') {
-        camRoll += speed;
-    }
-    if (key == 'e') {
-        camRoll -= speed;
     }
 
     glutPostRedisplay();

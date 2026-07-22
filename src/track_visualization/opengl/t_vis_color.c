@@ -34,40 +34,6 @@ float min_z, max_z;  // Global variables for z-range color mapping
 
 Config config = {0};
 
-// Read CSV file
-void read_csv(const char* filename) {
-    printf("Opening %s...\n",filename);
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        printf("Failed to open %s\n", filename);
-        exit(1);
-    }
-
-    char line[256];
-    fgets(line, sizeof(line), file); // Skip header
-
-    int count = 0;
-    while (fgets(line, sizeof(line), file)) count++;
-    numTracks = count;
-    tracks = (Track*)malloc(numTracks * sizeof(Track));
-    rewind(file);
-    fgets(line, sizeof(line), file); // Skip header again
-
-    int i = 0;
-    while (fgets(line, sizeof(line), file) && i < numTracks) {
-        float dummy;
-        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
-               &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
-               &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
-        tracks[i].hradius = 0.5;
-        tracks[i].vradius = 0.5;
-        i++;
-    }
-    fclose(file);
-}
-
-
-
 int read_config(const char* filename, Config* config) {
     printf("Opening %s...\n",filename);
     FILE* file = fopen(filename, "r");
@@ -96,11 +62,50 @@ int read_config(const char* filename, Config* config) {
         if (strcmp(key, "tracks_to_plot") == 0) {
             strncpy(config->tracks_to_plot, value, sizeof(config->tracks_to_plot) - 1);
             config->tracks_to_plot[sizeof(config->tracks_to_plot) - 1] = '\0';
+          }
+        else if (strcmp(key, "horizontal_radius") == 0) {
+            config->horizontal_radius = atof(value);
+
+        }
+        else if (strcmp(key, "vertical_radius") == 0) {
+            config->vertical_radius = atof(value);
         }
     }
 
     fclose(file);
     return 0;
+}
+
+// Read CSV file
+void read_csv(const char* filename) {
+    printf("Opening %s...\n",filename);
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("Failed to open %s\n", filename);
+        exit(1);
+    }
+
+    char line[256];
+    fgets(line, sizeof(line), file); // Skip header
+
+    int count = 0;
+    while (fgets(line, sizeof(line), file)) count++;
+    numTracks = count;
+    tracks = (Track*)malloc(numTracks * sizeof(Track));
+    rewind(file);
+    fgets(line, sizeof(line), file); // Skip header again
+
+    int i = 0;
+    while (fgets(line, sizeof(line), file) && i < numTracks) {
+        float dummy;
+        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
+               &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
+               &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
+        tracks[i].hradius = config.horizontal_radius;
+        tracks[i].vradius = config.vertical_radius;
+        i++;
+    }
+    fclose(file);
 }
 
 // Draw an elliptical cylinder from point A to B with correct orientation
@@ -135,6 +140,8 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
         v[1] /= v_len;
         v[2] /= v_len;
     } else {
+        //NOTE the edges of Niere, are circles which point up
+        //are they pointing up, because of the code below?
         v[0] = 1.0f; v[1] = 0.0f; v[2] = 0.0f; // Fallback
     }
 
@@ -219,7 +226,7 @@ void reshape(int w, int h) {
 }
 
 void mouse(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON) {
+    if (button == GLUT_LEFT_BUTTON) { //is LMB held?
         if (state == GLUT_DOWN) {
             buttonDown = 1;
             lastX = x;
@@ -231,9 +238,10 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void motion(int x, int y) {
-    if (buttonDown) { //only allows LMB
+    if (buttonDown) { //only allows paning when holding LMB
         camYaw += (x - lastX) * 0.1f;
         camPitch += (y - lastY) * 0.1f;
+        //limit neck pitch (nodding) to 90°
         if (camPitch > 89.0f) camPitch = 89.0f;
         if (camPitch < -89.0f) camPitch = -89.0f;
         lastX = x;

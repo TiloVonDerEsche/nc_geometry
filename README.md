@@ -29,15 +29,15 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
    - **`horizontal_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
    - **`vertical_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
    - **`track_accel_margin`** — Section-length from the end and start of a track, where the CNC machine (de-/)accelerates. WIP!
-   
+
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
-   
+
 4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks, which are drawn as cylinders, with an elliptical base.  
    **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around.
-   
+
 # Version-Features of **`generate_track_list.exe`**:
-- **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables. 
+- **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables.
 - **`0.2`** IF COND THEN BODY ENDIF Block. GOTOB jump command.
 - **`0.3`** A,B,C work-plain rotation & GOTOF, GOTO and REPEAT.
 - **`0.4`** Binary benchmarking tool.
@@ -50,7 +50,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements:
-- **`bison`** (https://gnuwin32.sourceforge.net/packages/bison.htm) or (https://www.gnu.org/software/bison/)
+- **`bison`** (https://www.gnu.org/software/bison/)
 - **`flex`** (https://gnuwin32.sourceforge.net/packages/flex.htm)
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
@@ -64,4 +64,3 @@ Alternativly you can just **execute the commands**, which are specified in the M
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested.
 [Download from Releases](releases), or <br>
 Click here: [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
-

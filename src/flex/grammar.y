@@ -314,15 +314,15 @@ if_element:
 
 assignment:
   XYZ_CMD opt_seps '=' opt_seps arith_expr
-  {if(!skip){
-    if (rot_mode) {
-      set_var_rot($1,$5);
-    }
-    else {
-     set_var_incr((char[]){$1, '\0'},$5);
-  }}}
-  //NOTE do ABC respond to incr_mode?
+    {if(!skip){
+      if (rot_mode) {
+        set_var_rot($1,$5);
+      }
+      else {
+       set_var_incr((char[]){$1, '\0'},$5);
+    }}}
   | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
+  | CMD opt_seps '=' opt_seps arith_expr        {}
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var((char[]){$1, '\0'},$5);}}
   | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}

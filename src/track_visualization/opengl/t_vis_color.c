@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctype.h>
 
 
 #define FREEGLUT_STATIC 1
@@ -11,6 +12,9 @@
 
 //parse_line and trim
 #include "helper_funcs.h"
+
+#define SPEED 0.3f
+#define SHIFT_BOOST 0.5f
 
 // Structure to hold track data
 typedef struct {
@@ -25,6 +29,7 @@ float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
 
 int buttonDown = 0;
+int isShiftPressed = 0;
 int keys[256] = {0};
 
 // Track data
@@ -253,15 +258,32 @@ void motion(int x, int y) {
 //Expected signature for keyboard functions:
 //glutKeyboardFunc( void (* callback)( unsigned char, int, int ) );
 void keyDown(unsigned char key, int x, int y) { //int x,y needed for signature
-  keys[key] = 1;
+  keys[tolower(key)] = 1;
 }
 
 void keyUp(unsigned char key, int x, int y) {
-  keys[key] = 0;
+  keys[tolower(key)] = 0;
+}
+
+//handles keys like SHIFT, ALT, CTRL
+void modeKeyDown(int key, int x, int y) {
+    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+        isShiftPressed = 1;
+    }
+}
+
+void modeKeyUp(int key, int x, int y) {
+    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+        isShiftPressed = 0;
+    }
 }
 
 void handle_movement(int garbage) {
-    float speed = 0.3f;
+    float speed = SPEED;
+
+    if (isShiftPressed) {
+        speed = SPEED + SHIFT_BOOST;
+    }
 
     // Convert yaw from degrees to radians for math.h functions
     float yawRad = camYaw * M_PI / 180.0f;
@@ -273,28 +295,28 @@ void handle_movement(int garbage) {
     float rightZ = sinf(yawRad);
 
     // 'W' and 'S' move forward/backward along the gaze direction
-    if (keys['w'] || keys['W']) {
+    if (keys['w']) {
         camX += forwardX * speed;
         camZ += forwardZ * speed;
     }
-    if (keys['s'] || keys['S']) {
+    if (keys['s']) {
         camX -= forwardX * speed;
         camZ -= forwardZ * speed;
     }
 
     // 'A' and 'D' strafe left/right relative to the gaze direction
-    if (keys['a'] || keys['A']) {
+    if (keys['a']) {
         camX -= rightX * speed;
         camZ -= rightZ * speed;
     }
-    if (keys['d'] || keys['D']) {
+    if (keys['d']) {
         camX += rightX * speed;
         camZ += rightZ * speed;
     }
     if (keys[' ']) {
         camY += speed;
     }
-    if (keys['c'] || keys['C']) {
+    if (keys['c']) {
         camY -= speed;
     }
 
@@ -341,7 +363,7 @@ int main(int argc, char** argv) {
     //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
     //glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
-    // GLUT callbacks
+    //register GLUT callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
@@ -349,6 +371,8 @@ int main(int argc, char** argv) {
 
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
+    glutSpecialFunc(modeKeyDown);
+    glutSpecialUpFunc(modeKeyUp);
     glutTimerFunc(0, handle_movement, 0);
 
     glutMainLoop();

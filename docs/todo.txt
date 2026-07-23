@@ -4,7 +4,7 @@ Fix line off by one error
 !Our runtime line should not be wrong!
 
 Exprs before ENDIF don't seem to execute
-
+     (^ ,in new lines,)
 
 |===============Stress Tests===============|
 Build or find a simple benchmarking tool.
@@ -12,18 +12,7 @@ Construct Test Cases (Assertions)
 ./src/benchmark/run_tests.bin
 
 |=======================================================|
-Better syntax error msgs
-Currently only "Error: syntax error, in line: %lld" gets omited.
-A description of what partial rule was taken, would be helpful.
-
-Better WASD and Paning Control in 3d_vis
-WASD moves in very discrete steps,
-The timer for repeating WASD when holding a key is way to long
--> It should be SMOOTH! Perhaps no noticable discrete teleports
-
-Diagonal movement not possible with WASD!
-Perhaps key is only allowed to have one value,
-and therefore overwritten if two keys are pressed / held
-
--> Paning is awkward while holding a mouse button,
-   perhaps allow paning just with mouse movement
+Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
+of a track to face any direction. The shorter radius is normally the vertical.
+Since the pull of gravity flattens the melting pool.
+We should consider the up (or down) vector, when setting the shape of the cylinders.

@@ -30,6 +30,7 @@
   void set_var(char*, float);
 
   void write_track_line();
+  void write_ncc_line(vec3D);
   void modify_tl();
 
   void request_jump(char*);
@@ -46,8 +47,9 @@
   int rot_mode = 0;
 
   int track_written = 0; //bad name, this is a counter to skip lines
+  int is_coord_line = 0;
 
-  size_t tid = 0;
+  size_t tid = 0; size_t pid = 0;
   vec3D t_start = {0,0,0};
   vec3D t_end = {0,0,0};
 
@@ -125,6 +127,7 @@ line:
 
      if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
      if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
+     if(is_coord_line) {write_ncc_line(net_point());is_coord_line=0;}
 
      if (jump_requested) {
           jump_requested = 0;
@@ -197,6 +200,7 @@ expr:
       } else {
         set_var((char[]){$1, '\0'},$2);
         handle_tracks_def_by_coord_lines();
+        is_coord_line=1;
       }
     }
   }
@@ -204,6 +208,7 @@ expr:
     if(!skip) {
       set_var((char[]){$1, '\0'},$2);
       handle_tracks_def_by_coord_lines();
+      is_coord_line=1;
     }
   }
   | CMD arith_expr       {}
@@ -478,6 +483,12 @@ void write_track_line() {
   get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
   //coll_vec,
   config.hrad, config.vrad);
+}
+
+void write_ncc_line(vec3D p) {
+  fprintf(ncc_points,"%lu, %lu, %f, %f, %f, %f, %f\n",
+  tid, pid++, p.x, p.y, p.z,
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"));
 }
 
 

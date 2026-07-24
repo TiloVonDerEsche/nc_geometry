@@ -50,8 +50,9 @@ main(int argc, char *argv[])
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
   }
   tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
-  laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
-  ncc_points = init_file(config.ncc_points_csv, "Track_id,A.x,A.y,A.z,B.x,B.y,B.z");
+  \rlaser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
+  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
+  \rlaser_power,machine_speed");
 
   yyparse();
 

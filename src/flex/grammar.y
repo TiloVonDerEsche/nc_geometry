@@ -11,6 +11,7 @@
 
   extern FILE* hmhis;
   extern FILE* tl;
+  extern FILE* ncc_points;
 
   extern FILE* yyin;
 

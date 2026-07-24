@@ -20,6 +20,7 @@ typedef struct {
 
   char mpf_file[256];
   char track_list_csv[256];
+  char ncc_points_csv[256];
   char hmhis_json[256];
 
   float hrad;
@@ -44,6 +45,7 @@ extern strfloat_t* h;
 
 extern FILE* hmhis;
 extern FILE* tl;
+extern FILE* ncc_points;
 extern FILE* yyin;
 
 //===========Functions===========//

@@ -10,6 +10,7 @@ strfloat_t* h = NULL;
 
 FILE* hmhis = NULL;
 FILE* tl = NULL;
+FILE* ncc_points = NULL;
 
 //===========Functions===========//
 //-----file functions-----//
@@ -321,6 +322,10 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "track_list_csv") == 0) {
             strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);
             config->track_list_csv[sizeof(config->track_list_csv) - 1] = '\0';
+        }
+        else if (strcmp(key, "ncc_points_csv") == 0) {
+            strncpy(config->ncc_points_csv, value, sizeof(config->ncc_points_csv) - 1);
+            config->ncc_points_csv[sizeof(config->ncc_points_csv) - 1] = '\0';
         }
         else if (strcmp(key, "hmhis_json") == 0) {
             strncpy(config->hmhis_json, value, sizeof(config->hmhis_json) - 1);

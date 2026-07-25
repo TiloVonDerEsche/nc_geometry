@@ -1,13 +1,14 @@
-SRC = ./marchingsource.cpp
+SRC = ./main.c
 OUT = run.bin
 ROOT_DIR = .
 
-STD = -std=c++20
-CC = g++
-CFLAGS = -Wall
-IFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
+
+
+CC = gcc
+CFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
 LIBS = -L/home/tilo/res/freeglut/build/lib -L/home/tilo/res/glew/lib
 LDFLAGS = -lglut -lGLEW -lGL -lGLU -lm
+
 
 $(OUT): $(SRC)
 	$(CC) $(SRC) -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)

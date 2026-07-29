@@ -17,5 +17,15 @@ of a track to face any direction. The shorter radius is normally the vertical.
 Since the pull of gravity flattens the melting pool.
 We should consider the up (or down) vector, when setting the shape of the cylinders.
 
-nccp_to_mesh.py, exposed a flaw of the ncc_points generation. The machine paths, between the tracks, are currently mapped to a tid, making them part of a track. We need to think of a solution for the tid value, when LASER=OFF. Perhaps we set it to -1, or we just multiply the current tid with -1. Meaning that negative tid's, indicate that the point is part off an inbetween (machine path) track
 
+Each ncc_point is the center of a metaball.
+Implement sliders in the 3d_track_vis, which sets the radius / radii of the metaballs.
+So that the user can experiment, when the beads will touch / flow into one-another.
+Read up on the isosurface Interpolation between the metaballs.
+
+Meatballs should have a radius each, which later depends on the laser_power and the laser_exposure_time of that bead (metaball).
+This should simulate the degree of meltedness.
+For this also experiment with the isosurface Interpolation between the metaballs.
+
+Steps:
+- First: construct spheres around each ncc_point, with each vertex (ncc_point) having their own settable radius.

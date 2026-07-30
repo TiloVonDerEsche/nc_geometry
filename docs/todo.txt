@@ -11,6 +11,9 @@ Build or find a simple benchmarking tool.
 Construct Test Cases (Assertions)
 ./src/benchmark/run_tests.bin
 
+|=================Fix Rotations====================|
+Matrix Transformation is non-communitative. Meaning A*B is not the same as B*A.
+Try reversing the application order of the rotation cmds, and plot the vase.
 |=======================================================|
 Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
 of a track to face any direction. The shorter radius is normally the vertical.

@@ -190,7 +190,8 @@ vec3D rot_z(vec3D p, float t) {
 }
 
 vec3D rot_xyz(vec3D p, vec3D rot) {
-   return rot_x(rot_y(rot_z(p,rot.z),rot.y),rot.x);
+   return rot_x(rot_y(rot_z(p,rot.z),rot.y),rot.x); //zyx order
+   //return rot_z(rot_y(rot_x(p,rot.x),rot.y),rot.z); //xyz order
 }
 
 vec3D rot_point(vec3D p) {

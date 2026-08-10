@@ -210,6 +210,10 @@ vec3D abc_point(vec3D p) {
   return rot_xyz(p, abc);
 }
 
+// [cos(t) -sin(t) 0 a ] [x]
+// [sin(t) cos(t) 0  b ] [y]
+// [ 0       0    1  0 ] [z]
+// [ 0       0    0  1 ] [w]  (w=1)
 //only works if machine swivel point is at global origin (0,0,0)
 vec3D to_world_coords(vec3D local_p) {
   //rotate with ROT in local space
@@ -217,7 +221,7 @@ vec3D to_world_coords(vec3D local_p) {
 
   vec3D global_p = vec3D_add(local_p, origin_offset);
   //rotate with ABC in global space
-  global_p = abc_point(global_p);
+  //global_p = abc_point(global_p);
   return global_p;
 }
 

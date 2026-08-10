@@ -10,10 +10,24 @@ Exprs before ENDIF don't seem to execute
 Build or find a simple benchmarking tool.
 Construct Test Cases (Assertions)
 ./src/benchmark/run_tests.bin
+|===============Performance=================|
+-Memory-wise:
+Try to avoid strdup, if possible
+
+-Latency-wise:
 
 |=================Fix Rotations====================|
 Matrix Transformation is non-communitative. Meaning A*B is not the same as B*A.
 Try reversing the application order of the rotation cmds, and plot the vase.
+
+Why are we using multiple 3x3 Matrices?
+We can definetly combine the rotation and transformation (NPV) step, into a 4x4 Matrix.
+(We could even add scaling for Zooming)
+
+Can we combine the X-Y-Z-wise Rotation matricies into one?
+
+Check angle to radians convertion.
+The c std lib fns, should all expect radians!
 |=======================================================|
 Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
 of a track to face any direction. The shorter radius is normally the vertical.

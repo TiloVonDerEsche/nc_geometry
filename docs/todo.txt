@@ -52,3 +52,5 @@ It is not enough to only construct Metaballs around the ncc points. We need to i
 Steps:
 - During LASER_OFF section, multiply the tid with -1
 - Construct spheres around each ncc_point, with each vertex (ncc_point) having their own settable radius.
+
+- Add lighting to 3d_vis, to add a contrast between similar colored parts

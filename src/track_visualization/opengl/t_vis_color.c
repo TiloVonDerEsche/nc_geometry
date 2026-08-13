@@ -358,10 +358,10 @@ int main(int argc, char** argv) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Set material properties for specular highlights
-    //GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    //GLfloat shininess[] = {50.0f};
-    //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    //glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+    GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat shininess[] = {50.0f};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
     //register GLUT callbacks
     glutDisplayFunc(display);

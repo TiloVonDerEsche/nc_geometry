@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <ctype.h>
 
 
 #define FREEGLUT_STATIC 1
@@ -11,6 +12,9 @@
 
 //parse_line and trim
 #include "helper_funcs.h"
+
+#define SPEED 0.3f
+#define SHIFT_BOOST 0.5f
 
 // Structure to hold track data
 typedef struct {
@@ -23,7 +27,10 @@ typedef struct {
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
+
 int buttonDown = 0;
+int isShiftPressed = 0;
+int keys[256] = {0};
 
 // Track data
 Track* tracks = NULL;
@@ -31,40 +38,6 @@ int numTracks = 0;
 float min_z, max_z;  // Global variables for z-range color mapping
 
 Config config = {0};
-
-// Read CSV file
-void read_csv(const char* filename) {
-    printf("Opening %s...\n",filename);
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        printf("Failed to open %s\n", filename);
-        exit(1);
-    }
-
-    char line[256];
-    fgets(line, sizeof(line), file); // Skip header
-
-    int count = 0;
-    while (fgets(line, sizeof(line), file)) count++;
-    numTracks = count;
-    tracks = (Track*)malloc(numTracks * sizeof(Track));
-    rewind(file);
-    fgets(line, sizeof(line), file); // Skip header again
-
-    int i = 0;
-    while (fgets(line, sizeof(line), file) && i < numTracks) {
-        float dummy;
-        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
-               &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
-               &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
-        tracks[i].hradius = 0.5;
-        tracks[i].vradius = 0.5;
-        i++;
-    }
-    fclose(file);
-}
-
-
 
 int read_config(const char* filename, Config* config) {
     printf("Opening %s...\n",filename);
@@ -94,11 +67,50 @@ int read_config(const char* filename, Config* config) {
         if (strcmp(key, "tracks_to_plot") == 0) {
             strncpy(config->tracks_to_plot, value, sizeof(config->tracks_to_plot) - 1);
             config->tracks_to_plot[sizeof(config->tracks_to_plot) - 1] = '\0';
+          }
+        else if (strcmp(key, "horizontal_radius") == 0) {
+            config->horizontal_radius = atof(value);
+
+        }
+        else if (strcmp(key, "vertical_radius") == 0) {
+            config->vertical_radius = atof(value);
         }
     }
 
     fclose(file);
     return 0;
+}
+
+// Read CSV file
+void read_csv(const char* filename) {
+    printf("Opening %s...\n",filename);
+    FILE* file = fopen(filename, "r");
+    if (!file) {
+        printf("Failed to open %s\n", filename);
+        exit(1);
+    }
+
+    char line[256];
+    fgets(line, sizeof(line), file); // Skip header
+
+    int count = 0;
+    while (fgets(line, sizeof(line), file)) count++;
+    numTracks = count;
+    tracks = (Track*)malloc(numTracks * sizeof(Track));
+    rewind(file);
+    fgets(line, sizeof(line), file); // Skip header again
+
+    int i = 0;
+    while (fgets(line, sizeof(line), file) && i < numTracks) {
+        float dummy;
+        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
+               &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
+               &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
+        tracks[i].hradius = config.horizontal_radius;
+        tracks[i].vradius = config.vertical_radius;
+        i++;
+    }
+    fclose(file);
 }
 
 // Draw an elliptical cylinder from point A to B with correct orientation
@@ -133,6 +145,8 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
         v[1] /= v_len;
         v[2] /= v_len;
     } else {
+        //NOTE the edges of Niere, are circles which point up
+        //are they pointing up, because of the code below?
         v[0] = 1.0f; v[1] = 0.0f; v[2] = 0.0f; // Fallback
     }
 
@@ -217,7 +231,7 @@ void reshape(int w, int h) {
 }
 
 void mouse(int button, int state, int x, int y) {
-    if (button == GLUT_LEFT_BUTTON) {
+    if (button == GLUT_LEFT_BUTTON) { //is LMB held?
         if (state == GLUT_DOWN) {
             buttonDown = 1;
             lastX = x;
@@ -229,19 +243,47 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void motion(int x, int y) {
-    if (buttonDown) {
+    if (buttonDown) { //only allows paning when holding LMB
         camYaw += (x - lastX) * 0.1f;
         camPitch += (y - lastY) * 0.1f;
+        //limit neck pitch (nodding) to 90°
         if (camPitch > 89.0f) camPitch = 89.0f;
         if (camPitch < -89.0f) camPitch = -89.0f;
         lastX = x;
         lastY = y;
         glutPostRedisplay();
+     }
+}
+
+//Expected signature for keyboard functions:
+//glutKeyboardFunc( void (* callback)( unsigned char, int, int ) );
+void keyDown(unsigned char key, int x, int y) { //int x,y needed for signature
+  keys[tolower(key)] = 1;
+}
+
+void keyUp(unsigned char key, int x, int y) {
+  keys[tolower(key)] = 0;
+}
+
+//handles keys like SHIFT, ALT, CTRL
+void modeKeyDown(int key, int x, int y) {
+    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+        isShiftPressed = 1;
     }
 }
 
-void keyboard(unsigned char key, int x, int y) {
-    float speed = 1.0f;
+void modeKeyUp(int key, int x, int y) {
+    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+        isShiftPressed = 0;
+    }
+}
+
+void handle_movement(int garbage) {
+    float speed = SPEED;
+
+    if (isShiftPressed) {
+        speed = SPEED + SHIFT_BOOST;
+    }
 
     // Convert yaw from degrees to radians for math.h functions
     float yawRad = camYaw * M_PI / 180.0f;
@@ -253,32 +295,35 @@ void keyboard(unsigned char key, int x, int y) {
     float rightZ = sinf(yawRad);
 
     // 'W' and 'S' move forward/backward along the gaze direction
-    if (key == 'w') {
+    if (keys['w']) {
         camX += forwardX * speed;
         camZ += forwardZ * speed;
     }
-    if (key == 's') {
+    if (keys['s']) {
         camX -= forwardX * speed;
         camZ -= forwardZ * speed;
     }
 
     // 'A' and 'D' strafe left/right relative to the gaze direction
-    if (key == 'a') {
+    if (keys['a']) {
         camX -= rightX * speed;
         camZ -= rightZ * speed;
     }
-    if (key == 'd') {
+    if (keys['d']) {
         camX += rightX * speed;
         camZ += rightZ * speed;
     }
-    if (key == ' ') {
+    if (keys[' ']) {
         camY += speed;
     }
-    if (key == 'c') {
+    if (keys['c']) {
         camY -= speed;
     }
 
+    // Request frame redraw
     glutPostRedisplay();
+    // Re-register timer callback for ~60 FPS (16 ms)
+    glutTimerFunc(16, handle_movement, 0);
 }
 
 
@@ -312,18 +357,29 @@ int main(int argc, char** argv) {
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    // Set material properties for specular highlights
-    //GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    //GLfloat shininess[] = {50.0f};
-    //glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-    //glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-    // GLUT callbacks
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    // Set material properties for specular highlights
+    GLfloat specular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    GLfloat shininess[] = {50.0f};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+
+    //register GLUT callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
-    glutKeyboardFunc(keyboard);
+
+    glutKeyboardFunc(keyDown);
+    glutKeyboardUpFunc(keyUp);
+    glutSpecialFunc(modeKeyDown);
+    glutSpecialUpFunc(modeKeyUp);
+    glutTimerFunc(0, handle_movement, 0);
 
     glutMainLoop();
 

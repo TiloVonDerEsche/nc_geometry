@@ -1,0 +1,17 @@
+obj
+
+
+glTF
+  by Khronos Group  
+  Graphics Language Transmission Format
+
+  supported by Blender, Unity, Maya
+  works directily in browsers 
+  
+  compressed data storage -> "3D JPEG"
+  -> short loading time, small size
+  saves geometry, colors, textures, light, animation 
+
+glb
+  compact binary bundles textures and data
+  

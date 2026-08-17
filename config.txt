@@ -2,7 +2,7 @@ debug_prints = 0;
 print_strs = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
-tracks_def_by_laser = 0;
+tracks_def_by_laser = 0; //0 for Vase
 track_mid_len = 10; //10 for Vase
 
 //mpf_file = "./data/nc_code/SKI/01_SKI_L_1_8_12_CuAL.mpf";

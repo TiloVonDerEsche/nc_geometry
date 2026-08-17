@@ -2,10 +2,8 @@ import numpy as np
 import pandas as pd
 
 
-def csv_to_swept_tube_obj(
-    csv_path, output_obj_path, r_x=1.5, r_y=0.8, n_sides=12
-):
-    df = pd.read_csv(csv_path)
+def csv_to_swept_tube_obj(csv_in_path, obj_out_path, r_x=1.5, r_y=0.8, n_sides=12):
+    df = pd.read_csv(csv_in_path)
     df.columns = [c.strip() for c in df.columns]
 
     vertices = []
@@ -61,7 +59,7 @@ def csv_to_swept_tube_obj(
                 faces.append((r1[j_next], r2[j], r2[j_next]))
 
     # Export OBJ file
-    with open(output_obj_path, "w") as f:
+    with open(obj_out_path, "w") as f:
         f.write("# Generated from ncc_points.csv\n")
         for v in vertices:
             f.write(f"v {v[0]:.6f} {v[1]:.6f} {v[2]:.6f}\n")
@@ -69,11 +67,11 @@ def csv_to_swept_tube_obj(
             f.write(f"f {face[0]} {face[1]} {face[2]}\n")
 
     print(
-        f"Exported {len(vertices)} vertices and {len(faces)} faces to {output_obj_path}"
+        f"Exported {len(vertices)} vertices and {len(faces)} faces to {obj_out_path}"
     )
 
-
-# Run conversion
-csv_to_swept_tube_obj(
-    "./../data/ncc_points.csv", "./../data/track_mesh.obj", r_x=1.2, r_y=0.6, n_sides=12
-)
+if __name__ == "__main__":
+    # Run conversion
+    csv_to_swept_tube_obj(
+    "./data/ncc_points.csv", "./data/3d_model/obj/track_mesh.obj", r_x=1.2, r_y=0.6, n_sides=12
+    )

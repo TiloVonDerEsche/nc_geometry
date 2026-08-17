@@ -54,3 +54,13 @@ Steps:
 - Construct spheres around each ncc_point, with each vertex (ncc_point) having their own settable radius.
 
 - Add lighting to 3d_vis, to add a contrast between similar colored parts
+
+|=================== Export Function=================|
+nccp_to_mesh.py works for Niere and Vase.
+But the resulting obj file sizes are a bit large.
+120 MB for Vase and ~ 500MB for Niere.
+It should make more sense to write a tl_to_obj.py,
+which uses track_lists instead of nccps.
+The python code in nccp_to_mesh, seems to reconstruct the track eliptical bases,
+and then uses quads to mesh the tube / pipe, i.e. the body of the track cylinder.
+The nccps between track_start and track_end seem redundant in this process.

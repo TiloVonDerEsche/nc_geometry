@@ -320,9 +320,9 @@ int read_config(const char* fpath, Config* config) {
             config->track_mid_len = atoi(value);
         }
 
-        else if (strcmp(key, "mpf_file") == 0) {
-            strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
-            config->mpf_file[sizeof(config->mpf_file) - 1] = '\0';
+        else if (strcmp(key, "nc_file") == 0) {
+            strncpy(config->nc_file, value, sizeof(config->nc_file) - 1);
+            config->nc_file[sizeof(config->nc_file) - 1] = '\0';
         }
         else if (strcmp(key, "track_list_csv") == 0) {
             strncpy(config->track_list_csv, value, sizeof(config->track_list_csv) - 1);

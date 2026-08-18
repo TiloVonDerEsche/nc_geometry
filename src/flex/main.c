@@ -23,7 +23,7 @@ main(int argc, char *argv[])
   }
   puts("\nRead values from config.txt:");
   // Print the config.txt values to verify
-  printf("mpf_file=%s\n", config.mpf_file);
+  printf("nc_file=%s\n", config.nc_file);
   printf("track_list_csv=%s\n", config.track_list_csv);
   printf("ncc_points_csv=%s\n", config.ncc_points_csv);
 
@@ -31,19 +31,19 @@ main(int argc, char *argv[])
   print_strs = config.print_strs;
 
   h = init_hashmap();
-  FILE* mpf = fopen(config.mpf_file, "rb");
-  if (mpf == NULL) {
+  FILE* ncf = fopen(config.nc_file, "rb");
+  if (ncf == NULL) {
     fprintf(stderr, "Error: Could not open %s (in read mode)!\
-    \n\rDoes that file exist?\n",config.mpf_file);
+    \n\rDoes that file exist?\n",config.nc_file);
     return -1;
   }
 
   //--------Preprocessor for Labels
-  label_finder(mpf);
-  rewind(mpf);
+  label_finder(ncf);
+  rewind(ncf);
   print_hashmap(h,stdout);
   //--------Bison Interpreter
-  yyin = mpf;
+  yyin = ncf;
 
   if(config.hmhis_to_file) {
     hmhis = init_file(config.hmhis_json,"[");

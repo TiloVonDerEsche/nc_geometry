@@ -34,7 +34,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
 
 4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks, which are drawn as cylinders, with an elliptical base.  
-   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around.
+   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around. **+** and **-** to control the ambient light intensity.
 
 # Version-Features of **`generate_track_list.exe`**:
 - **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables.
@@ -46,7 +46,9 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 # Version-Features of **`3d_track_visualizer.exe`**:
 - **`0.1`** Basic WASD and LMB Paning, which moves the world, instead of the camera. Which is troublesome, when viewing detail, distant from the origin.  
-- **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend
+- **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend.
+- **`0.3.7.5`** Less choppy movement. Move faster while holding **SHIFT**. 
+- **`0.3.7.7`** Added Lighting, with **+**, **-** controlling the ambient light intensity.
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements:

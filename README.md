@@ -2,7 +2,7 @@
 This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
 # The **`track_list.csv` contains**:
 - `track_index`
--  start `point A`, end `point B` of a welding track
+-  `start_point`, `end_point` of a welding track
 - laser_power (PUIS_LASER)
 - machine_speed (VIT_TIR)
 - overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)

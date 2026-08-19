@@ -42,7 +42,7 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                 char* s = yytext;
                 s[strlen(s) - 1] = '\0';
                 yylval.LABEL = strdup(s);
-                if(debug){ printf("A label: %s\n", s); }
+                if(debug){printf("A label:'%s'\n", s);}
                 return LABEL;
                 }
 
@@ -52,51 +52,33 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                 yylval.SPECIAL_CMD = strdup(yytext);
                 return SPECIAL_CMD;
               }
-              else if(strcmp(yytext,"PUIS_LASER") == 0 ||
-                 strcmp(yytext,"MODE_LASER") == 0 ||
-                 strcmp(yytext,"VIT_TIR") == 0 ||
-                 strcmp(yytext,"Flow_gas_2") == 0 ||
-                 strcmp(yytext,"Flow_gas_3") == 0 ||
-                 strcmp(yytext,"Feeder_Speed_2") == 0 ||
-                 strcmp(yytext,"Feeder_Speed_3") == 0 ||
-                 strcmp(yytext,"TOFFL") == 0) {
-
-                yylval.CUSTOM_VAR = strdup(yytext);
-                if(debug){ printf("A custom Variable: %s\n", yytext); }
-                return CUSTOM_VAR;
-              }
-              else if(strcmp(yytext,"IF") == 0) {
-                if(debug){ puts("An IF!"); }
-                return IF;
-              }
-              else if(strcmp(yytext,"ENDIF") == 0) {
-                if(debug){ puts("An ENDIF!"); }
-                return ENDIF;
-              }
+              else if(strcmp(yytext,"IF") == 0) {if(debug){puts("An IF!");}
+                return IF;}
+              else if(strcmp(yytext,"ENDIF") == 0) {if(debug){puts("An ENDIF!");}
+                return ENDIF;}
               else if(strcmp(yytext,"GOTOB") == 0 ||
                       strcmp(yytext,"GOTOF") == 0 ||
-                      strcmp(yytext,"GOTO") == 0) {
-                if(debug){ puts("A GOTO!"); }
+                      strcmp(yytext,"GOTO") == 0) {if(debug){puts("A GOTO!");}
                 return GOTO;
               }
-              else if(strcmp(yytext,"REPEAT") == 0) {
-                if(debug){ puts("A REPEAT!"); }
+              else if(strcmp(yytext,"REPEAT") == 0) {if(debug){puts("A REPEAT!");}
                 return REPEAT;
               }
-              else if(strcmp(yytext,"ROT") == 0) {
-                if(debug){ puts("A ROT!"); }
-                return ROT;
-              }
+              else if(strcmp(yytext,"ROT") == 0) {if(debug){puts("A ROT!");}
+                return ROT;}
+              else if(strcmp(yytext,"AROT") == 0) {if(debug){puts("An AROT!");}
+                  return AROT;}
+              else if(strcmp(yytext,"TRANS") == 0) {if(debug){puts("A TRANS!");}
+                      return TRANS;}
               else if(strcmp(yytext,"CALL") == 0 ||
                       strcmp(yytext,"MSG") == 0) {
+                if(debug){printf("A MSG:'%s'\n",yytext);}
                 return MSG;
               }
-              else {
-                if(debug){ printf("A MISC_ID: %s\n",yytext); }
-                yylval.MISC_ID = strdup(yytext);
-                return MISC_ID;
+              else {if(debug){printf("An ID:'%s'\n",yytext);}
+                yylval.ID = strdup(yytext);
+                return ID;
               }
-
              }
 
 [G]      {yylval.G_CMD = yytext[0]; return G_CMD;}
@@ -108,8 +90,8 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
          }
 
 "_"{id}   {
-        if(debug){ printf("A hidden MISC_ID: %s\n",yytext); }
-        return MISC_ID;
+        if(debug){ printf("An hidden ID:'%s'\n",yytext); }
+        return ID;
        }
 
 
@@ -121,7 +103,7 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
 "\""[^\"]*"\"" { if(print_strs){ printf("A string: %s\n",yytext);puts("..."); } return STRING;}
 
-";"[^\n]* {if(debug){ printf("A comment: %s\n", yytext); } return COMMENT;}
+";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);} return COMMENT;}
 
 [ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
 "\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}

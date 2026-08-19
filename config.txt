@@ -1,4 +1,4 @@
-debug_prints = 0;
+debug_prints = 1;
 print_strs = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;

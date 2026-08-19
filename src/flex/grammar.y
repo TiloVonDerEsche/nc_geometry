@@ -65,8 +65,7 @@
 
 %token IF ENDIF
 %token GOTO REPEAT
-%token ROT
-%token <char*> MISC_ID
+%token ROT AROT TRANS
 
 %token <char> VAR
 %token <char> G_CMD
@@ -76,7 +75,7 @@
 
 %token <char*> LABEL
 %token <char*> SPECIAL_CMD
-%token <char*> CUSTOM_VAR
+%token <char*> ID
 
 %token <char*> STRING
 %token <int> INT
@@ -101,6 +100,27 @@
     //h = init_hashmap(); //h is global in helper.c for now
 }
 
+%expect 1
+/**
+  NOTE is it really unproblematic to allow:
+  Example: ID • SEP fn
+  Shift derivation
+    exprs
+    ↳ 13: expr
+          ↳ 22: assignment
+                ↳ 42: ID seps        arith_expr
+                         ↳ 11: • SEP ↳ 52: fn
+  Reduce derivation
+    exprs
+    ↳ 14: exprs            seps      expr
+          ↳ 13: expr       ↳ 11: SEP ↳ 30: fn
+                ↳ 29: ID •
+
+  NOTE Bison allegedly chooses Shift before Reduce
+  NOTE F.e.: 'SPEED 100', should be recognised as an assignment,
+       since it shifts to 100, before reducing SPEED to an ID
+  TODO Readup on Shift/Reduce Conflicts
+**/
 
 %%
 
@@ -213,6 +233,8 @@ expr:
   }
   | CMD arith_expr       {}
   | ROT                {rot_mode = 1;}
+  | AROT               //{arot_mode = 1;}
+  | TRANS              //{trans_mode=1;}
   | assignment
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){
@@ -274,16 +296,16 @@ expr:
                           //not_found:
                         }
                        }
-  | GOTO SEP MISC_ID   {if(!skip){
+  | GOTO SEP ID   {if(!skip){
                           request_jump($3);}
                         }
-  | REPEAT SEP MISC_ID %prec LOW_PREC
+  | REPEAT SEP ID %prec LOW_PREC
                         {if(!skip){
                             char start_end_l[32+11];
                             snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $3);
                             handle_repeat($3,start_end_l,(size_t)get_var_val("line"));}
                         }
-  | REPEAT SEP MISC_ID SEP MISC_ID
+  | REPEAT SEP ID SEP ID
                         {if(!skip){
                             handle_repeat($3,$5,(size_t)get_var_val("line"));}
                         }
@@ -301,7 +323,7 @@ expr:
                           }
                          }
   | MSG SEP STRING
-  | MISC_ID
+  | ID //to consume SUPA f.e.
   | fn
   | COMMENT
 ;
@@ -330,8 +352,8 @@ assignment:
   | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
   | CMD opt_seps '=' opt_seps arith_expr        {}
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var((char[]){$1, '\0'},$5);}}
-  | CUSTOM_VAR opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
-  | CUSTOM_VAR SEP arith_expr                   {if(!skip){set_var($1,$3);}}
+  | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
+  | ID seps arith_expr                   {if(!skip){set_var($1,$3);}}
 ;
 
 
@@ -340,8 +362,8 @@ val:
                   /*printf("Getting VAR=%s\n",$1);*/
                   $$ = get_var_val((char[]){$1, '\0'});
                  }
-  | CUSTOM_VAR   {
-                  /*printf("Getting CUSTOM_VAR=%s\n",$1);*/
+  | ID  {
+                  /*printf("Getting ID=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
   | INT          {$$=$1;}
@@ -349,15 +371,15 @@ val:
 ;
 
 fn:
-  MISC_ID '(' params ')' {$$=0;}
+  ID '(' params ')' {$$=0;}
 ;
 
 params:
   %empty
   | arith_expr
-  | MISC_ID
+  //| ID //redundant, since: arith_expr -> val -> ID
   | params ',' arith_expr
-  | params ',' MISC_ID
+  //| params ',' ID
 ;
 
 

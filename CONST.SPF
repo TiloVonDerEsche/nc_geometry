@@ -1,0 +1,14 @@
+; Constanst for CYCLE832
+OFF = 0 ;Abwahl
+_FINISH = 1 ;Schlichten
+_SEMIFIN = 2 ;Vorschlichten
+_ROUGH = 3 ;Schruppen
+_PRECISION = 4 ;Feinschlichten
+_ORI_FINISH = 11 ;Schlichten mit Eingabe einer Orientierungstoleranz
+_ORI_SEMIFIN = 12 ;Vorschlichten mit Eingabe einer Orientierungstoleranz
+_ORI_ROUGH = 13 ;Schruppen mit Eingabe einer Orientierungstoleranz
+_ORI_PRECISION = 14 ;Feinschlichten mit Eingabe einer Orientierungstoleranz
+_TOP_SURFACE_SMOOTH_OFF = 1000000 ;Top Surface ohne Glättung
+_TOP_SURFACE_SMOOTH_ON = 2000000 ;Top Surface mit Glättung
+
+; Use f.e.:'CALL "~/work/nc_geometry/CONST.SPF"' to import these CONSTS

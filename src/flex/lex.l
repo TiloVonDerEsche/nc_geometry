@@ -90,7 +90,8 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
          }
 
 "_"{id}   {
-        if(debug){ printf("An hidden ID:'%s'\n",yytext); }
+        if(debug){printf("An hidden ID:'%s'\n",yytext);}
+        yylval.ID = strdup(yytext);
         return ID;
        }
 

@@ -341,7 +341,7 @@ if_element:
 
 
 assignment:
-  XYZ_CMD opt_seps '=' opt_seps arith_expr
+   XYZ_CMD opt_seps '=' opt_seps arith_expr
     {if(!skip){
       if (rot_mode) {
         set_var_rot($1,$5);

@@ -49,35 +49,34 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 {letter}{id} {
               if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
-                yylval.SPECIAL_CMD = strdup(yytext);
-                return SPECIAL_CMD;
+                  yylval.SPECIAL_CMD = strdup(yytext);
+                  return SPECIAL_CMD;
               }
               else if(strcmp(yytext,"IF") == 0) {if(debug){puts("An IF!");}
-                return IF;}
+                  return IF;}
               else if(strcmp(yytext,"ENDIF") == 0) {if(debug){puts("An ENDIF!");}
-                return ENDIF;}
+                  return ENDIF;}
               else if(strcmp(yytext,"GOTOB") == 0 ||
                       strcmp(yytext,"GOTOF") == 0 ||
                       strcmp(yytext,"GOTO") == 0) {if(debug){puts("A GOTO!");}
-                return GOTO;
+                  return GOTO;
               }
               else if(strcmp(yytext,"REPEAT") == 0) {if(debug){puts("A REPEAT!");}
-                return REPEAT;
+                  return REPEAT;
               }
               else if(strcmp(yytext,"ROT") == 0) {if(debug){puts("A ROT!");}
-                return ROT;}
+                  return ROT;}
               else if(strcmp(yytext,"AROT") == 0) {if(debug){puts("An AROT!");}
                   return AROT;}
               else if(strcmp(yytext,"TRANS") == 0) {if(debug){puts("A TRANS!");}
-                      return TRANS;}
-              else if(strcmp(yytext,"CALL") == 0 ||
-                      strcmp(yytext,"MSG") == 0) {
-                if(debug){printf("A MSG:'%s'\n",yytext);}
-                return MSG;
-              }
+                  return TRANS;}
+              else if(strcmp(yytext,"CALL") == 0 {if(debug){printf("A CALL:'%s'\n",yytext);}
+                  return CALL;}
+              else if(strcmp(yytext,"MSG") == 0) {if(debug){printf("A MSG:'%s'\n",yytext);}
+                  return MSG;}
               else {if(debug){printf("An ID:'%s'\n",yytext);}
-                yylval.ID = strdup(yytext);
-                return ID;
+                  yylval.ID = strdup(yytext);
+                  return ID;
               }
              }
 

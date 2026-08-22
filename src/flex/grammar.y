@@ -60,8 +60,11 @@
 %define parse.error detailed //bison v3.6+
 
 %token SEP NEWLINE END OTHER
+
 %token COMMENT
 %token MSG
+
+%token CALL
 
 %token IF ENDIF
 %token GOTO REPEAT

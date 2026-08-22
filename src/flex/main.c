@@ -14,8 +14,8 @@ extern void label_finder(FILE* fp);
 extern FILE* yyin;
 extern int yyparse();
 
-int
-main(int argc, char *argv[])
+//Read params from config.txt
+int main(int argc, char *argv[])
 {
   // Read the config file
   if (read_config("config.txt", &config) != 0) {
@@ -38,22 +38,22 @@ main(int argc, char *argv[])
     return -1;
   }
 
+  /*if(config.hmhis_to_file) {
+    hmhis = init_file(config.hmhis_json,"[");
+    setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
+  }*/
+
+  tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
+    laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
+  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
+    laser_power,machine_speed");
+
   //--------Preprocessor for Labels
   label_finder(ncf);
   rewind(ncf);
-  print_hashmap(h,stdout);
+  printf("Labels of '%s':\n",config.nc_file); print_hashmap(h,stdout);
   //--------Bison Interpreter
   yyin = ncf;
-
-  if(config.hmhis_to_file) {
-    hmhis = init_file(config.hmhis_json,"[");
-    setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
-  }
-  tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
-  laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
-  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
-  laser_power,machine_speed");
-
   yyparse();
 
   //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);

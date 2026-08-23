@@ -1,6 +1,10 @@
 #define NOMINAL 0
 #define NOT_FOUND -1
 
+extern void label_finder(FILE* fp);
+extern FILE* yyin;
+extern int yyparse();
+
 int exec(char* fpath) {
   FILE* ncf = fopen(fpath, "rb");
   if (ncf == NULL) {

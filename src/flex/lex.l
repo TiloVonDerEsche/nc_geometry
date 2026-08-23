@@ -70,7 +70,7 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                   return AROT;}
               else if(strcmp(yytext,"TRANS") == 0) {if(debug){puts("A TRANS!");}
                   return TRANS;}
-              else if(strcmp(yytext,"CALL") == 0 {if(debug){printf("A CALL:'%s'\n",yytext);}
+              else if(strcmp(yytext,"CALL") == 0) {if(debug){printf("A CALL:'%s'\n",yytext);}
                   return CALL;}
               else if(strcmp(yytext,"MSG") == 0) {if(debug){printf("A MSG:'%s'\n",yytext);}
                   return MSG;}
@@ -101,7 +101,12 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
 [()]      {return yytext[0];}
 
-"\""[^\"]*"\"" { if(print_strs){ printf("A string: %s\n",yytext);puts("..."); } return STRING;}
+"\""[^\"]*"\"" {
+  if(print_strs){ printf("A string: %s\n",yytext);puts("..."); }
+  //TODO Strip quotes: "", from STRING yyval
+  yylval.STRING = strdup(yytext);
+  return STRING;
+}
 
 ";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);} return COMMENT;}
 

@@ -4,6 +4,7 @@
 
   #include "helper.h"
   #include "stack.c"
+  #include "exe.c"
 
   extern Config config;
   extern int debug;
@@ -239,6 +240,10 @@ expr:
   | AROT               //{arot_mode = 1;}
   | TRANS              //{trans_mode=1;}
   | assignment
+  | CALL seps STRING   {if(!skip){
+                          exec($3);
+                        }
+                       }
   | LABEL              {
                         if(!skip && !is_empty(&ret_stack)){
 

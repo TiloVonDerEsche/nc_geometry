@@ -16,6 +16,7 @@ int exec(char* fpath) {
   //--------Preprocessor for Labels
   label_finder(ncf);
   rewind(ncf);
+  printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
   //--------Bison Interpreter
   yyin = ncf;
   yyparse();

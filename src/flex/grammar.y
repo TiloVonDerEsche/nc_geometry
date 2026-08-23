@@ -4,7 +4,6 @@
 
   #include "helper.h"
   #include "stack.c"
-  #include "exe.c"
 
   extern Config config;
   extern int debug;

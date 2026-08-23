@@ -32,6 +32,9 @@ KHASHL_MAP_INIT(KH_LOCAL,
   const char*, float,
   kh_hash_str, kh_eq_str)
 
+#define NOMINAL 0
+#define NOT_FOUND -1
+
 #define PI 3.14159265358979323846
 #define TO_RAD(deg) ((deg) * PI / 180.0)
 //===========Extern Vars===========//
@@ -47,6 +50,9 @@ extern FILE* hmhis;
 extern FILE* tl;
 extern FILE* ncc_points;
 extern FILE* yyin;
+
+extern void label_finder(FILE* fp);
+extern int yyparse();
 
 //===========Functions===========//
 //file functions
@@ -80,3 +86,4 @@ char* trim(char* str);
 void parse_line(char* line, char** key, char** value);
 //------------File Functions-------------------//
 int read_config(const char* fpath, Config* config);
+int exec(char* fpath);

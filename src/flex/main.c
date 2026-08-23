@@ -31,12 +31,7 @@ int main(int argc, char *argv[])
   print_strs = config.print_strs;
 
   h = init_hashmap();
-  FILE* ncf = fopen(config.nc_file, "rb");
-  if (ncf == NULL) {
-    fprintf(stderr, "Error: Could not open %s (in read mode)!\
-    \n\rDoes that file exist?\n",config.nc_file);
-    return -1;
-  }
+
 
   /*if(config.hmhis_to_file) {
     hmhis = init_file(config.hmhis_json,"[");
@@ -48,13 +43,7 @@ int main(int argc, char *argv[])
   ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
     laser_power,machine_speed");
 
-  //--------Preprocessor for Labels
-  label_finder(ncf);
-  rewind(ncf);
-  printf("Labels of '%s':\n",config.nc_file); print_hashmap(h,stdout);
-  //--------Bison Interpreter
-  yyin = ncf;
-  yyparse();
+  exec(config.nc_file);
 
   //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}

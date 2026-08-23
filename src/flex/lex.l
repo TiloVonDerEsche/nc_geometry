@@ -101,10 +101,29 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
 [()]      {return yytext[0];}
 
+
 "\""[^\"]*"\"" {
-  if(print_strs){ printf("A string: %s\n",yytext);puts("..."); }
-  //TODO Strip quotes: "", from STRING yyval
-  yylval.STRING = strdup(yytext);
+  /*
+  "\""[^\"]*"\"" {
+    if(print_strs){ printf("A string: %s\n",yytext);puts("..."); }
+    //TODO Strip quotes: "", from STRING yyval
+    yylval.STRING = strdup(yytext);
+    return STRING;
+  }*/
+
+  if (print_strs) {
+    printf("A string: %s\n", yytext);
+    puts("...");
+  }
+
+  // Allocate exact size for string contents excluding quotes, plus 1 for '\0'
+  yylval.STRING = (char*)malloc(yyleng - 1);
+  if (yylval.STRING != NULL) {
+    // Copy (yyleng - 2) characters starting from yytext + 1
+    memcpy(yylval.STRING, yytext + 1, yyleng - 2);
+    yylval.STRING[yyleng - 2] = '\0';
+  }
+
   return STRING;
 }
 

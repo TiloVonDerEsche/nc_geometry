@@ -6,16 +6,6 @@ Fix line off by one error
 Exprs before ENDIF don't seem to execute
      (^ ,in new lines,)
 
-|===============Stress Tests===============|
-Build or find a simple benchmarking tool.
-Construct Test Cases (Assertions)
-./src/benchmark/run_tests.bin
-|===============Performance=================|
--Memory-wise:
-Try to avoid strdup, if possible
-
--Latency-wise:
-
 |=================Fix Rotations====================|
 Matrix Transformation is non-communitative. Meaning A*B is not the same as B*A.
 Try reversing the application order of the rotation cmds, and plot the vase.
@@ -27,6 +17,8 @@ We can definetly combine the rotation and transformation (NPV) step, into a 4x4 
 Can we combine the X-Y-Z-wise Rotation matricies into one?
 
 Should we use ABC and ROT/AROT? If yes how?
+
+We should look into Basisframes, and implement them as 4x4 Matrix Transformations, as in OpenGL f.e. :)
 |=======================================================|
 Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
 of a track to face any direction. The shorter radius is normally the vertical.
@@ -34,6 +26,17 @@ Since the pull of gravity flattens the melting pool.
 We should consider the up (or down) vector, when setting the shape of the cylinders.
 
 nccp_to_mesh.py, exposed a flaw of the ncc_points generation. The machine paths, between the tracks, are currently mapped to a tid, making them part of a track. We need to think of a solution for the tid value, when LASER=OFF. Perhaps we set it to -1, or we just multiply the current tid with -1. Meaning that negative tid's, indicate that the point is part off an inbetween (machine path) track
+
+|=================== Export Function=================|
+nccp_to_mesh.py works for Niere and Vase.
+But the resulting obj file sizes are a bit large.
+120 MB for Vase and ~ 500MB for Niere.
+It should make more sense to write a tl_to_obj.py,
+which uses track_lists instead of nccps.
+The python code in nccp_to_mesh, seems to reconstruct the track eliptical bases,
+and then uses quads to mesh the tube / pipe, i.e. the body of the track cylinder.
+The nccps between track_start and track_end seem redundant in this process.
+
 |============== Advanced track vis =================|
 Each ncc_point is the center of a metaball.
 Implement sliders in the 3d_track_vis, which sets the radius / radii of the metaballs.
@@ -49,12 +52,14 @@ It is not enough to only construct Metaballs around the ncc points. We need to i
 Steps:
 - During LASER_OFF section, multiply the tid with -1
 - Construct spheres around each ncc_point, with each vertex (ncc_point) having their own settable radius
-|=================== Export Function=================|
-nccp_to_mesh.py works for Niere and Vase.
-But the resulting obj file sizes are a bit large.
-120 MB for Vase and ~ 500MB for Niere.
-It should make more sense to write a tl_to_obj.py,
-which uses track_lists instead of nccps.
-The python code in nccp_to_mesh, seems to reconstruct the track eliptical bases,
-and then uses quads to mesh the tube / pipe, i.e. the body of the track cylinder.
-The nccps between track_start and track_end seem redundant in this process.
+
+
+|===============Stress Tests===============|
+Build or find a simple benchmarking tool.
+Construct Test Cases (Assertions)
+./src/benchmark/run_tests.bin
+|===============Performance=================|
+-Memory-wise:
+Try to avoid strdup, if possible
+
+-Latency-wise:

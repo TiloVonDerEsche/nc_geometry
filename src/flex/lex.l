@@ -74,6 +74,8 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                   return CALL;}
               else if(strcmp(yytext,"MSG") == 0) {if(debug){printf("A MSG:'%s'\n",yytext);}
                   return MSG;}
+              else if(strcmp(yytext,"SUPA") == 0) {if(debug){printf("A SUPA:'%s'\n",yytext);}
+                  return SUPA;}
               else {if(debug){printf("An ID:'%s'\n",yytext);}
                   yylval.ID = strdup(yytext);
                   return ID;

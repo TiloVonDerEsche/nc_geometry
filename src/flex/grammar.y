@@ -69,6 +69,7 @@
 %token IF ENDIF
 %token GOTO REPEAT
 %token ROT AROT TRANS
+%token SUPA
 
 %token <char> VAR
 %token <char> G_CMD
@@ -198,6 +199,9 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
+  | SUPA /*{//acts like G153, also supresses:
+              DRF, "überlagerte Bewegungen"
+             ,extern NPV, PRESET-Translation}*/
   | G_CMD arith_expr {if(!skip){
       //handle G codes
       switch((int)$2) {
@@ -212,6 +216,9 @@ expr:
         //assingments of coords happens absolute or relative
         case 90: incr_mode=0;break; //absolute
         case 91: incr_mode=1;break; //relative
+        case 53: break;  //TODO
+        case 153: break;
+        case 500: break; //TODO Readup on: $P_ACTBFRAME, $P_UIFR
         default: break;
       }
     }
@@ -330,7 +337,7 @@ expr:
                           }
                          }
   | MSG SEP STRING
-  | ID //to consume SUPA f.e.
+  | ID
   | fn
   | COMMENT
 ;

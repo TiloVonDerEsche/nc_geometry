@@ -41,8 +41,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.2`** IF COND THEN BODY ENDIF Block. GOTOB jump command.
 - **`0.3`** A,B,C work-plain rotation & GOTOF, GOTO and REPEAT.
 - **`0.3.8.2`** Include CALL's
-- **`0.4`** Binary benchmarking tool.
-- **`0.5`** GLR Parsing -> Expand Look-Ahead-buffer (currently size 1)
+- **`0.5`** (Binary benchmarking tool.)
 - **`0.6`** Complex user-variable types and functions.
 
 # Version-Features of **`3d_track_visualizer.exe`**:

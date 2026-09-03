@@ -62,6 +62,9 @@ Alternativly you can just **execute the commands**, which are specified in the M
 - **`flex -l lex.l`**
 - **`bison -dv grammar.y`**
 - **`gcc -o ./../../generate_track_list main.c`**
-# Download
+# Download:
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested. <br>
 Download the binaries from Releases, or click here: [![GitHub release (latest by date)](https://img.shields.io/github/v/release/TiloVonDerEsche/nc_geometry)](https://github.com/TiloVonDerEsche/nc_geometry/releases/latest)
+
+# Used by:
+https://github.com/CIMTT-Kiel/schmelz-ki

@@ -2,7 +2,7 @@
 SRC = ./t_vis_color.c
 ROOT_DIR = ./../../../
 MXE_PATH = /home/tilo/res/mxe
-SUFFIX = _64
+SUFFIX = _x86_64
 # --- Default Target Logic ---
 # Usage: 
 #   make              (Builds Linux)
@@ -21,7 +21,7 @@ ifeq ($(TARGET), WIN64)
     LDFLAGS = -static -Wl,--subsystem,windows
     
 else ifeq ($(TARGET), XP)
-    SUFFIX = _32
+    SUFFIX = _x86_32
     # Note: Ensure you have the i686 target installed in MXE
     ARCH = i686-w64-mingw32.static
     CC = $(MXE_PATH)/usr/bin/$(ARCH)-gcc

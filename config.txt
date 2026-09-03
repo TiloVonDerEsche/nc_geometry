@@ -2,7 +2,7 @@ debug_prints = 0;
 print_strs = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
-tracks_def_by_laser = 0; //0 for Vase; 1 for LASER_ON / LASER_OFF used
+tracks_def_by_laser = 1; //0 for Vase; 1 for LASER_ON / LASER_OFF used
 track_mid_len = 10; //10 for Vase
 
 //nc_file = "./CONST.SPF";
@@ -13,7 +13,7 @@ track_mid_len = 10; //10 for Vase
 //nc_file = "./data/nc_code/Bahnen_Z_Abs_Test_316L.MPF";
 //nc_file = "./data/nc_code/Niere/Tail_Cut.txt";
 
-nc_file = "./data/nc_code/test/call/1.nc";
+nc_file = "./data/nc_code/test/call/X.mpf";
 //nc_file = "./data/nc_code/test/repeat/windmill.mpf";
 //nc_file = "./data/nc_code/test/dummy/1.mpf";
 //nc_file = "./data/nc_code/test/abc/CoordSys3D.nc";

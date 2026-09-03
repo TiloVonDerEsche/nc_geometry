@@ -1,0 +1,58 @@
+CYCLE832 verhält sich in einer Siemens SINUMERIK One-Umgebung (wie sie auf der AddUp Modulo 400 DED-Maschine läuft) grundlegend anders als eine statische Konstante, da der Befehl tief in die vorausschauende Pfadplanung eingreift. [1, 2] 
+------------------------------
+## 1. Wo werden die Konstanten im Execution Environment definiert?
+In der SINUMERIK-Welt existieren die Werte, auf die CYCLE832 zugreift, auf drei spezifischen Ebenen:
+
+   1. Maschinendaten (MD): Die globalen Grenzwerte und Standard-Technologiewerte (z.B. maximale Achsrucke, Standardtoleranzen) sind fest in den herstellerspezifischen Maschinendaten des NCK hinterlegt (z. B. MD20150 $MC_GCODE_RESET_VALUES oder MD20443 $MC_LOOKAH_FFORM). AddUp konfiguriert diese passend zur Dynamik der Achsen der M400. [3] 
+   2. GUD-Variablen (Global User Data): Der Zyklus CYCLE832.SPF ist ein von Siemens geschriebenes Makro-Subroutine. Die darin verwendeten Variablen (wie _FACTOR, _TOLM etc.) sind in globalen Definitionsdateien (z. B. MGUD.DEF oder UGUD.DEF) deklariert. Diese liegen im NCK-Speicher unter Definitionen und sind permanent aktiv.
+   3. Zyklus-Interne Zuordnung: Wenn du CYCLE832(_TOL, _TECH) aufrufst, mappt der Siemens-Standardzyklus die vereinfachten Übergabewerte (z. B. _TECH = 1 für Schruppen) auf spezifische G-Codes (COMPCAD, ORISON, SOFT) und die internen Toleranz-Systemvariablen ($TC_CYCL_TOL[0]).
+
+------------------------------
+## 2. Wie funktioniert der NCK (NC Kernel)?
+Der NCK verarbeitet den NC-Code in einer mehrstufigen Pipeline, bevor er als elektrisches Signal an die Antriebe geht:
+
+[ NC-Programm ] 
+       │
+       ▼
+[ 1. Parser / Interpreter ]  --> Löst Kontrollstrukturen, Berechnungen und Zyklen auf.
+       │                         Generiert den "Vorlauf"-Pfad.
+       ▼
+[ 2. Look-Ahead / Kompressor ] -> (Hier greift CYCLE832!) COMPCAD fasst Punkt-Lines (G1)
+       │                         zu stetigen Splines zusammen. Berechnet max. Vorschub.
+       ▼
+[ 3. IPO (Interpolator) ] ------> Taktgenaue (z.B. 4ms) Aufteilung des Pfades in diskrete 
+       │                         Sollwerte für jede Achse unter Einhaltung von Ruck & Beschleunigung.
+       ▼
+[ 4. Antriebsregler ] ----------> Physische Bewegung.
+
+------------------------------
+## 3. Beeinflusst CYCLE832 die Dateien Schweiß-Track_Liste.csv und ncc_points.csv?
+Das hängt exakt davon ab, an welcher Stelle deiner Pipeline diese Dateien geschrieben werden.
+## Fall A: Die CSVs stammen aus dem CAM / Postprozessor (Pre-Processing)
+
+* Wenn das CAM-System oder dein Offline-Interpreter die CSV-Dateien direkt aus den rohen G1-Zeilen des G-Codes generiert, hat CYCLE832 keinen Einfluss.
+* Die CSV-Dateien spiegeln dann nur das mathematische Polygon wider, das im NC-Text steht.
+
+## Fall B: Die CSVs stammen aus dem NCK-Vorlauf / Interpreter (Compile-Cycles)
+
+* Wenn AddUp ein eigenes Hintergrund-Skript (einen sogenannten Compile Cycle oder Achs-Synchronaktionen) nutzt, um die Interpreter-Daten abzugreifen, sieht der Interpreter die Rohpunkte. ncc_points.csv enthält die exakten XYZABC-Stützpunkte aus dem NC-Code.
+* Ausnahme: Die Toleranzwerte selbst werden als Systemvariablen mitgeschrieben, aber die Raumkoordinaten ändern sich im reinen Interpreter-Schritt noch nicht.
+
+## Fall C: Die CSVs werden aus dem Interpolator / Digitalen Zwilling exportiert (Post-Processing)
+
+* Wenn AddUp diese Dateien aus dem Look-Ahead oder der Interpolation des Digitalen Zwillings generiert (also das, was die Maschine wirklich abfährt), hat CYCLE832 einen massiven Einfluss. [2] 
+* Der Grund: CYCLE832 aktiviert den Kompressor (COMPCAD). Dieser modifiziert die Punkte im Speicher. Er bricht die harten Ecken von aneinandergereihten G1-Sätzen auf und generiert ein geglättetes Profil (Spline) innerhalb der definierten Toleranz.
+* Dadurch weichen die Punkte in der Punktwolke (ncc_points.csv) geringfügig von den G-Code-Koordinaten ab, um flüssigere Bewegungen zu erlauben.
+
+## Auswirkung auf das 3D-Modell und die Schweiß-Tracks
+Da die AddUp M400 eine DED-Maschine (Direct Energy Deposition / Laserauftragschweißen) ist, steuert die Bahngeschwindigkeit direkt den Materialauftrag: [1, 4] 
+
+   1. Ohne CYCLE832: Die Maschine stottert an dichten Punktwolken (G1-Sätzen), bremst ab, und es kommt an den Ecken zu Überhitzung und lokal zu dickem Materialauftrag.
+   2. Mit CYCLE832: Der Vorschub bleibt konstant, der Pfad wird geglättet. Wenn deine Schweiß-Track_Liste.csv auch die reale Geschwindigkeit oder Laserleistung aus dem Interpolator logged, verändern sich diese Werte fundamental. Das resultierende physische und simulierte 3D-Modell wird an den Übergängen homogener und formtreuer.
+
+Für deinen NC-Interpreter: Möchtest du CYCLE832 rein syntaktisch parsen, um Fehler zu vermeiden, oder planst du, den Kompressions-Algorithmus (Spline-Glättung) im Python/C++ Code geometrisch nachzubauen?
+
+[1] [https://addupsolutions.com](https://addupsolutions.com/de/maschinen/ded/modulo-400/)
+[2] [https://www.aeroexpo.online](https://www.aeroexpo.online/prod/addup/product-183975-76505.html)
+[3] [https://support.industry.siemens.com](https://support.industry.siemens.com/cs/mdm/109994173?c=192126421771&dl=en)
+[4] [https://addupsolutions.com](https://addupsolutions.com/de/maschinen/ded/)

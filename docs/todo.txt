@@ -1,4 +1,22 @@
-sUM HOURS AND SEND TO jANINE
+|=================Finish Include CALL'S ==========================|
+Better syntax error msgs through seperate line var counting per nc_file
+F.e.:
+test/call/X.mpf and Y.spf
+
+Both 25 lines
+When finished with Y.spf
+The line_num seems to be 25 larger
+
+Also EOF gives a syntax error
+Perhaps it gets confused, by the EOF of Y.spf
+and then doesn't expect the second EOF of X.mpf
+
+-> Syntax Error
+Error: syntax error, unexpected end of file, expecting NEWLINE, in line: 50
+-> Error: syntax error, unexpected end of file, expecting NEWLINE, in line: X.mpf:25
+
+So new format of err in line reporting: <nc_file>:<line_in_that_nc_file>
+
 
 |=======================================================|
 Fix line off by one error

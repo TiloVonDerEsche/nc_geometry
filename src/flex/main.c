@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   }
   puts("\nRead values from config.txt:");
   // Print the config.txt values to verify
-  printf("nc_file=%s\n", config.nc_file);
+  printf("mpf_file=%s\n", config.mpf_file);
   printf("track_list_csv=%s\n", config.track_list_csv);
   printf("ncc_points_csv=%s\n", config.ncc_points_csv);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
     laser_power,machine_speed");
 
-  exec(config.nc_file);
+  exec(config.mpf_file); //exec entry point -> Main_Program_File
 
   //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}

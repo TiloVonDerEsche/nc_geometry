@@ -18,7 +18,7 @@ typedef struct {
   int tracks_def_by_laser;
   int track_mid_len;
 
-  char nc_file[256];
+  char mpf_file[256];
   char track_list_csv[256];
   char ncc_points_csv[256];
   char hmhis_json[256];

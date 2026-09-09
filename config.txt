@@ -19,11 +19,11 @@ mpf_file = "./data/nc_code/test/call/X.mpf";
 //mpf_file = "./data/nc_code/test/vase/debug.nc";
 
 
-track_list_csv = "./data/track_list.csv";
-ncc_points_csv = "./data/ncc_points.csv";
-hmhis_json = "./data/hmhis.json";
+track_list_csv = "./track_list.csv";
+ncc_points_csv = "./ncc_points.csv";
+hmhis_json = "./hmhis.json";
 
-tracks_to_plot = "./data/track_list.csv";
+tracks_to_plot = "./track_list.csv";
 
 //radii of welding track
 horizontal_radius= 0.49;
@@ -31,5 +31,5 @@ vertical_radius=0.31;
 
 track_accel_margin=0.02;
 //=============not used===============//
-interpolation_csv = "./data/interpolation/_intpol.csv";
+interpolation_csv = "./interpolation/_intpol.csv";
 step_distance = 1; //step distance of interpolation in mm

@@ -60,7 +60,7 @@ Requirements:
 
 Navigate to **`./src/flex`** and execute **`make`** in a terminal.
 Alternativly you can just **execute the commands**, which are specified in the **`./src/flex/Makefile`**.
-On Linux, you can simply run **`./src/build_scripts/linux.sh`** or **`all.sh`**, for also WIN (64/32-bit) binaries.
+On Linux, you can run **`./src/build_scripts/linux.sh`** or **`all.sh`**, for also WIN (64/32-bit) binaries.
 
 # Download:
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested. <br>

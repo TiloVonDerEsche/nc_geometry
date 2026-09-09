@@ -57,8 +57,10 @@ Requirements:
 - **`gcc`** (https://sourceforge.net/projects/gcc-win64/) or (https://gcc.gnu.org/)
 - **`make`** (https://gnuwin32.sourceforge.net/packages/make.htm) (optional, see Makefile commands point 5)
 
-Navigate to **`./src/flex`** and executing **`make`** in a terminal.
+
+Navigate to **`./src/flex`** and execute **`make`** in a terminal.
 Alternativly you can just **execute the commands**, which are specified in the **`./src/flex/Makefile`**.
+On Linux, you can simply run **`./src/build_scripts/linux.sh`** or **`all.sh`**, for also WIN (64/32-bit) binaries.
 
 # Download:
 Under the Releases tab you can download the latest binaries / executables, and the corresponding source code, in a ZIP File, if interested. <br>

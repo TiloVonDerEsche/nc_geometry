@@ -137,7 +137,6 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 "\n"           {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 ","            {return yytext[0];}
-
 .      		     {return OTHER;}
 
 %%

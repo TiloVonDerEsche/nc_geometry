@@ -90,7 +90,7 @@
 %nterm <float> fn
 %nterm <float> arith_expr
 %nterm <int> bool_expr
-%nterm <int> prog
+
 
 %left '+' '-'
 %left '*' '/'
@@ -132,13 +132,32 @@
 
 %%
 
-prog:
+execution:
+  files
+;
+
+files:
+  %empty
+  | files file
+;
+
+file:
   lines YYEOF {
     YY_BUFFER_STATE prev_buf;
     FILE *prev_fp;
 
-    if (!pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)) {
-        return terminate_lexer();
+    if (pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)) {
+        //done w included file, returning to caller
+        fclose(yyin);
+        yy_delete_buffer(YY_CURRENT_BUFFER);
+        yyin = prev_fp;
+        yy_switch_to_buffer(prev_buf);
+
+        //not returning YYEOF here
+        //-> bison perceives one large file
+    } else {
+      //done w root file
+      yyterminate();
     }
 
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
@@ -444,7 +463,7 @@ int exec(char* fpath) {
   label_finder(ncf);
   rewind(ncf);
   printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
-  //--------Bison Interpreter
+
   push_call_frame(&call_stack, ncf, get_current_buffer(), yyin);
 
   printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);

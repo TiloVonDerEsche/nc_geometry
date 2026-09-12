@@ -43,7 +43,8 @@ int main(int argc, char *argv[])
   ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
     laser_power,machine_speed");
 
-  exec(config.mpf_file); //exec entry point -> Main_Program_File
+  exec(config.mpf_file); //set entry point -> Main_Program_File
+  yyparse();
 
   //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}

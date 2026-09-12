@@ -3,7 +3,7 @@
   #include <math.h>
 
   #include "helper.h"
-  #include "stack.c"
+  #include "stack/frames.h"
 
   extern Config config;
   extern int debug;
@@ -53,7 +53,8 @@
   vec3D t_start = {0,0,0};
   vec3D t_end = {0,0,0};
 
-  Stack ret_stack;
+  Stack call_stack;
+  Stack jmp_stack;
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -100,8 +101,11 @@
 
 
 %initial-action {
-    init_stack(&ret_stack);
     //h = init_hashmap(); //h is global in helper.c for now
+
+    // In initial setup:
+    stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
+    stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
 %expect 1
@@ -130,6 +134,13 @@
 
 prog:
   lines YYEOF {
+    YY_BUFFER_STATE prev_buf;
+    FILE *prev_fp;
+
+    if (!pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)) {
+        return terminate_lexer();
+    }
+
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
     if (get_var_val("line") <= 1) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
@@ -251,12 +262,12 @@ expr:
                         }
                        }
   | LABEL              {
-                        if(!skip && !is_empty(&ret_stack)){
+                        if(!skip && !is_empty(&jmp_stack)){
 
-                          Elem top;
+                          JmpFrame top;
                           //Get stack top, without removing it from the stack
-                          peek(&ret_stack, &top);
-                          printf("$1_LABEL=%s, ret_stack_top.label=%s\n",$1,top.label);
+                          peek(&jmp_stack, &top);
+                          printf("$1_LABEL=%s, jmp_stack_top.label=%s\n",$1,top.label);
 
                           //if the currently read LABEL="END_LABEL"
                           printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
@@ -285,7 +296,7 @@ expr:
                                \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                                target_line, target_byte_offset);
 
-                               pop(&ret_stack, &top);
+                               pop(&jmp_stack, &top);
                             }
                           }
                           else if (strcmp($1,top.label) == 0) {
@@ -299,7 +310,7 @@ expr:
                             \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                             target_line, target_byte_offset);
 
-                            pop(&ret_stack, &top);
+                            pop(&jmp_stack, &top);
                           }
                           //else:
                           //goto not_found;
@@ -421,6 +432,26 @@ bool_expr:
 
 
 %%
+int exec(char* fpath) {
+  FILE* ncf = fopen(fpath, "rb");
+  if (ncf == NULL) {
+    fprintf(stderr, "Error: Could not open %s (in read mode)!\
+    \n\rDoes that file exist?\n",fpath);
+    return NOT_FOUND;
+  }
+
+  //--------Preprocessor for Labels
+  label_finder(ncf);
+  rewind(ncf);
+  printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
+  //--------Bison Interpreter
+  push_call_frame(&call_stack, ncf, get_current_buffer(), yyin);
+
+  printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);
+
+  return NOMINAL;
+}
+
 void request_jump(char* target) {
   jump_requested = 1;
   skip = 1;
@@ -483,7 +514,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
   }
   printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);
 
-  push(&ret_stack,
+  push_jmp_frame(&jmp_stack,
     strdup(end_label), //return label
     line,       //return line
     byte_offset //return byte_offset
@@ -492,8 +523,8 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
   request_jump(start_label);
 
   if (debug > 0) {
-    Elem temp;
-    if (peek(&ret_stack, &temp)) {
+    JmpFrame temp;
+    if (peek(&jmp_stack, &temp)) {
         printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
                 temp.label, temp.line, temp.byte_offset);
     }

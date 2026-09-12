@@ -356,23 +356,3 @@ int read_config(const char* fpath, Config* config) {
     fclose(file);
     return 0;
 }
-
-int exec(char* fpath) {
-  FILE* ncf = fopen(fpath, "rb");
-  if (ncf == NULL) {
-    fprintf(stderr, "Error: Could not open %s (in read mode)!\
-    \n\rDoes that file exist?\n",fpath);
-    return NOT_FOUND;
-  }
-
-  //--------Preprocessor for Labels
-  label_finder(ncf);
-  rewind(ncf);
-  printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
-  //--------Bison Interpreter
-  yyin = ncf;
-  yyparse();
-  printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);
-
-  return NOMINAL;
-}

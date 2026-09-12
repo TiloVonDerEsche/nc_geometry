@@ -147,3 +147,11 @@ int yywrap(){
     return 1;
     //set_var("line", get_var_val("line") + 1);
 }
+
+YY_BUFFER_STATE get_current_buffer(void) {
+    return YY_CURRENT_BUFFER;
+}
+
+int terminate_lexer(void) {
+    yyterminate();
+}

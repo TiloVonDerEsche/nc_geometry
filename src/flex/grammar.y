@@ -146,7 +146,9 @@ file:
     YY_BUFFER_STATE prev_buf;
     FILE *prev_fp;
 
-    if (pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)) {
+    pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)
+    
+    if (YY_CURRENT_BUFFER) {
         //done w included file, returning to caller
         fclose(yyin);
         yy_delete_buffer(YY_CURRENT_BUFFER);

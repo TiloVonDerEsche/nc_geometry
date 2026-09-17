@@ -131,7 +131,7 @@
 **/
 
 %%
-
+/*
 execution:
   files
 ;
@@ -139,15 +139,15 @@ execution:
 files:
   %empty
   | files file
-;
+;*/
 
 file:
   lines YYEOF {
-    YY_BUFFER_STATE prev_buf;
+  /*  YY_BUFFER_STATE prev_buf;
     FILE *prev_fp;
 
     pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)
-    
+
     if (YY_CURRENT_BUFFER) {
         //done w included file, returning to caller
         fclose(yyin);
@@ -160,7 +160,7 @@ file:
     } else {
       //done w root file
       yyterminate();
-    }
+    }*/
 
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
     if (get_var_val("line") <= 1) {
@@ -279,7 +279,7 @@ expr:
   | TRANS              //{trans_mode=1;}
   | assignment
   | CALL seps STRING   {if(!skip){
-                          exec($3);
+                          //exec($3);
                         }
                        }
   | LABEL              {
@@ -466,7 +466,7 @@ int exec(char* fpath) {
   rewind(ncf);
   printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
 
-  push_call_frame(&call_stack, ncf, get_current_buffer(), yyin);
+  //push_call_frame(&call_stack, ncf, get_current_buffer(), yyin);
 
   printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);
 

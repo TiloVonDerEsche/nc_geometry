@@ -11,6 +11,8 @@
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
 
+%x call
+
 digit    [0-9]
 inum     {digit}+
 fnum    ({digit}+"."{digit}*)|({digit}*"."{digit}+)
@@ -47,7 +49,12 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                 }
 
 {letter}{id} {
-              if(strcmp(yytext,"LASER_ON") == 0 ||
+              if(strcmp(yytext,"CALL") == 0) {if(debug){printf("A CALL:'%s'\n",yytext);}
+                  if(debug){puts("An Include CALL!\n");}
+                  BEGIN(call);
+                  //return CALL;
+              }
+              else if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
                   yylval.SPECIAL_CMD = strdup(yytext);
                   return SPECIAL_CMD;
@@ -70,8 +77,6 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                   return AROT;}
               else if(strcmp(yytext,"TRANS") == 0) {if(debug){puts("A TRANS!");}
                   return TRANS;}
-              else if(strcmp(yytext,"CALL") == 0) {if(debug){printf("A CALL:'%s'\n",yytext);}
-                  return CALL;}
               else if(strcmp(yytext,"MSG") == 0) {if(debug){printf("A MSG:'%s'\n",yytext);}
                   return MSG;}
               else if(strcmp(yytext,"SUPA") == 0) {if(debug){printf("A SUPA:'%s'\n",yytext);}
@@ -105,14 +110,6 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 
 
 "\""[^\"]*"\"" {
-  /*
-  "\""[^\"]*"\"" {
-    if(print_strs){ printf("A string: %s\n",yytext);puts("..."); }
-    //TODO Strip quotes: "", from STRING yyval
-    yylval.STRING = strdup(yytext);
-    return STRING;
-  }*/
-
   if (print_strs) {
     printf("A string: %s\n", yytext);
     puts("...");
@@ -139,18 +136,33 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 ","            {return yytext[0];}
 .      		     {return OTHER;}
 
+<call>[ \t]*      /* eat the whitespace */
+<call>[^ \t\n]+   { /* got the include file name */
+        if(debug){printf("Calling %s!\n\n",yytext);}
+
+        yyin=fopen(yytext,"r");
+
+        if (!yyin){fprintf(stderr,"Failed to open %s!\n",yytext);}
+
+        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+
+        BEGIN(INITIAL);
+        }
+
+
+<<EOF>> {
+        yypop_buffer_state();
+
+        if ( !YY_CURRENT_BUFFER )
+            {
+            yyterminate();
+            }
+        }
+
 %%
 
 
 int yywrap(){
     return 1;
     //set_var("line", get_var_val("line") + 1);
-}
-
-YY_BUFFER_STATE get_current_buffer(void) {
-    return YY_CURRENT_BUFFER;
-}
-
-int terminate_lexer(void) {
-    yyterminate();
 }

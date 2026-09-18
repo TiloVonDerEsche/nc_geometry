@@ -38,6 +38,20 @@
   void handle_repeat(char*, char*, size_t);
   void handle_tracks_def_by_coord_lines();
 
+  /* --- Flex Buffer API Declarations --- */
+  typedef struct yy_buffer_state *YY_BUFFER_STATE;
+
+  #ifndef YY_BUF_SIZE
+  #define YY_BUF_SIZE 16384
+  #endif
+
+  YY_BUFFER_STATE yy_create_buffer(FILE *file, int size);
+  void yypush_buffer_state(YY_BUFFER_STATE new_buffer);
+  void yypop_buffer_state(void);
+  void yy_switch_to_buffer(YY_BUFFER_STATE new_buffer);
+  void yy_delete_buffer(YY_BUFFER_STATE buffer);
+  /*--------------------------------------*/
+
   size_t target_line = 0;
   long target_byte_offset = 0;
 
@@ -91,7 +105,6 @@
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 
-
 %left '+' '-'
 %left '*' '/'
 
@@ -104,11 +117,11 @@
     //h = init_hashmap(); //h is global in helper.c for now
 
     // In initial setup:
-    stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
+    //stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
-%expect 1
+//%expect 1
 /**
   NOTE is it really unproblematic to allow:
   Example: ID • SEP fn
@@ -131,37 +144,19 @@
 **/
 
 %%
+
 /*
 execution:
   files
-;
-
+;*/
+/*
 files:
   %empty
   | files file
-;*/
-
+;
+*/
 file:
-  lines YYEOF {
-  /*  YY_BUFFER_STATE prev_buf;
-    FILE *prev_fp;
-
-    pop_call_frame(&call_stack, get_current_buffer(), &prev_buf, &prev_fp)
-
-    if (YY_CURRENT_BUFFER) {
-        //done w included file, returning to caller
-        fclose(yyin);
-        yy_delete_buffer(YY_CURRENT_BUFFER);
-        yyin = prev_fp;
-        yy_switch_to_buffer(prev_buf);
-
-        //not returning YYEOF here
-        //-> bison perceives one large file
-    } else {
-      //done w root file
-      yyterminate();
-    }*/
-
+  lines {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
     if (get_var_val("line") <= 1) {
       printf("Warning: File %s is empty!\n",config.mpf_file);
@@ -279,7 +274,7 @@ expr:
   | TRANS              //{trans_mode=1;}
   | assignment
   | CALL seps STRING   {if(!skip){
-                          //exec($3);
+                          exec($3);
                         }
                        }
   | LABEL              {
@@ -369,8 +364,6 @@ expr:
                           }
                          }
   | MSG SEP STRING
-  | ID
-  | fn
   | COMMENT
 ;
 
@@ -454,19 +447,19 @@ bool_expr:
 
 %%
 int exec(char* fpath) {
-  FILE* ncf = fopen(fpath, "rb");
-  if (ncf == NULL) {
+  yyin = fopen(fpath, "rb");
+  if (yyin == NULL) {
     fprintf(stderr, "Error: Could not open %s (in read mode)!\
     \n\rDoes that file exist?\n",fpath);
     return NOT_FOUND;
   }
 
   //--------Preprocessor for Labels
-  label_finder(ncf);
-  rewind(ncf);
+  label_finder(yyin);
+  rewind(yyin);
   printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
 
-  //push_call_frame(&call_stack, ncf, get_current_buffer(), yyin);
+  yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 
   printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);
 

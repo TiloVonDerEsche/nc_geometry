@@ -49,10 +49,9 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
                 }
 
 {letter}{id} {
-              if(strcmp(yytext,"CALL") == 0) {if(debug){printf("A CALL:'%s'\n",yytext);}
-                  if(debug){puts("An Include CALL!\n");}
-                  BEGIN(call);
-                  //return CALL;
+              if(strcmp(yytext,"CALL") == 0) {if(debug){puts("An Include CALL!\n");}
+                  //BEGIN(call);
+                  return CALL;
               }
               else if(strcmp(yytext,"LASER_ON") == 0 ||
                  strcmp(yytext,"LASER_OFF") == 0 ) {
@@ -134,30 +133,20 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 "\n"           {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 ","            {return yytext[0];}
-.      		     {return OTHER;}
 
-<call>[ \t]*      /* eat the whitespace */
-<call>[^ \t\n]+   { /* got the include file name */
-        if(debug){printf("Calling %s!\n\n",yytext);}
-
-        yyin=fopen(yytext,"r");
-
-        if (!yyin){fprintf(stderr,"Failed to open %s!\n",yytext);}
-
-        yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
-
-        BEGIN(INITIAL);
-        }
 
 
 <<EOF>> {
         yypop_buffer_state();
 
-        if ( !YY_CURRENT_BUFFER )
-            {
+        if ( !YY_CURRENT_BUFFER ){
             yyterminate();
-            }
         }
+      }
+
+.      		     {return OTHER;}
+
+
 
 %%
 
@@ -165,4 +154,28 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
 int yywrap(){
     return 1;
     //set_var("line", get_var_val("line") + 1);
+
+    //<call>[ \t]*      /* eat the whitespace */
+    /*<call>[^ \t\n]+   { /* got the include file name */
+    /*        if(debug){printf("Calling %s!\n\n",yytext);}
+
+            yyin=fopen(yytext,"r");
+
+            if (!yyin){fprintf(stderr,"Failed to open %s!\n",yytext);}
+
+            yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+
+            BEGIN(INITIAL);
+            }
+    */
+    /*
+    <<EOF>> {
+            yypop_buffer_state();
+
+            if ( !YY_CURRENT_BUFFER )
+                {
+                yyterminate();
+                }
+            }
+    */
 }

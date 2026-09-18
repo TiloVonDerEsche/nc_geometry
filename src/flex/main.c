@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
   }*/
 
-  tl = init_file(config.track_list_csv,"Track_id,A.x,A.y,A.z,B.x,B.y,B.z,\
-    laser_power,machine_speed,coll_vec.x,coll_vec.y,coll_vec.z,hradius,vradius");
+  tl = init_file(config.track_list_csv,"Track_id,T_start.x,T_start.y,T_start.z,T_end.x,T_end.y,T_end.z,\
+    laser_power,machine_speed,G_code");
   ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
     laser_power,machine_speed");
 

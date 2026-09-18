@@ -121,7 +121,7 @@
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
-//%expect 1
+%expect 1
 /**
   NOTE is it really unproblematic to allow:
   Example: ID • SEP fn
@@ -226,6 +226,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
+  | ID
   | SUPA /*{//acts like G153, also supresses:
               DRF, "überlagerte Bewegungen"
              ,extern NPV, PRESET-Translation}*/
@@ -248,6 +249,7 @@ expr:
         case 500: break; //TODO Readup on: $P_ACTBFRAME, $P_UIFR
         default: break;
       }
+    set_var("G", $2);
     }
   }
   | XYZ_CMD arith_expr {
@@ -268,7 +270,7 @@ expr:
       is_coord_line=1;
     }
   }
-  | CMD arith_expr       {}
+  | CMD arith_expr     {}
   | ROT                {rot_mode = 1;}
   | AROT               //{arot_mode = 1;}
   | TRANS              //{trans_mode=1;}
@@ -405,6 +407,7 @@ val:
                   /*printf("Getting ID=%s\n",$1);*/
                   $$ = get_var_val($1);
                  }
+  | fn           {$$=$1;}
   | INT          {$$=$1;}
   | FLOAT        {$$=$1;}
 ;
@@ -416,15 +419,12 @@ fn:
 params:
   %empty
   | arith_expr
-  //| ID //redundant, since: arith_expr -> val -> ID
   | params ',' arith_expr
-  //| params ',' ID
 ;
 
 
 arith_expr:
   val         {$$=$1;}
-  | fn        {$$=$1;}
   | arith_expr '+' arith_expr {$$=$1+$3; /*printf("%f+%f=%f\n", $1,$3,$$);*/}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
@@ -559,11 +559,10 @@ void handle_tracks_def_by_coord_lines() {
 }
 
 void write_track_line() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
+  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, %d\n",
   tid++, t_start.x, t_start.y, t_start.z, t_end.x, t_end.y, t_end.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"),
-  //coll_vec,
-  config.hrad, config.vrad);
+  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"), (int)get_var_val("G")
+  );
 }
 
 void write_ncc_line(vec3D p) {

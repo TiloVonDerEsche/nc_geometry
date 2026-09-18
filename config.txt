@@ -7,7 +7,7 @@ mpf_file = "./data/nc_code/Niere/Round_channel.mpf";
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/vase/debug.nc";
 
-debug_prints = 1;
+debug_prints = 0;
 print_strs = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;

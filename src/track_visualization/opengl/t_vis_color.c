@@ -15,10 +15,32 @@
 #define SPEED 0.3f
 #define SHIFT_BOOST 0.5f
 
+#define SUCCESS 0
+#define FAILURE -1
+
+#define MAX_COLOR_MAPS 10
+
+typedef struct {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} Color;
+
+typedef struct {
+    unsigned int g_code;
+    Color color;
+} ColorMapEntry;
+
 // Structure to hold track data
 typedef struct {
+    unsigned int id;
     float ax, ay, az; // Start point
     float bx, by, bz; // End point
+    float laser_power;
+    float machine_speed;
+    unsigned int g_code;
+
+    Color color;
     float hradius, vradius; // Radii
 } Track;
 
@@ -41,12 +63,90 @@ Config config = {0};
 // Ambient Light Control Variable
 float ambientIntensity = 0.2f; // Default 20% ambient light
 
+Color default_color = {255,0,0};
+
+/**************************File / Str Functions**************************************/
+
+/************Untested***************/
+int parse_color_entry(char* line, ColorMapEntry* cm) {
+    char* key;
+    char* value;
+
+    // Use your existing parse_line to split key and value around '='
+    parse_line(line, &key, &value);
+    if (!key || !value) {
+        return FAILURE; // missing '='
+    }
+
+    char c;
+    unsigned int code;
+    // Extract <Char><uInt> (e.g., "G23")
+    if (sscanf(key, "%c%u", &c, &cm->g_code) != 2) {
+        return FAILURE; //key isn't formatted as Char + Number
+    }
+    if (c != 'G') {return FAILURE;}
+
+    // Parse RGB values enclosed in curly braces {r, g, b}
+    if (sscanf(value, "{%hhu,%hhu,%hhu}", &cm->color.r, &cm->color.g, &cm->color.b) != 3) {
+        return FAILURE; //RGB values not matched
+    }
+
+    printf("Read values G:%u, Color: {%hhu,%hhu,%hhu}\n",
+      cm->g_code,
+      cm->color.r, cm->color.g, cm->color.b);
+
+    return SUCCESS;
+}
+
+
+int read_color_config(const char* filename, ColorMapEntry color_mapping[MAX_COLOR_MAPS]) {
+    printf("Opening %s...\n", filename);
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Could not open color_config file %s\n", filename);
+        return FAILURE;
+    }
+
+    unsigned int cmi = 0;
+    char line[512];
+    while (fgets(line, sizeof(line), file)) {
+        char* trimmed = trim(line);
+
+        // ignore comments and empty lines
+        if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
+            continue;
+        }
+
+        if(parse_color_entry(trimmed, &color_mapping[cmi]) == SUCCESS) {
+          cmi++;
+        }
+
+        if (cmi >= MAX_COLOR_MAPS) {
+          fprintf(stderr,"Too many Color mappings read, in color_config file: %s\n",filename);
+          fclose(file);
+          return FAILURE;
+        }
+
+    }
+
+    for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
+      printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
+        i,color_mapping[i].g_code,
+        color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
+    }
+
+    fclose(file);
+    return SUCCESS;
+}
+/***************************/
+
+
 int read_config(const char* filename, Config* config) {
     printf("Opening %s...\n", filename);
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "Error: Could not open config file %s\n", filename);
-        return 1;
+        return FAILURE;
     }
 
     char line[512];
@@ -76,11 +176,11 @@ int read_config(const char* filename, Config* config) {
     }
 
     fclose(file);
-    return 0;
+    return SUCCESS;
 }
 
 // Read CSV file
-void read_csv(const char* filename) {
+void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR_MAPS]) {
     printf("Opening %s...\n", filename);
     FILE* file = fopen(filename, "r");
     if (!file) {
@@ -98,17 +198,35 @@ void read_csv(const char* filename) {
     rewind(file);
     fgets(line, sizeof(line), file); // Skip header again
 
+    //initialize tracks
     int i = 0;
     while (fgets(line, sizeof(line), file) && i < numTracks) {
-        sscanf(line, "%*d,%f,%f,%f, %f,%f,%f",
+        sscanf(line, "%d,%f,%f,%f, %f,%f,%f, %f,%f,%u",
+               &tracks[i].id,
                &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
-               &tracks[i].bx, &tracks[i].by, &tracks[i].bz);
+               &tracks[i].bx, &tracks[i].by, &tracks[i].bz,
+               &tracks[i].laser_power, &tracks[i].machine_speed,
+               &tracks[i].g_code);
         tracks[i].hradius = config.horizontal_radius;
         tracks[i].vradius = config.vertical_radius;
+
+        //TODO var for num of valid ColorMapEntries
+        for(unsigned int j=0; j<MAX_COLOR_MAPS; j++) {
+          printf("g_code_match:%d,t.g:%u, cm.g:%u\n",
+            tracks[i].g_code == color_mapping[j].g_code,
+            tracks[i].g_code, color_mapping[j].g_code
+          );
+          if(tracks[i].g_code == color_mapping[j].g_code) {
+            tracks[i].color = color_mapping[j].color;
+          }
+        }
+
         i++;
     }
     fclose(file);
 }
+
+/****************************************************************/
 
 void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
     const int segments = 32;
@@ -173,14 +291,16 @@ void display() {
     GLfloat lightPos[] = {1.0f, 1.0f, 1.0f, 0.0f};
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
-    // Camera setup
+    // Camera
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
     glTranslatef(-camX, -camY, -camZ);
 
     // Draw tracks
     for (int i = 0; i < numTracks; i++) {
-        float z_avg = (tracks[i].az + tracks[i].bz) / 2.0f;
+
+        //interpolate color in Z
+        /*float z_avg = (tracks[i].az + tracks[i].bz) / 2.0f;
         float t = (max_z - min_z) > 0 ? (z_avg - min_z) / (max_z - min_z) : 0.5f;
         float r, g, b;
 
@@ -192,12 +312,15 @@ void display() {
             r = 4.0f * (t - 0.5f); g = 1.0f; b = 0.0f;
         } else {
             r = 1.0f; g = 1.0f - 4.0f * (t - 0.75f); b = 0.0f;
-        }
+        }*/
 
-        glColor3f(r, g, b);
-        drawCylinder(tracks[i].ax, tracks[i].ay, tracks[i].az,
-                     tracks[i].bx, tracks[i].by, tracks[i].bz,
-                     tracks[i].hradius, tracks[i].vradius);
+        glColor3f(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
+        //don't render tracks, if they're black
+        if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
+          drawCylinder(tracks[i].ax, tracks[i].ay, tracks[i].az,
+                       tracks[i].bx, tracks[i].by, tracks[i].bz,
+                       tracks[i].hradius, tracks[i].vradius);
+        }
     }
 
     glutSwapBuffers();
@@ -288,9 +411,20 @@ void handle_movement(int garbage) {
 }
 
 int main(int argc, char** argv) {
-    read_config("config.txt", &config);
-    read_csv(config.tracks_to_plot);
+    ColorMapEntry color_mapping[MAX_COLOR_MAPS];
+    read_color_config("./color_config.txt", color_mapping);
+    for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
+      printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
+        i,color_mapping[i].g_code,
+        color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
+    }
+    puts("");
 
+    read_config("config.txt", &config);
+    read_track_list(config.tracks_to_plot, color_mapping);
+
+
+    //NOTE set Z values of near and far plane, of view frustum
     min_z = tracks[0].az;
     max_z = tracks[0].az;
     for (int i = 0; i < numTracks; i++) {

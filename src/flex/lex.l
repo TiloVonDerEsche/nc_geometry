@@ -60,6 +60,8 @@ H{inum} {yylval.VAR = yytext[0]; return VAR;}
               }
               else if(strcmp(yytext,"IF") == 0) {if(debug){puts("An IF!");}
                   return IF;}
+              else if(strcmp(yytext,"THEN") == 0) {if(debug){puts("A THEN!");}
+                  return THEN;}
               else if(strcmp(yytext,"ENDIF") == 0) {if(debug){puts("An ENDIF!");}
                   return ENDIF;}
               else if(strcmp(yytext,"GOTOB") == 0 ||

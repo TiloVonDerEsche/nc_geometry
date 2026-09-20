@@ -217,11 +217,11 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
 
         //TODO var for num of valid ColorMapEntries
         for(unsigned int j=0; j<MAX_COLOR_MAPS; j++) {
-          if (config.debug) {
+          /*if (config.debug) {
             printf("g_code_match:%d,t.g:%u, cm.g:%u\n",
             tracks[i].g_code == color_mapping[j].g_code,
             tracks[i].g_code, color_mapping[j].g_code
-            ); }
+            ); }*/
           if(tracks[i].g_code == color_mapping[j].g_code) {
             tracks[i].color = color_mapping[j].color;
           }
@@ -421,15 +421,6 @@ int main(int argc, char** argv) {
 
     ColorMapEntry color_mapping[MAX_COLOR_MAPS];
     read_color_config("color_config.txt", color_mapping);
-
-    if (config.debug) {
-      for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
-        printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
-          i,color_mapping[i].g_code,
-          color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
-      }
-    }
-
     read_track_list(config.tracks_to_plot, color_mapping);
 
 

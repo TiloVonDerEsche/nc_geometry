@@ -81,7 +81,7 @@
 
 %token CALL
 
-%token IF ENDIF
+%token IF THEN ENDIF
 %token GOTO REPEAT
 %token ROT AROT TRANS
 %token SUPA
@@ -211,7 +211,7 @@ exprs:
 ;
 
 expr:
-  IF SEP bool_expr {
+  IF SEP bool_expr SEP THEN {
       if (!$3) {
           skip++; //ignore code lines, if condition is false
           if(debug) {printf("Skip=%d\n",skip);}
@@ -391,7 +391,9 @@ assignment:
        set_var_incr((char[]){$1, '\0'},$5);
     }}}
   | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
-  | CMD opt_seps '=' opt_seps arith_expr        {}
+  | G_CMD opt_seps '=' opt_seps arith_expr      {if(!skip){set_var((char[]){$1, '\0'},$5);}}
+  | CMD opt_seps '=' opt_seps arith_expr        {//ignoring F=150
+                                                 }
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var((char[]){$1, '\0'},$5);}}
   | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | ID seps arith_expr                   {if(!skip){set_var($1,$3);}}

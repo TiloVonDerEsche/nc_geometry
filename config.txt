@@ -5,7 +5,8 @@
 //mpf_file = "./data/nc_code/Niere/Tail_Cut.txt";
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
-mpf_file = "./data/nc_code/test/vase/debug.nc";
+//mpf_file = "./data/nc_code/test/color/g.mpf";
+mpf_file = "./data/nc_code/test/abc/CoordSys3D.nc";
 
 debug_prints = 0;
 print_strs = 1;

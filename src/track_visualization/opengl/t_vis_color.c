@@ -67,7 +67,6 @@ Color default_color = {255,0,0};
 
 /**************************File / Str Functions**************************************/
 
-/************Untested***************/
 int parse_color_entry(char* line, ColorMapEntry* cm) {
     char* key;
     char* value;
@@ -91,9 +90,11 @@ int parse_color_entry(char* line, ColorMapEntry* cm) {
         return FAILURE; //RGB values not matched
     }
 
-    printf("Read values G:%u, Color: {%hhu,%hhu,%hhu}\n",
-      cm->g_code,
-      cm->color.r, cm->color.g, cm->color.b);
+    if (config.debug) {
+      printf("Read values G:%u, Color: {%hhu,%hhu,%hhu}\n",
+        cm->g_code,
+        cm->color.r, cm->color.g, cm->color.b);
+    }
 
     return SUCCESS;
 }
@@ -129,16 +130,18 @@ int read_color_config(const char* filename, ColorMapEntry color_mapping[MAX_COLO
 
     }
 
-    for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
-      printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
-        i,color_mapping[i].g_code,
-        color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
+    if (config.debug) {
+      for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
+        printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
+          i,color_mapping[i].g_code,
+          color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
+      }
     }
 
     fclose(file);
     return SUCCESS;
 }
-/***************************/
+
 
 
 int read_config(const char* filename, Config* config) {
@@ -172,6 +175,8 @@ int read_config(const char* filename, Config* config) {
             config->horizontal_radius = atof(value);
         } else if (strcmp(key, "vertical_radius") == 0) {
             config->vertical_radius = atof(value);
+        } else if (strcmp(key, "debug_prints") == 0) {
+            config->debug = atoi(value);
         }
     }
 
@@ -212,10 +217,11 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
 
         //TODO var for num of valid ColorMapEntries
         for(unsigned int j=0; j<MAX_COLOR_MAPS; j++) {
-          printf("g_code_match:%d,t.g:%u, cm.g:%u\n",
+          if (config.debug) {
+            printf("g_code_match:%d,t.g:%u, cm.g:%u\n",
             tracks[i].g_code == color_mapping[j].g_code,
             tracks[i].g_code, color_mapping[j].g_code
-          );
+            ); }
           if(tracks[i].g_code == color_mapping[j].g_code) {
             tracks[i].color = color_mapping[j].color;
           }
@@ -411,16 +417,19 @@ void handle_movement(int garbage) {
 }
 
 int main(int argc, char** argv) {
-    ColorMapEntry color_mapping[MAX_COLOR_MAPS];
-    read_color_config("./color_config.txt", color_mapping);
-    for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
-      printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
-        i,color_mapping[i].g_code,
-        color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
-    }
-    puts("");
+    read_config("plot_config.txt", &config);
 
-    read_config("config.txt", &config);
+    ColorMapEntry color_mapping[MAX_COLOR_MAPS];
+    read_color_config("color_config.txt", color_mapping);
+
+    if (config.debug) {
+      for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
+        printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
+          i,color_mapping[i].g_code,
+          color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
+      }
+    }
+
     read_track_list(config.tracks_to_plot, color_mapping);
 
 

@@ -1,0 +1,14 @@
+tracks_to_plot = "./track_list.csv";
+
+//radii of welding track
+horizontal_radius= 12;//0.49;
+vertical_radius=0.31;
+
+debug_prints = 1;
+//shift_boost=10;
+//camera_orient={90,0,0}; //rotated 90° around x
+
+//=============not used===============//
+track_accel_margin=0.02;
+interpolation_csv = "./interpolation/_intpol.csv";
+step_distance = 1; //step distance of interpolation in mm

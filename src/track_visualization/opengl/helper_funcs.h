@@ -6,18 +6,12 @@
 #include <ctype.h>
 
 typedef struct {
-  size_t mpf_lines;
-  size_t precision;
-  size_t max_line_len;
-
-  char mpf_file[256];
-  char data_tuples_csv[256];
-  char track_list_csv[256];
+  char tracks_to_plot[256];
 
   float horizontal_radius;
   float vertical_radius;
 
-  char tracks_to_plot[256];
+  int debug;
 } Config;
 
 typedef struct {
@@ -39,7 +33,7 @@ typedef struct {
   float laser_power;
   float machine_speed;
   //set by track_collision
-  vec3D coll_vec;
+  //vec3D coll_vec;
   //set by set_track_radius
   float hradius;
   float vradius;

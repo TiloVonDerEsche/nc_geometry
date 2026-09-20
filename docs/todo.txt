@@ -18,6 +18,13 @@ Error: syntax error, unexpected end of file, expecting NEWLINE, in line: 50
 So new format of err in line reporting: <nc_file>:<line_in_that_nc_file>
 
 
+|=======================Color Property Selection, 3d_track_vis==========================|
+Added color_config.txt which currently only lets you set colors for tracks,
+depending on their active g_code, while they were printed.
+The plan for the future is, a small bison/flex interpreter which handles boolean expressions,
+and perhaps sort of runs live with the visualizer. With that the user can filter tracks with properties specified in the boolean expr.
+Currently possible: F.e.: if(G==1) {color={255,0,0}}. Future: if(50<track_start.x<100) {Color={100,100,0}}
+
 |=======================================================|
 Fix line off by one error
 -> Stop with ball search non-sense

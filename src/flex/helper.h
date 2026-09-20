@@ -22,9 +22,6 @@ typedef struct {
   char track_list_csv[256];
   char ncc_points_csv[256];
   char hmhis_json[256];
-
-  float hrad;
-  float vrad;
 } Config;
 //===========Macros===========//
 KHASHL_MAP_INIT(KH_LOCAL,

@@ -42,7 +42,7 @@ void modify_tl() {
 
     char line[2048];
     size_t tid = 0;
-    vec3D A = {0}, B = {0};
+    vec3D t_start = {0}, t_end = {0};
     float puis_laser = 0, vit_tir = 0;
 
     const char* read_fmt = "%lu , %f , %f , %f , %f , %f , %f , %f , %f";
@@ -54,28 +54,17 @@ void modify_tl() {
 
     while (fgets(line, sizeof(line), fr)) {
         int found = sscanf(line, read_fmt, &tid,
-          &A.x, &A.y, &A.z, &B.x, &B.y, &B.z, &puis_laser, &vit_tir);
+          &t_start.x, &t_start.y, &t_start.z, &t_end.x, &t_end.y, &t_end.z, &puis_laser, &vit_tir);
           if (found != 9) {
               printf("Line Dropped! Match count: %d\n", found);
               printf("Content: %s\n", line);
               continue;
           }
-
-        // 1. Modify your vectors here
-        //A.x += 1.0f;
-        //B.z *= 2.0f;
-
-        // 2. Write back in the original format
-        // Note: You'll need to decide what to put for the values you skipped
-        // during reading (here I used 0.0 for the laser/config vars)
-        printf("Writing: %lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
-                //coll_vec,
-                config.hrad, config.vrad);
-        fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f, 0, 0, 0, %f, %f\n",
-                tid, A.x, A.y, A.z, B.x, B.y, B.z, puis_laser, vit_tir,
-                //coll_vec,
-                config.hrad, config.vrad);
+        //NOTE Currently track_list gets copied, since no modifications are happening
+        printf("Writing: %lu, %f, %f, %f, %f, %f, %f, %f, %f\n",
+                tid, t_start.x, t_start.y, t_start.z, t_end.x, t_end.y, t_end.z, puis_laser, vit_tir);
+        fprintf(fw, "%lu, %f, %f, %f, %f, %f, %f, %f, %f\n",
+                tid, t_start.x, t_start.y, t_start.z, t_end.x, t_end.y, t_end.z, puis_laser, vit_tir);
     }
 
     fclose(fw);
@@ -336,6 +325,7 @@ int read_config(const char* fpath, Config* config) {
             strncpy(config->hmhis_json, value, sizeof(config->hmhis_json) - 1);
             config->hmhis_json[sizeof(config->hmhis_json) - 1] = '\0';
         }
+        /*
         else if (strcmp(key, "tracks_to_plot") == 0) {
           //Do nothing; Used by t_vis_color.c
         }
@@ -347,7 +337,7 @@ int read_config(const char* fpath, Config* config) {
             config->vrad = atof(value);
         }
         else if (strcmp(key, "step_distance") == 0) {}
-        else if (strcmp(key, "track_accel_margin") == 0) {}
+        else if (strcmp(key, "track_accel_margin") == 0) {}*/
         else {
           fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,fpath);
         }

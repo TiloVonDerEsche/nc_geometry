@@ -1,11 +1,11 @@
 //mpf_file = "./data/nc_code/Niere/Layer10_2.spf";
-mpf_file = "./data/nc_code/Niere/Round_channel.mpf";
+//mpf_file = "./data/nc_code/Niere/Round_channel.mpf";
 
 //mpf_file = "./data/nc_code/Niere/POS_051_KERN_SG_V5.mpf";
 //mpf_file = "./data/nc_code/Niere/Tail_Cut.txt";
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
-//mpf_file = "./data/nc_code/test/vase/debug.nc";
+mpf_file = "./data/nc_code/test/vase/debug.nc";
 
 debug_prints = 0;
 print_strs = 1;
@@ -17,14 +17,3 @@ track_mid_len = 0; //10 for Vase
 track_list_csv = "./track_list.csv";
 ncc_points_csv = "./ncc_points.csv";
 hmhis_json = "./hmhis.json";
-
-tracks_to_plot = "./track_list.csv";
-
-//radii of welding track
-horizontal_radius= 0.49;
-vertical_radius=0.31;
-
-track_accel_margin=0.02;
-//=============not used===============//
-interpolation_csv = "./interpolation/_intpol.csv";
-step_distance = 1; //step distance of interpolation in mm

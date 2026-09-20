@@ -86,12 +86,12 @@
 %token ROT AROT TRANS
 %token SUPA
 
-%token <char> VAR
 %token <char> G_CMD
 %token <char> XYZ_CMD
 %token <char> ABC_CMD
 %token <char> CMD
 
+%token <char*> VAR
 %token <char*> LABEL
 %token <char*> SPECIAL_CMD
 %token <char*> ID
@@ -394,7 +394,7 @@ assignment:
   | G_CMD opt_seps '=' opt_seps arith_expr      {if(!skip){set_var((char[]){$1, '\0'},$5);}}
   | CMD opt_seps '=' opt_seps arith_expr        {//ignoring F=150
                                                  }
-  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var((char[]){$1, '\0'},$5);}}
+  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
   | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | ID seps arith_expr                   {if(!skip){set_var($1,$3);}}
 ;
@@ -403,7 +403,7 @@ assignment:
 val:
   VAR            {
                   /*printf("Getting VAR=%s\n",$1);*/
-                  $$ = get_var_val((char[]){$1, '\0'});
+                  $$ = get_var_val($1);
                  }
   | ID  {
                   /*printf("Getting ID=%s\n",$1);*/

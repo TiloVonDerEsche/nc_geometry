@@ -37,8 +37,8 @@ id       [A-Za-z][_A-Za-z0-9]*
         return FLOAT;
         }
 
-R{inum} {yylval.VAR = yytext[0]; return VAR;}
-H{inum} {yylval.VAR = yytext[0]; return VAR;}
+R{inum} {yylval.VAR = strdup(yytext); return VAR;}
+H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 {letter}{id}":" {
                 char* s = yytext;

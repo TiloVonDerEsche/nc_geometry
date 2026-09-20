@@ -18,6 +18,43 @@
 #define SUCCESS 0
 #define FAILURE -1
 
+#define MAX_COLOR_MAPS 10
+
+typedef struct {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} Color;
+
+typedef struct {
+    unsigned int g_code;
+    Color color;
+} ColorMapEntry;
+
+typedef struct {
+  char tracks_to_plot[256];
+
+  float horizontal_radius;
+  float vertical_radius;
+
+  int debug;
+
+  Color default_color;
+} Config;
+
+// Structure to hold track data
+typedef struct {
+    unsigned int id;
+    float ax, ay, az; // Start point
+    float bx, by, bz; // End point
+    float laser_power;
+    float machine_speed;
+    unsigned int g_code;
+
+    Color color;
+    float hradius, vradius; // Radii
+} Track;
+
 // Camera variables
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
@@ -37,6 +74,7 @@ Config config = {0};
 // Ambient Light Control Variable
 float ambientIntensity = 0.2f; // Default 20% ambient light
 
+unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
 int parse_color_entry(char* line, ColorMapEntry* cm) {
@@ -96,14 +134,14 @@ int read_color_config(const char* filename, ColorMapEntry color_mapping[MAX_COLO
 
         if (cmi >= MAX_COLOR_MAPS) {
           fprintf(stderr,"Too many Color mappings read, in color_config file: %s\n",filename);
-          fclose(file);
-          return FAILURE;
+          break;
         }
 
     }
 
+    valid_color_maps = cmi;
     if (config.debug) {
-      for(unsigned int i=0; i<MAX_COLOR_MAPS; i++) {
+      for(unsigned int i=0; i<valid_color_maps; i++) {
         printf("MapID: %u, G:%u,Color:{%hhu,%hhu,%hhu}\n",
           i,color_mapping[i].g_code,
           color_mapping[i].color.r, color_mapping[i].color.g, color_mapping[i].color.b);
@@ -196,13 +234,7 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
         tracks[i].vradius = config.vertical_radius;
         tracks[i].color = config.default_color;
 
-        //TODO var for num of valid ColorMapEntries
-        for(unsigned int j=0; j<MAX_COLOR_MAPS; j++) {
-          /*if (config.debug) {
-            printf("g_code_match:%d,t.g:%u, cm.g:%u\n",
-            tracks[i].g_code == color_mapping[j].g_code,
-            tracks[i].g_code, color_mapping[j].g_code
-            ); }*/
+        for(unsigned int j=0; j<valid_color_maps; j++) {
           if(tracks[i].g_code == color_mapping[j].g_code) {
             tracks[i].color = color_mapping[j].color;
           }

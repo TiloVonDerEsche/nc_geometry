@@ -6,42 +6,6 @@
 #include <ctype.h>
 
 typedef struct {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-} Color;
-
-typedef struct {
-    unsigned int g_code;
-    Color color;
-} ColorMapEntry;
-#define MAX_COLOR_MAPS 10
-
-typedef struct {
-  char tracks_to_plot[256];
-
-  float horizontal_radius;
-  float vertical_radius;
-
-  int debug;
-
-  Color default_color;
-} Config;
-
-// Structure to hold track data
-typedef struct {
-    unsigned int id;
-    float ax, ay, az; // Start point
-    float bx, by, bz; // End point
-    float laser_power;
-    float machine_speed;
-    unsigned int g_code;
-
-    Color color;
-    float hradius, vradius; // Radii
-} Track;
-
-typedef struct {
   float x;
   float y;
   float z;
@@ -52,7 +16,7 @@ typedef struct {
   vec3D P;
 } plane;
 
-
+/*
 typedef struct {
   //set by read_mpf
   vec3D A;
@@ -81,7 +45,7 @@ void copy_data_tuple(size_t i, data_tuple** arr) {
   (*arr)[i].P.y = (*arr)[i-1].P.y;
   (*arr)[i].P.z = (*arr)[i-1].P.z;
   (*arr)[i].laser = (*arr)[i-1].laser;
-}
+}*/
 
 
 void print_buf(char* buf, size_t buf_len) {

@@ -18,32 +18,6 @@
 #define SUCCESS 0
 #define FAILURE -1
 
-#define MAX_COLOR_MAPS 10
-
-typedef struct {
-    unsigned char r;
-    unsigned char g;
-    unsigned char b;
-} Color;
-
-typedef struct {
-    unsigned int g_code;
-    Color color;
-} ColorMapEntry;
-
-// Structure to hold track data
-typedef struct {
-    unsigned int id;
-    float ax, ay, az; // Start point
-    float bx, by, bz; // End point
-    float laser_power;
-    float machine_speed;
-    unsigned int g_code;
-
-    Color color;
-    float hradius, vradius; // Radii
-} Track;
-
 // Camera variables
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
@@ -62,8 +36,6 @@ Config config = {0};
 
 // Ambient Light Control Variable
 float ambientIntensity = 0.2f; // Default 20% ambient light
-
-Color default_color = {255,0,0};
 
 /**************************File / Str Functions**************************************/
 
@@ -177,6 +149,14 @@ int read_config(const char* filename, Config* config) {
             config->vertical_radius = atof(value);
         } else if (strcmp(key, "debug_prints") == 0) {
             config->debug = atoi(value);
+        } else if (strcmp(key, "default_color") == 0) {
+            if(sscanf(value, "{%hhu,%hhu,%hhu}",
+            &config->default_color.r, &config->default_color.g, &config->default_color.b) != 3) {
+              fprintf(stderr,"Failed to read default_color!\n");
+            } else{
+              printf("Read default_color={%hhu,%hhu,%hhu}\n",
+                config->default_color.r, config->default_color.g, config->default_color.b);
+            }
         }
     }
 
@@ -199,7 +179,7 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
     int count = 0;
     while (fgets(line, sizeof(line), file)) count++;
     numTracks = count;
-    tracks = (Track*)malloc(numTracks * sizeof(Track));
+    tracks = (Track*)calloc(numTracks, sizeof(Track));
     rewind(file);
     fgets(line, sizeof(line), file); // Skip header again
 
@@ -214,6 +194,7 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
                &tracks[i].g_code);
         tracks[i].hradius = config.horizontal_radius;
         tracks[i].vradius = config.vertical_radius;
+        tracks[i].color = config.default_color;
 
         //TODO var for num of valid ColorMapEntries
         for(unsigned int j=0; j<MAX_COLOR_MAPS; j++) {
@@ -320,7 +301,7 @@ void display() {
             r = 1.0f; g = 1.0f - 4.0f * (t - 0.75f); b = 0.0f;
         }*/
 
-        glColor3f(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
+        glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
         //don't render tracks, if they're black
         if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
           drawCylinder(tracks[i].ax, tracks[i].ay, tracks[i].az,

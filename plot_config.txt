@@ -4,7 +4,9 @@ tracks_to_plot = "./track_list.csv";
 horizontal_radius=0.50;//0.49;
 vertical_radius=0.50;     //0.31;
 
-debug_prints = 0;
+default_color = {255,0,0};
+
+debug_prints = 1;
 //shift_boost=10;
 //camera_orient={90,0,0}; //rotated 90° around x
 

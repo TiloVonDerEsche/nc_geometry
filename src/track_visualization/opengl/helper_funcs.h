@@ -6,13 +6,40 @@
 #include <ctype.h>
 
 typedef struct {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} Color;
+
+typedef struct {
+    unsigned int g_code;
+    Color color;
+} ColorMapEntry;
+#define MAX_COLOR_MAPS 10
+
+typedef struct {
   char tracks_to_plot[256];
 
   float horizontal_radius;
   float vertical_radius;
 
   int debug;
+
+  Color default_color;
 } Config;
+
+// Structure to hold track data
+typedef struct {
+    unsigned int id;
+    float ax, ay, az; // Start point
+    float bx, by, bz; // End point
+    float laser_power;
+    float machine_speed;
+    unsigned int g_code;
+
+    Color color;
+    float hradius, vradius; // Radii
+} Track;
 
 typedef struct {
   float x;

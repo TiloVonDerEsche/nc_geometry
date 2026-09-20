@@ -49,6 +49,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend.
 - **`0.3.7.5`** Less choppy movement. Move faster while holding **SHIFT**. 
 - **`0.3.7.7`** Added Lighting, with **+**, **-** controlling the ambient light intensity.
+- **`0.3.9.0`** color_config- and plot_config.txt. Selectivly color tracks depending on their G code.
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements:

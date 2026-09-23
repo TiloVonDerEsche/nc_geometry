@@ -1,3 +1,34 @@
+tid < 0 = {0,255,0}; //G01 Tracks, where laser is off
+1600 < VIT_TIR < 1750 = {0,255,0};
+B != 0 = {0,0,255};
+G==01 -> {0,55,100};
+-> G==1
+if (bool_expr)
+
+(A,) B, C in track_list
+
+   X,Y-wise -> Drehradius von C
+    Z-wise -> Drehradius von B
+
+-> Tisch-Mitte NP
+
+ ||-||
+  |-|
+---.---
+
+
+G51
+-> TRANS ROT
+
+SCALE
+TRANS X12 Y23 Z13
+      Tx  Ty  Tz
+ROT X15 Y13
+Sx Rx 0 Tx
+Rx Sy 0 Ty
+0 0 Sz Tz
+0 0 0 0
+
 |=================Finish Include CALL'S ==========================|
 Better syntax error msgs through seperate line var counting per nc_file
 F.e.:

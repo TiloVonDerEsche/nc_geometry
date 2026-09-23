@@ -104,7 +104,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 
 
 [+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
-[<>!]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
+[<>!&|]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
 "="            {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
 
 [()]      {return yytext[0];}

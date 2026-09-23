@@ -29,8 +29,6 @@ id       [A-Za-z][_A-Za-z]*
         return FLOAT;
         }
 
-"{"{inum}","{inum}","{inum}"}"
-
 {id} {if(debug){ printf("An ID: %s\n", yytext); }
       //return strdup(yytext);;
       }
@@ -44,6 +42,7 @@ id       [A-Za-z][_A-Za-z]*
 
 [(){}]      {if(debug){ printf("A brace: %s\n", yytext);} return yytext[0];}
 [;]       {if(debug){ printf("A semicolon: %s\n", yytext);} return yytext[0];}
+[,]       {if(debug){ printf("A comma: %s\n", yytext);} return yytext[0];}
 
 .          { return yytext[0]; }
 

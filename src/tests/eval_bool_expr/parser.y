@@ -17,7 +17,7 @@
 #define TRUE 1
 #define FALSE 0
 
-void yyerror(const char *s);
+int yyerror(const char *s);
 int yylex(void);
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
@@ -45,7 +45,7 @@ Color rcolor = (Color){255,0,0}; //resulting color for track
 
 %%
 mapping:
-  bool_expr ARROW rgb_color {
+  bool_expr ARROW rgb_color ';' {
     printf("bool_expr eval'd to: %u\n", $1);
     if($1) {
       rcolor=$3;
@@ -88,14 +88,17 @@ bool_expr:
   | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
   | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
   | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
+  | arith_expr '|' '|' arith_expr {$$=$1||$4;}
+  | arith_expr '&' '&' arith_expr {$$=$1&&$4;}
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
 ;
 
 %%
 
-void yyerror(const char *s) {
-    /* Stille Fehlerbehandlung oder Logging */
+int yyerror(const char* s) {
+	printf("Error: %s, in line: 0\n", s);
+	return 0;
 }
 
 Color map_color(const char* expr_str) {

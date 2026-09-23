@@ -442,6 +442,8 @@ bool_expr:
   | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
   | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
   | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
+  | arith_expr '|' '|' arith_expr {$$=$1||$4;}
+  | arith_expr '&' '&' arith_expr {$$=$1&&$4;}
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
 ;

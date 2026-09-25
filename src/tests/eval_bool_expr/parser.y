@@ -26,6 +26,8 @@ extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
 
 Color default_color = (Color){255,0,0};
 Color rcolor = (Color){255,0,0}; //resulting color for track
+
+int debug = 0;
 }
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -34,23 +36,33 @@ Color rcolor = (Color){255,0,0}; //resulting color for track
 %token <int> INT
 %token <float> FLOAT
 %token ARROW
+%token OR AND
+%token EQ NEQ
+%token LTEQ GTEQ
 
 %type <float> val
-%type <float> arith_expr
-%type <uint8_t> bool_expr
+//%type <float> arith_expr
+%type <int> bool_expr
 %type <Color> rgb_color
 
+%left OR //Bool Algebra, OR ^= ADD, AND ^= MULT
+%left AND // (x < 5) && (y > 10), instead of x < (5 && y) > 10
+%left '=' EQ NEQ
+%left '<' '>' LTEQ GTEQ
 %left '+' '-'
 %left '*' '/'
+%left '(' ')'
+%right '!' UNEG //unary negate
+//%nonassoc '<' '>' //forbid: 1<2<3
 
 %%
 mapping:
   bool_expr ARROW rgb_color ';' {
-    printf("bool_expr eval'd to: %u\n", $1);
+    if(debug){printf("bool_expr eval'd to: %d\n", $1);}
     if($1) {
       rcolor=$3;
     } else {rcolor=default_color;}
-    printf("Setting color to: {%u,%u,%u}\n", rcolor.r,rcolor.g,rcolor.b);
+    if(debug){printf("Setting color to: {%u,%u,%u}\n", rcolor.r,rcolor.g,rcolor.b);}
   }
 ;
 
@@ -62,7 +74,7 @@ rgb_color:
       $$.r = $2;
       $$.g = $4;
       $$.b = $6;
-      printf("Parsed RGB: R=%d, G=%d, B=%d\n", $$.r, $$.g, $$.b);
+      if(debug){printf("Parsed RGB: R=%d, G=%d, B=%d\n", $$.r, $$.g, $$.b);}
   }
 ;
 
@@ -71,28 +83,46 @@ val:
   | FLOAT {$$=$1;}
 ;
 
-arith_expr:
-  val         {$$=$1;}
-  | arith_expr '+' arith_expr {$$=$1+$3;}
-  | arith_expr '-' arith_expr {$$=$1-$3;}
-  | arith_expr '*' arith_expr {$$=$1*$3;}
-  | arith_expr '/' arith_expr {$$=$1/$3;}
-  | '(' arith_expr ')'        {$$=$2;}
-  | '-' arith_expr            {$$=-$2;}
+bool_expr:
+  val                           {$$=$1;}
+  | bool_expr '+' bool_expr     {$$=$1+$3;}
+  | bool_expr '-' bool_expr     {$$=$1-$3;}
+  | bool_expr '*' bool_expr     {$$=$1*$3;}
+  | bool_expr '/' bool_expr     {$$=$1/$3;}
+  | bool_expr OR bool_expr      {$$=$1||$3;}
+  | bool_expr AND bool_expr     {$$=$1&&$3;}
+  | bool_expr EQ bool_expr      {$$=$1==$3;}
+  | bool_expr NEQ bool_expr     {$$=$1!=$3;}
+  | bool_expr LTEQ bool_expr    {$$=$1<=$3;}
+  | bool_expr GTEQ bool_expr    {$$=$1>=$3;}
+  | bool_expr '<' bool_expr     {$$=$1<$3;}
+  | bool_expr '>' bool_expr     {$$=$1>$3;}
+  | '!' bool_expr               {$$=!$2;}
+  | '-' bool_expr %prec UNEG    {$$=-$2;}
+  | '(' bool_expr ')'           {$$=$2;}
 ;
+
+//Can't handle:
+
+/*
+(1<50 || 50<1)
+(val<val || val<val)
+(bool_expr || bool_expr)
 
 bool_expr:
   arith_expr '<' arith_expr       {$$=$1<$3;}
   | arith_expr '>' arith_expr     {$$=$1>$3;}
-  | arith_expr '=' '=' arith_expr {$$=$1==$4;}
-  | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
   | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
   | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
+
+  | arith_expr '=' '=' arith_expr {$$=$1==$4;}
+  | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
+
   | arith_expr '|' '|' arith_expr {$$=$1||$4;}
   | arith_expr '&' '&' arith_expr {$$=$1&&$4;}
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
-;
+;*/
 
 %%
 

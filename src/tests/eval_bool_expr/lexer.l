@@ -2,7 +2,7 @@
 #include "parser.tab.h"
 #include <stdlib.h>
 
-int debug = 1;
+extern int debug;
 %}
 
 %option noyywrap
@@ -36,9 +36,16 @@ id       [A-Za-z][_A-Za-z]*
 [ \t\n\r]+            ; /* Trim SEPS */
 
 "->"      {if(debug){ printf("An arrow!\n");} return ARROW;}
+"||"      {return OR;}
+"&&"      {return AND;}
+"=="      {return EQ;}
+"!="      {return NEQ;}
+"<="      {return LTEQ;}
+">="      {return GTEQ;}
+"="       {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
 [+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
 [<>!|&]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
-"="            {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
+
 
 [(){}]      {if(debug){ printf("A brace: %s\n", yytext);} return yytext[0];}
 [;]       {if(debug){ printf("A semicolon: %s\n", yytext);} return yytext[0];}

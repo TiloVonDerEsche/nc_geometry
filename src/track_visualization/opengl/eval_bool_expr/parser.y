@@ -1,31 +1,20 @@
 %code requires {
   #include <stdint.h>
+  #include "../typedefs.h"
   uint8_t is_valid_uint8(int ui);
-
-  typedef struct {
-      uint8_t r, g, b;
-  } Color;
-
-  extern Color default_color;
-  extern Color rcolor;
 }
+%parse-param { Track* t }
 
 %code {
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRUE 1
-#define FALSE 0
-
-int yyerror(const char *s);
+int yyerror(Track* t, const char *s);
 int yylex(void);
 
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 extern YY_BUFFER_STATE yy_scan_string(const char *str);
 extern void yy_delete_buffer(YY_BUFFER_STATE buffer);
-
-Color default_color = (Color){255,0,0};
-Color rcolor = (Color){255,0,0}; //resulting color for track
 
 int debug = 0;
 }
@@ -39,6 +28,13 @@ int debug = 0;
 %token OR AND
 %token EQ NEQ
 %token LTEQ GTEQ
+
+%token T_ID
+%token T_START_X T_START_Y T_START_Z
+%token T_END_X T_END_Y T_END_Z
+%token LASER_POWER MACHINE_SPEED
+%token G_CODE
+%token HRAD VRAD
 
 %type <float> val
 //%type <float> arith_expr
@@ -60,9 +56,9 @@ mapping:
   bool_expr ARROW rgb_color ';' {
     if(debug){printf("bool_expr eval'd to: %d\n", $1);}
     if($1) {
-      rcolor=$3;
-    } else {rcolor=default_color;}
-    if(debug){printf("Setting color to: {%u,%u,%u}\n", rcolor.r,rcolor.g,rcolor.b);}
+      t->color=$3;
+    } //else {default_color;}
+    if(debug){printf("Setting color to: {%u,%u,%u}\n", t->color.r,t->color.g,t->color.b);}
   }
 ;
 
@@ -81,6 +77,19 @@ rgb_color:
 val:
   INT   {$$=$1;}
   | FLOAT {$$=$1;}
+  //Track Attrs:
+  | T_ID {$$=t->id;}
+  | T_START_X {$$=t->ax;}
+  | T_START_Y {$$=t->ay;}
+  | T_START_Z {$$=t->az;}
+  | T_END_X {$$=t->bx;}
+  | T_END_Y {$$=t->by;}
+  | T_END_Z {$$=t->bz;}
+  | LASER_POWER {$$=t->laser_power;}
+  | MACHINE_SPEED {$$=t->machine_speed;}
+  | G_CODE {$$=t->g_code;}
+  | VRAD {$$=t->vradius;}
+  | HRAD {$$=t->hradius;}
 ;
 
 bool_expr:
@@ -104,25 +113,26 @@ bool_expr:
 
 %%
 
-int yyerror(const char* s) {
+int yyerror(Track* t, const char* s) {
+  (void)t; // suppress unused parameter warning
 	printf("Error: %s, in line: 0\n", s);
 	return 0;
 }
 
-Color map_color(const char* expr_str) {
-    rcolor = default_color;
-
+//mutate color attr of t
+//access other attrs for bool eval
+void map_color(const char* expr_str, Track* t_ptr) {
     YY_BUFFER_STATE buffer = yy_scan_string(expr_str);
-    int parse_status = yyparse();
+    int parse_status = yyparse(t_ptr);
     yy_delete_buffer(buffer);
 
     if (parse_status != 0) {
         printf("Syntax-Error in expr: %s\n", expr_str);
     }
 
-    return rcolor;
+    //return t_ptr->color;
 }
 
 uint8_t is_valid_uint8(int ui) {
-  return 0<=ui<=255;
+  return (0<=ui && ui<=255);
 }

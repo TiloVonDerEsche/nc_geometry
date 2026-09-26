@@ -16,44 +16,6 @@ typedef struct {
   vec3D P;
 } plane;
 
-/*
-typedef struct {
-  //set by read_mpf
-  vec3D A;
-  vec3D B;
-  float laser_power;
-  float machine_speed;
-  //set by track_collision
-  //vec3D coll_vec;
-  //set by set_track_radius
-  float hradius;
-  float vradius;
-} track;
-
-typedef struct {
-  //set by read_mpf
-  vec3D P;
-  uint8_t laser; //bool -> laser on/off
-  float laser_power;
-  float machine_speed;
-} data_tuple;
-
-
-void copy_data_tuple(size_t i, data_tuple** arr) {
-  if (i <= 0) { return; } // Avoid seg fault when i = 0
-  (*arr)[i].P.x = (*arr)[i-1].P.x;
-  (*arr)[i].P.y = (*arr)[i-1].P.y;
-  (*arr)[i].P.z = (*arr)[i-1].P.z;
-  (*arr)[i].laser = (*arr)[i-1].laser;
-}*/
-
-
-void print_buf(char* buf, size_t buf_len) {
-  for (size_t i = 0; i < buf_len && buf[i] != '\0'; i++) {
-    printf("%c",buf[i]);
-  }
-}
-
 float dot_product(vec3D s, vec3D t) {
   return (s.x * t.x) + (s.y * t.y) + (s.z * t.z);
 }

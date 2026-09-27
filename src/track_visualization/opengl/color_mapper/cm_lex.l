@@ -17,6 +17,8 @@ id       [A-Za-z][_A-Za-z]*
 
 %%
 
+"//"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
+
 {inum} {
         yylval.INT = atoi(yytext);
         if(debug){ printf("An integer: %d\n", yylval.INT); }

@@ -52,8 +52,13 @@ int debug = 0;
 //%nonassoc '<' '>' //forbid: 1<2<3
 
 %%
+line:
+  %empty
+  | mapping ';'
+;
+
 mapping:
-  bool_expr ARROW rgb_color ';' {
+  bool_expr ARROW rgb_color {
     if(debug){printf("bool_expr eval'd to: %d\n", $1);}
     if($1) {
       t->color=$3;
@@ -64,9 +69,9 @@ mapping:
 
 rgb_color:
   '{' INT ',' INT ',' INT '}' {
-      if(!is_valid_uint8($2)) {fprintf(stderr,"First argument of rgb_color is not in range [0,255]!\n");}
-      if(!is_valid_uint8($4)) {fprintf(stderr,"Second argument of rgb_color is not in range [0,255]!\n");}
-      if(!is_valid_uint8($6)) {fprintf(stderr,"Third argument of rgb_color is not in range [0,255]!\n");}
+      if(!is_valid_uint8($2)) {fprintf(stderr,"First argument of rgb_color: %d,is not in range [0,255]!\n",$2);}
+      if(!is_valid_uint8($4)) {fprintf(stderr,"Second argument of rgb_color: %d,is not in range [0,255]!\n",$4);}
+      if(!is_valid_uint8($6)) {fprintf(stderr,"Third argument of rgb_color: %d,is not in range [0,255]!\n",$6);}
       $$.r = $2;
       $$.g = $4;
       $$.b = $6;
@@ -121,7 +126,9 @@ int yyerror(Track* t, const char* s) {
 
 //mutate color attr of t
 //access other attrs for bool eval
-Color map_color(const char* expr_str, Track* t_ptr) {
+int map_color(const char* expr_str, Track* t_ptr) {
+    Color stc=t_ptr->color; //start_color
+
     YY_BUFFER_STATE buffer = yy_scan_string(expr_str);
     int parse_status = yyparse(t_ptr);
     yy_delete_buffer(buffer);
@@ -130,14 +137,21 @@ Color map_color(const char* expr_str, Track* t_ptr) {
         printf("Syntax-Error in expr: %s\n", expr_str);
     }
 
-    return t_ptr->color;
+    //did we change the color attr of t_ptr?
+    return (t_ptr->color.r != stc.r || t_ptr->color.g != stc.g || t_ptr->color.b != stc.b);
 }
 
 void apply_color_config(FILE* fp, Track* t_ptr) {
-  Color c = (Color){0,0,0};
+  int color_changed = 0;
   char line[512];
   while (fgets(line, sizeof(line), fp)) {
-    c = map_color(line, t_ptr);
+    if(color_changed) {
+      break; //after first match
+    }
+    color_changed = map_color(line, t_ptr);
+
+
+
     //printf("Return Color: {%u,%u,%u}\n", c.r, c.g, c.b);
     //printf("'%s' mapped to {%u,%u,%u}\n", line,
     //t_ptr->color.r, t_ptr->color.g, t_ptr->color.b);

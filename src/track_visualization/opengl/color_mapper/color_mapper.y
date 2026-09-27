@@ -1,6 +1,6 @@
 %code requires {
   #include <stdint.h>
-  #include "../typedefs.h"
+  #include "typedefs.h"
   uint8_t is_valid_uint8(int ui);
 }
 %parse-param { Track* t }
@@ -121,7 +121,7 @@ int yyerror(Track* t, const char* s) {
 
 //mutate color attr of t
 //access other attrs for bool eval
-void map_color(const char* expr_str, Track* t_ptr) {
+Color map_color(const char* expr_str, Track* t_ptr) {
     YY_BUFFER_STATE buffer = yy_scan_string(expr_str);
     int parse_status = yyparse(t_ptr);
     yy_delete_buffer(buffer);
@@ -130,7 +130,18 @@ void map_color(const char* expr_str, Track* t_ptr) {
         printf("Syntax-Error in expr: %s\n", expr_str);
     }
 
-    //return t_ptr->color;
+    return t_ptr->color;
+}
+
+void apply_color_config(FILE* fp, Track* t_ptr) {
+  Color c = (Color){0,0,0};
+  char line[512];
+  while (fgets(line, sizeof(line), fp)) {
+    c = map_color(line, t_ptr);
+    //printf("Return Color: {%u,%u,%u}\n", c.r, c.g, c.b);
+    //printf("'%s' mapped to {%u,%u,%u}\n", line,
+    //t_ptr->color.r, t_ptr->color.g, t_ptr->color.b);
+  }
 }
 
 uint8_t is_valid_uint8(int ui) {

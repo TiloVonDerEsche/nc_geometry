@@ -11,6 +11,13 @@
 
 // parse_line and trim
 #include "helper_funcs.h"
+#include "color_mapper.tab.h"
+
+//mutate color attr of t
+//access other attrs for bool eval
+//Color map_color(const char* expr_str, Track* t);
+void apply_color_config(FILE* fp, Track* t_ptr);
+
 
 #define SPEED 0.3f
 #define SHIFT_BOOST 0.5f
@@ -37,6 +44,7 @@ float ambientIntensity = 0.2f; // Default 20% ambient light
 unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
+/*
 int parse_color_entry(char* line, ColorMapEntry* cm) {
     char* key;
     char* value;
@@ -110,7 +118,7 @@ int read_color_config(const char* filename, ColorMapEntry color_mapping[MAX_COLO
 
     fclose(file);
     return SUCCESS;
-}
+}*/
 
 
 
@@ -163,12 +171,20 @@ int read_config(const char* filename, Config* config) {
 }
 
 // Read CSV file
-void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR_MAPS]) {
+void read_track_list(const char* filename) {
     printf("Opening %s...\n", filename);
     FILE* file = fopen(filename, "r");
     if (!file) {
         printf("Failed to open %s\n", filename);
         exit(1);
+    }
+
+    const char* fname="color_config.txt";
+    printf("Opening %s...\n", fname);
+    FILE* colorf = fopen(fname, "r");
+    if (colorf == NULL) {
+        fprintf(stderr, "Error: Could not open file %s\n", fname);
+        //return FAILURE;
     }
 
     char line[256];
@@ -194,11 +210,13 @@ void read_track_list(const char* filename, ColorMapEntry color_mapping[MAX_COLOR
         tracks[i].vradius = config.vertical_radius;
         tracks[i].color = config.default_color;
 
-        for(unsigned int j=0; j<valid_color_maps; j++) {
+        apply_color_config(colorf,&tracks[i]);
+        rewind(colorf);
+        /*for(unsigned int j=0; j<valid_color_maps; j++) {
           if(tracks[i].g_code == color_mapping[j].g_code) {
             tracks[i].color = color_mapping[j].color;
           }
-        }
+        }*/
 
         i++;
     }
@@ -392,9 +410,10 @@ void handle_movement(int garbage) {
 int main(int argc, char** argv) {
     read_config("plot_config.txt", &config);
 
-    ColorMapEntry color_mapping[MAX_COLOR_MAPS];
-    read_color_config("color_config.txt", color_mapping);
-    read_track_list(config.tracks_to_plot, color_mapping);
+    /*ColorMapEntry color_mapping[MAX_COLOR_MAPS];
+    read_color_config("color_config.txt", color_mapping);*/
+
+    read_track_list(config.tracks_to_plot);
 
 
     //NOTE set Z values of near and far plane, of view frustum

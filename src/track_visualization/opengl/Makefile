@@ -4,7 +4,7 @@ ROOT_DIR = ./../../../
 MXE_PATH = /home/tilo/res/mxe
 SUFFIX = _x86_64
 # --- Default Target Logic ---
-# Usage: 
+# Usage:
 #   make              (Builds Linux)
 #   make TARGET=WIN64 (Builds Windows 64-bit via MXE)
 #   make TARGET=XP    (Builds Windows 32-bit via MXE)
@@ -19,7 +19,7 @@ ifeq ($(TARGET), WIN64)
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`
     LIBS = `$(PKG_CONFIG) --libs --static glut glew` -lopengl32 -lglu32 -lm
     LDFLAGS = -static -Wl,--subsystem,windows
-    
+
 else ifeq ($(TARGET), XP)
     SUFFIX = _x86_32
     # Note: Ensure you have the i686 target installed in MXE
@@ -45,9 +45,15 @@ endif
 
 all: $(OUT)
 
-$(OUT): $(SRC)
+lex.yy.c: color_mapper/cm_lex.l
+		flex color_mapper/cm_lex.l
+
+color_mapper.tab.h color_mapper.tab.c: color_mapper/color_mapper.y
+	bison -dv color_mapper/color_mapper.y
+
+$(OUT): $(SRC) color_mapper.tab.c lex.yy.c
 	@echo "Building for Target: $(TARGET) [$(CC)]"
-	$(CC) $(SRC) -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
+	$(CC) $(SRC) color_mapper.tab.c lex.yy.c -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
 	@echo "Compilation successful: $(OUT)"
 
 clean:

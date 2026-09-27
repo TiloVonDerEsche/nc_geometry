@@ -1,5 +1,5 @@
 %{
-#include "parser.tab.h"
+#include "color_mapper.tab.h"
 #include <stdlib.h>
 
 extern int debug;
@@ -38,7 +38,7 @@ id       [A-Za-z][_A-Za-z]*
 "t_end_z" {return T_END_Z;}
 "laser_power" {return LASER_POWER;}
 "machine_speed" {return MACHINE_SPEED;}
-"g_code" {return G_CODE;}
+[gG] {return G_CODE;}
 "hradius" {return HRAD;}
 "vradius" {return VRAD;}
 

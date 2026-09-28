@@ -60,7 +60,7 @@
   int incr_mode = 0;
   int rot_mode = 0;
 
-  int track_written = 0; //bad name, this is a counter to skip lines
+  int coord_line_counter = 0; //bad name, this is a counter to skip lines
   int is_coord_line = 0;
 
   size_t tid = 0; size_t pid = 0;
@@ -101,6 +101,7 @@
 
 %nterm <float> val
 %nterm <float> fn
+%nterm <float> params
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 
@@ -173,11 +174,13 @@ line:
   | opt_seps opt_skip exprs opt_seps
     {
      rot_mode = 0; //reset linewise
-     track_written--; //counter for how many lines not to print_track
 
      if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
      if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
-     if(is_coord_line) {write_ncc_line(net_point());is_coord_line=0;}
+     if(is_coord_line) {write_ncc_line(net_point());is_coord_line=0;
+       coord_line_counter--;
+       handle_tracks_def_by_coord_lines();
+     }
 
      if (jump_requested) {
           jump_requested = 0;
@@ -257,7 +260,6 @@ expr:
         set_var_rot($1, $2);
       } else {
         set_var((char[]){$1, '\0'},$2);
-        handle_tracks_def_by_coord_lines();
         is_coord_line=1;
       }
     }
@@ -265,7 +267,6 @@ expr:
   | ABC_CMD arith_expr {
     if(!skip) {
       set_var((char[]){$1, '\0'},$2);
-      handle_tracks_def_by_coord_lines();
       is_coord_line=1;
     }
   }
@@ -414,12 +415,12 @@ val:
 ;
 
 fn:
-  ID '(' params ')' {$$=0;}
+  ID '(' params ')' {$$=$3;}
 ;
 
 params:
-  %empty
-  | arith_expr
+  %empty       {$$=0;}
+  | arith_expr {$$=$1;/*return val of most left param*/}
   | params ',' arith_expr
 ;
 
@@ -556,20 +557,25 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
 void handle_tracks_def_by_coord_lines() {
   //handle (X,Y,Z) points rotated
   //in the experimental tracks_def_by_coord_lines mode
-  if (!rot_mode && !config.tracks_def_by_laser && !(track_written>0))
+  if (!rot_mode && !config.tracks_def_by_laser && coord_line_counter<0)
   {
     t_end = net_point();
     write_track_line();
     t_start = net_point(); //TODO perhaps cleaner sol, than net_point weird global var inline function
     //prevent mult writes in line with mult coord cmds
-    track_written = config.track_mid_len;
+    coord_line_counter = config.track_mid_len;
   }
 }
 
 void write_track_line() {
-  fprintf(tl,"%lu, %f, %f, %f, %f, %f, %f, %f, %f, %d\n",
-  tid++, t_start.x, t_start.y, t_start.z, t_end.x, t_end.y, t_end.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"), (int)get_var_val("G")
+  fprintf(tl,"%lu,  %f, %f, %f,   %f, %f, %f,   %f, %f,   %f, %f, %d, %d\n",
+  tid++,
+  t_start.x, t_start.y, t_start.z,
+  t_end.x, t_end.y, t_end.z,
+  get_var_val("B"), get_var_val("C"),
+  get_var_val("VIT_TIR"),
+  get_var_val("PUIS_LASER"), (int)get_var_val("laser"),
+  (int)get_var_val("G")
   );
 }
 

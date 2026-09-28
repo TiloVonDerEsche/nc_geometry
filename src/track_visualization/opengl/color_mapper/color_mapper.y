@@ -32,7 +32,9 @@ int debug = 0;
 %token T_ID
 %token T_START_X T_START_Y T_START_Z
 %token T_END_X T_END_Y T_END_Z
-%token LASER_POWER MACHINE_SPEED
+%token B_CMD C_CMD
+%token MACHINE_SPEED
+%token LASER_POWER LASER
 %token G_CODE
 %token HRAD VRAD
 
@@ -84,14 +86,17 @@ val:
   | FNUM {$$=$1;}
   //Track Attrs:
   | T_ID {$$=t->id;}
-  | T_START_X {$$=t->ax;}
-  | T_START_Y {$$=t->ay;}
-  | T_START_Z {$$=t->az;}
-  | T_END_X {$$=t->bx;}
-  | T_END_Y {$$=t->by;}
-  | T_END_Z {$$=t->bz;}
-  | LASER_POWER {$$=t->laser_power;}
+  | T_START_X {$$=t->start_x;}
+  | T_START_Y {$$=t->start_y;}
+  | T_START_Z {$$=t->start_z;}
+  | T_END_X {$$=t->end_x;}
+  | T_END_Y {$$=t->end_y;}
+  | T_END_Z {$$=t->end_z;}
+  | B_CMD   {$$=t->b;}
+  | C_CMD   {$$=t->c;}
   | MACHINE_SPEED {$$=t->machine_speed;}
+  | LASER_POWER {$$=t->laser_power;}
+  | LASER       {$$=t->laser;}
   | G_CODE {$$=t->g_code;}
   | VRAD {$$=t->vradius;}
   | HRAD {$$=t->hradius;}

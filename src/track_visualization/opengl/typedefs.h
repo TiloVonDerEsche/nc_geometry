@@ -30,10 +30,12 @@ typedef struct {
 // Structure to hold track data
 typedef struct {
     unsigned int id;
-    float ax, ay, az; // Start point t_start_x, t_start_y, t_start_z
-    float bx, by, bz; // End point  t_end_x, ...
-    float laser_power;
+    float start_x, start_y, start_z; // Start point t_start_x, t_start_y, t_start_z
+    float end_x, end_y, end_z; // End point  t_end_x, ...
+    float b, c;
     float machine_speed;
+    float laser_power;
+    unsigned int laser; //laser on : off?
     unsigned int g_code;
 
     Color color;

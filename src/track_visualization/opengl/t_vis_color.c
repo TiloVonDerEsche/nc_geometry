@@ -124,8 +124,8 @@ void read_track_list(const char* filename) {
     while (fgets(line, sizeof(line), file) && i < numTracks) {
         sscanf(line, "%d,%f,%f,%f, %f,%f,%f, %f,%f,%u",
                &tracks[i].id,
-               &tracks[i].ax, &tracks[i].ay, &tracks[i].az,
-               &tracks[i].bx, &tracks[i].by, &tracks[i].bz,
+               &tracks[i].start_x, &tracks[i].start_y, &tracks[i].start_z,
+               &tracks[i].end_x, &tracks[i].end_y, &tracks[i].end_z,
                &tracks[i].laser_power, &tracks[i].machine_speed,
                &tracks[i].g_code);
         tracks[i].hradius = config.horizontal_radius;
@@ -219,7 +219,7 @@ void display() {
     for (int i = 0; i < numTracks; i++) {
 
         //interpolate color in Z
-        /*float z_avg = (tracks[i].az + tracks[i].bz) / 2.0f;
+        /*float z_avg = (tracks[i].start_z + tracks[i].end_z) / 2.0f;
         float t = (max_z - min_z) > 0 ? (z_avg - min_z) / (max_z - min_z) : 0.5f;
         float r, g, b;
 
@@ -236,8 +236,8 @@ void display() {
         glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
         //don't render tracks, if they're black
         if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
-          drawCylinder(tracks[i].ax, tracks[i].ay, tracks[i].az,
-                       tracks[i].bx, tracks[i].by, tracks[i].bz,
+          drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
+                       tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
                        tracks[i].hradius, tracks[i].vradius);
         }
     }
@@ -339,13 +339,13 @@ int main(int argc, char** argv) {
 
 
     //NOTE set Z values of near and far plane, of view frustum
-    min_z = tracks[0].az;
-    max_z = tracks[0].az;
+    min_z = tracks[0].start_z;
+    max_z = tracks[0].start_z;
     for (int i = 0; i < numTracks; i++) {
-        if (tracks[i].az < min_z) min_z = tracks[i].az;
-        if (tracks[i].az > max_z) max_z = tracks[i].az;
-        if (tracks[i].bz < min_z) min_z = tracks[i].bz;
-        if (tracks[i].bz > max_z) max_z = tracks[i].bz;
+        if (tracks[i].start_z < min_z) min_z = tracks[i].start_z;
+        if (tracks[i].start_z > max_z) max_z = tracks[i].start_z;
+        if (tracks[i].end_z < min_z) min_z = tracks[i].end_z;
+        if (tracks[i].end_z > max_z) max_z = tracks[i].end_z;
     }
 
     glutInit(&argc, argv);

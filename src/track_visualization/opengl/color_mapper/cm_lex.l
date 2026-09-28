@@ -6,6 +6,7 @@ extern int debug;
 %}
 
 %option noyywrap
+%x COMMENT
 
 digit    [0-9]
 inum     {digit}+
@@ -17,6 +18,9 @@ id       [A-Za-z][_A-Za-z]*
 
 %%
 
+"/*"            { BEGIN(COMMENT); }
+<COMMENT>"*/"   { BEGIN(INITIAL); }
+<COMMENT>.      { /* ignore everything else*/ }
 "//"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
 
 {inum} {
@@ -38,8 +42,11 @@ id       [A-Za-z][_A-Za-z]*
 "t_end_x" {return T_END_X;}
 "t_end_y" {return T_END_Y;}
 "t_end_z" {return T_END_Z;}
-"laser_power" {return LASER_POWER;}
+[bB] {return B_CMD;}
+[cC] {return C_CMD;}
 "machine_speed" {return MACHINE_SPEED;}
+"laser_power" {return LASER_POWER;}
+"laser" {return LASER;}
 [gG] {return G_CODE;}
 "hradius" {return HRAD;}
 "vradius" {return VRAD;}

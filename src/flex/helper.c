@@ -83,8 +83,8 @@ strfloat_t* init_hashmap() {
   kh_key(h, k) = strdup("line");
   kh_val(h, k) = 0;
 
-  k = strfloat_put(h, "laser", &absent);
-  kh_key(h, k) = strdup("laser");
+  k = strfloat_put(h, "laser_status", &absent);
+  kh_key(h, k) = strdup("laser_status");
   kh_val(h, k) = 0;
 
   return h;

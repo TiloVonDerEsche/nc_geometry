@@ -35,7 +35,7 @@ typedef struct {
     float b, c;
     float machine_speed;
     float laser_power;
-    unsigned int laser; //laser on : off?
+    unsigned int laser_status; //on/off?
     unsigned int g_code;
 
     Color color;

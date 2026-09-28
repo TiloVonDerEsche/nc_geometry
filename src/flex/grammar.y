@@ -354,12 +354,12 @@ expr:
                         }
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
-                            set_var("laser",1);
+                            set_var("laser_status",1);
                             if (config.tracks_def_by_laser){t_start=net_point();}
 
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
-                            set_var("laser",0);
+                            set_var("laser_status",0);
                             if (config.tracks_def_by_laser){t_end=net_point();}
 
                             write_track_line();
@@ -574,7 +574,7 @@ void write_track_line() {
   t_end.x, t_end.y, t_end.z,
   get_var_val("B"), get_var_val("C"),
   get_var_val("VIT_TIR"),
-  get_var_val("PUIS_LASER"), (int)get_var_val("laser"),
+  get_var_val("PUIS_LASER"), (int)get_var_val("laser_status"),
   (int)get_var_val("G")
   );
 }

@@ -34,7 +34,7 @@ int debug = 0;
 %token T_END_X T_END_Y T_END_Z
 %token B_CMD C_CMD
 %token MACHINE_SPEED
-%token LASER_POWER LASER
+%token LASER_POWER LASER_STATUS
 %token G_CODE
 %token HRAD VRAD
 
@@ -96,7 +96,7 @@ val:
   | C_CMD   {$$=t->c;}
   | MACHINE_SPEED {$$=t->machine_speed;}
   | LASER_POWER {$$=t->laser_power;}
-  | LASER       {$$=t->laser;}
+  | LASER_STATUS{$$=t->laser_status;}
   | G_CODE {$$=t->g_code;}
   | VRAD {$$=t->vradius;}
   | HRAD {$$=t->hradius;}

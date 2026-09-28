@@ -46,7 +46,7 @@ id       [A-Za-z][_A-Za-z]*
 [cC] {return C_CMD;}
 "machine_speed" {return MACHINE_SPEED;}
 "laser_power" {return LASER_POWER;}
-"laser" {return LASER;}
+"laser_status" {return LASER_STATUS;}
 [gG] {return G_CODE;}
 "hradius" {return HRAD;}
 "vradius" {return VRAD;}

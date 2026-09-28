@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     T_end_x,T_end_y,T_end_z,\
     B,C,\
     machine_speed,\
-    laser_power, laser,\
+    laser_power, laser_status,\
     G_code");
   ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
     laser_power,machine_speed");

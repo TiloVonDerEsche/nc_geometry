@@ -50,6 +50,10 @@ So new format of err in line reporting: <nc_file>:<line_in_that_nc_file>
 
 
 |=======================Color Property Selection, 3d_track_vis==========================|
+[main 63a1234] Fixed color_config color map. The first layer of round_channel still has a too low Z value fsr.
+Instead of 139.4+43.5 it is between 139.4+42.0 139.4+43.0
+
+
 [main b1ef8d5] Now using color_mapper (bison/flex) in the 3d_vis.
 In read_track_list, we also open color_config.txt, and for each track,
 we give its file pointer and a track to apply_color_config,

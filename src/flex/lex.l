@@ -127,7 +127,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return STRING;
 }
 
-";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);} return COMMENT;}
+";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
 
 [ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
 "\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}

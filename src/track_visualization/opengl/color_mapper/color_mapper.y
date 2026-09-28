@@ -22,8 +22,8 @@ int debug = 0;
 %define api.value.type union /* Generate YYSTYPE from these types: */
 %define parse.error detailed //bison v3.6+
 
-%token <int> INT
-%token <float> FLOAT
+%token <int> INUM
+%token <float> FNUM
 %token ARROW
 %token OR AND
 %token EQ NEQ
@@ -68,7 +68,7 @@ mapping:
 ;
 
 rgb_color:
-  '{' INT ',' INT ',' INT '}' {
+  '{' INUM ',' INUM ',' INUM '}' {
       if(!is_valid_uint8($2)) {fprintf(stderr,"First argument of rgb_color: %d,is not in range [0,255]!\n",$2);}
       if(!is_valid_uint8($4)) {fprintf(stderr,"Second argument of rgb_color: %d,is not in range [0,255]!\n",$4);}
       if(!is_valid_uint8($6)) {fprintf(stderr,"Third argument of rgb_color: %d,is not in range [0,255]!\n",$6);}
@@ -80,8 +80,8 @@ rgb_color:
 ;
 
 val:
-  INT   {$$=$1;}
-  | FLOAT {$$=$1;}
+  INUM   {$$=$1;}
+  | FNUM {$$=$1;}
   //Track Attrs:
   | T_ID {$$=t->id;}
   | T_START_X {$$=t->ax;}

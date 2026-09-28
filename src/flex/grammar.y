@@ -76,7 +76,6 @@
 
 %token SEP NEWLINE END OTHER
 
-%token COMMENT
 %token MSG
 
 %token CALL
@@ -366,7 +365,7 @@ expr:
                           }
                          }
   | MSG SEP STRING
-  | COMMENT
+  | fn
 ;
 
 if_body:
@@ -461,11 +460,16 @@ int exec(char* fpath) {
   //--------Preprocessor for Labels
   label_finder(yyin);
   rewind(yyin);
-  printf("Labels of '%s':\n",fpath);print_hashmap(h,stdout);
+
+  if(debug){
+    printf("Labels of '%s':\n",fpath);
+    print_hashmap(h,stdout);}
 
   yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 
-  printf("Hashmap after executing '%s':\n",fpath);print_hashmap(h,stdout);
+  if(debug){
+    printf("Hashmap after executing '%s':\n",fpath);
+    print_hashmap(h,stdout);}
 
   return NOMINAL;
 }

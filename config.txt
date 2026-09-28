@@ -13,7 +13,7 @@ print_strs = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
 
-tracks_def_by_laser = 0; //0 for Vase; 1 for LASER_ON / LASER_OFF used
+tracks_def_by_laser = 1; //0 for Vase; 1 for LASER_ON / LASER_OFF used
 track_mid_len = 0; //10 for Vase
 save_laser_off_tracks = 1;
 

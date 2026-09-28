@@ -20,15 +20,15 @@ id       [A-Za-z][_A-Za-z]*
 "//"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
 
 {inum} {
-        yylval.INT = atoi(yytext);
-        if(debug){ printf("An integer: %d\n", yylval.INT); }
-        return INT;
+        yylval.INUM = atoi(yytext);
+        if(debug){ printf("An integer: %d\n", yylval.INUM); }
+        return INUM;
         }
 
 {fnum} {
-        yylval.FLOAT = atof(yytext);
-        if(debug){ printf("A float: %f\n", yylval.FLOAT); }
-        return FLOAT;
+        yylval.FNUM = atof(yytext);
+        if(debug){ printf("A float: %f\n", yylval.FNUM); }
+        return FNUM;
         }
 
 "t_id" {return T_ID;}

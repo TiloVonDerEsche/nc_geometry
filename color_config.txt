@@ -40,3 +40,7 @@ t_start_z <= (139.4+42) -> {255,255,255};
 
 //machine_speed==1750 -> {0,0,255};
 //1600 < machine_speed && machine_speed < 1900 -> {0,0,255};
+
+//ideas:
+//(t_end_z - t_start_z) * (t_end_z - t_start_z) ^= dZ^2
+//i.e. track_length calculation

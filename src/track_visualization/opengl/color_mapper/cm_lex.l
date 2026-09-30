@@ -69,10 +69,10 @@ id       [A-Za-z][_A-Za-z]*
 [<>!|&]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
 
 
-[(){}]      {if(debug){ printf("A brace: %s\n", yytext);} return yytext[0];}
+[(){}]    {if(debug){ printf("A brace: %s\n", yytext);} return yytext[0];}
 [;]       {if(debug){ printf("A semicolon: %s\n", yytext);} return yytext[0];}
 [,]       {if(debug){ printf("A comma: %s\n", yytext);} return yytext[0];}
 
-.          { return yytext[0]; }
+.          {fprintf(stderr,"An unknown Token: %s\n", yytext); /*return yytext[0];*/ }
 
 %%

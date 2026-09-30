@@ -85,6 +85,11 @@
 %token ROT AROT TRANS
 %token SUPA
 
+%token OR AND
+%token EQ NEQ
+%token LTEQ GTEQ
+
+
 %token <char> G_CMD
 %token <char> XYZ_CMD
 %token <char> ABC_CMD
@@ -96,8 +101,9 @@
 %token <char*> ID
 
 %token <char*> STRING
-%token <int> INT
-%token <float> FLOAT
+%token <int> INT /*Why doesn't this produce a Win Error?*/
+%token <float> FLOAT /*Why doesn't this produce a Win Error?*/
+/*FLOAT INT should be used namespaces on Windows??*/
 
 %nterm <float> val
 %nterm <float> fn
@@ -105,8 +111,16 @@
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 
+%left OR //Bool Algebra, OR ^= ADD, AND ^= MULT
+%left AND // (x < 5) && (y > 10), instead of x < (5 && y) > 10
+%left '=' EQ NEQ
+%left '<' '>' LTEQ GTEQ
 %left '+' '-'
 %left '*' '/'
+%left '(' ')'
+%right '!' UNEG //unary negate
+//%nonassoc '<' '>' //forbid: 1<2<3
+
 
 %nonassoc LOW_PREC
 %left SEP
@@ -424,6 +438,19 @@ params:
   | params ',' arith_expr
 ;
 
+bool_expr:
+  bool_expr OR bool_expr {$$=$1||$3;}
+  | bool_expr AND bool_expr {$$=$1&&$3;}
+  | '!' bool_expr                 {$$=!$2;}
+  | '(' bool_expr ')'             {$$=$2;}
+
+  | arith_expr '<' arith_expr  {$$=$1<$3;}
+  | arith_expr '>' arith_expr  {$$=$1>$3;}
+  | arith_expr EQ arith_expr   {$$=$1==$3;}
+  | arith_expr NEQ arith_expr  {$$=$1!=$3;}
+  | arith_expr LTEQ arith_expr {$$=$1<=$3;}
+  | arith_expr GTEQ arith_expr {$$=$1>=$3;}
+;
 
 arith_expr:
   val         {$$=$1;}
@@ -432,22 +459,8 @@ arith_expr:
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
   | '(' arith_expr ')'        {$$=$2;}
-  | '-' arith_expr            {$$=-$2;}
+  | '-' arith_expr %prec UNEG {$$=-$2;}
 ;
-
-bool_expr:
-  arith_expr '<' arith_expr       {$$=$1<$3;}
-  | arith_expr '>' arith_expr     {$$=$1>$3;}
-  | arith_expr '=' '=' arith_expr {$$=$1==$4;}
-  | arith_expr '!' '=' arith_expr {$$=$1!=$4;}
-  | arith_expr '<' '=' arith_expr {$$=$1<=$4;}
-  | arith_expr '>' '=' arith_expr {$$=$1>=$4;}
-  | arith_expr '|' '|' arith_expr {$$=$1||$4;}
-  | arith_expr '&' '&' arith_expr {$$=$1&&$4;}
-  | '!' bool_expr                 {$$=!$2;}
-  | '(' bool_expr ')'             {$$=$2;}
-;
-
 
 %%
 int exec(char* fpath) {

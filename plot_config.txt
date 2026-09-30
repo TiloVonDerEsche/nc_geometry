@@ -4,7 +4,7 @@ tracks_to_plot = "./track_list.csv";
 horizontal_radius=0.30;//0.49;
 vertical_radius=0.30;     //0.31;
 
-default_color = {66,67,68}; //do not use in color_config.txt!
+default_color = {255,67,68}; //do not use in color_config.txt!
 
 debug_prints = 1;
 //shift_boost=10;

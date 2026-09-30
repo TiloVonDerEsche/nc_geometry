@@ -2,13 +2,19 @@
 *.exe
 *.bin
 *.dll
+
 *.csv
 *.json
-*.mpf
+
 *.zip
+
 *.output
 *.tab.*
 *.yy.*
+
+*.mpf
+*.spf
+*.nc
 
 data/
 backup/

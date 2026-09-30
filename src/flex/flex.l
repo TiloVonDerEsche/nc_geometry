@@ -93,11 +93,19 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return CMD;
 }
 
+"||"      {return OR;}
+"&&"      {return AND;}
+"=="      {return EQ;}
+"!="      {return NEQ;}
+"<="      {return LTEQ;}
+">="      {return GTEQ;}
+[=]       {if(debug){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
 [+\-*/]   {if(debug){ printf("An arithmetic operator: %s\n",yytext);} return yytext[0];}
 [<>!&|]   {if(debug){ printf("An boolean operator: %s\n",yytext);} return yytext[0];}
-"="       {if(debug){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
 
 [()]      {return yytext[0];}
+[,]       {return yytext[0];}
+";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
 
 
 "\""[^\"]*"\"" {
@@ -117,14 +125,12 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return STRING;
 }
 
-";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
-
 [ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
 "\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 "\n"           {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
-","            {return yytext[0];}
+
 
 
 
@@ -133,7 +139,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
       yyterminate();}
 }
 
-.       {return OTHER;}
+.       {fprintf(stderr,"An unknown Token: %s\n", yytext); return OTHER;}
 
 %%
 

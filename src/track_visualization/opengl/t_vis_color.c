@@ -101,7 +101,7 @@ void read_track_list(const char* filename) {
         exit(1);
     }
 
-    const char* fname="color_config.txt";
+    const char* fname="color_config.c";
     printf("Opening %s...\n", fname);
     FILE* colorf = fopen(fname, "r");
     if (colorf == NULL) {

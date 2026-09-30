@@ -32,8 +32,8 @@ frames.o: ./stack/frames.c ./stack/frames.h
 	$(CC) -c ./stack/frames.c -o frames.o
 
 # Keep your Flex/Bison rules as they are (using Linux natives)
-lex.yy.c: lex.l grammar.tab.h
-	flex lex.l
+lex.yy.c: flex.l grammar.tab.h
+	flex flex.l
 
 grammar.tab.c grammar.tab.h: grammar.y
 	bison -dv grammar.y

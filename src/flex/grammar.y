@@ -60,7 +60,7 @@
   int incr_mode = 0;
   int rot_mode = 0;
 
-  int coord_line_counter = 0; //bad name, this is a counter to skip lines
+  int coord_line_counter = 0;
   int is_coord_line = 0;
 
   size_t tid = 0; size_t pid = 0;
@@ -406,8 +406,10 @@ assignment:
     }}}
   | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
   | G_CMD opt_seps '=' opt_seps arith_expr      {if(!skip){set_var((char[]){$1, '\0'},$5);}}
-  | CMD opt_seps '=' opt_seps arith_expr        {//ignoring F=150
-                                                 }
+| CMD opt_seps '=' opt_seps arith_expr
+  {if(!skip){
+    if($1 == 'F') { //machine_speed
+      set_var("VIT_TIR",$5);}}}
   | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
   | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
   | ID seps arith_expr                   {if(!skip){set_var($1,$3);}}

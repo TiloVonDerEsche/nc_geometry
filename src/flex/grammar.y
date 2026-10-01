@@ -446,12 +446,12 @@ bool_expr:
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
 
-  | arith_expr '<' arith_expr  {$$=$1<$3;}
-  | arith_expr '>' arith_expr  {$$=$1>$3;}
-  | arith_expr EQ arith_expr   {$$=$1==$3;}
-  | arith_expr NEQ arith_expr  {$$=$1!=$3;}
-  | arith_expr LTEQ arith_expr {$$=$1<=$3;}
-  | arith_expr GTEQ arith_expr {$$=$1>=$3;}
+  | arith_expr opt_seps '<' opt_seps arith_expr  {$$=$1<$5;}
+  | arith_expr opt_seps '>' opt_seps arith_expr  {$$=$1>$5;}
+  | arith_expr opt_seps EQ opt_seps arith_expr   {$$=$1==$5;}
+  | arith_expr opt_seps NEQ opt_seps arith_expr  {$$=$1!=$5;}
+  | arith_expr opt_seps LTEQ opt_seps arith_expr {$$=$1<=$5;}
+  | arith_expr opt_seps GTEQ opt_seps arith_expr {$$=$1>=$5;}
 ;
 
 arith_expr:

@@ -74,7 +74,7 @@
 %define api.value.type union /* Generate YYSTYPE from these types: */
 %define parse.error detailed //bison v3.6+
 
-%token SEP NEWLINE END OTHER
+%token NEWLINE END OTHER
 
 %token MSG
 
@@ -121,10 +121,10 @@
 %right '!' UNEG //unary negate
 //%nonassoc '<' '>' //forbid: 1<2<3
 
-
 %nonassoc LOW_PREC
-%left SEP
-
+%nonassoc ID VAR
+%nonassoc FN
+%nonassoc ASSIGNMENT
 
 
 %initial-action {
@@ -135,22 +135,8 @@
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
-%expect 1
+//%expect 1
 /**
-  NOTE is it really unproblematic to allow:
-  Example: ID • SEP fn
-  Shift derivation
-    exprs
-    ↳ 13: expr
-          ↳ 22: assignment
-                ↳ 42: ID seps        arith_expr
-                         ↳ 11: • SEP ↳ 52: fn
-  Reduce derivation
-    exprs
-    ↳ 14: exprs            seps      expr
-          ↳ 13: expr       ↳ 11: SEP ↳ 30: fn
-                ↳ 29: ID •
-
   NOTE Bison allegedly chooses Shift before Reduce
   NOTE F.e.: 'SPEED 100', should be recognised as an assignment,
        since it shifts to 100, before reducing SPEED to an ID
@@ -159,16 +145,6 @@
 
 %%
 
-/*
-execution:
-  files
-;*/
-/*
-files:
-  %empty
-  | files file
-;
-*/
 file:
   lines {
     printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
@@ -184,8 +160,8 @@ lines:
 ;
 
 line:
-  opt_seps
-  | opt_seps opt_skip exprs opt_seps
+  %empty
+  | opt_skip exprs
     {
      rot_mode = 0; //reset linewise
 
@@ -211,24 +187,14 @@ opt_skip:
     | '/'
 ;
 
-opt_seps:
-  %empty
-  | seps
-;
-
-seps:
-  SEP
-  | seps SEP
-;
-
 exprs:
   expr
-  | exprs seps expr
+  | exprs expr
 ;
 
 expr:
-  IF SEP bool_expr SEP THEN {
-      if (!$3) {
+  IF bool_expr THEN {
+      if (!$2) {
           skip++; //ignore code lines, if condition is false
           if(debug) {printf("Skip=%d\n",skip);}
       }
@@ -289,8 +255,8 @@ expr:
   | AROT               //{arot_mode = 1;}
   | TRANS              //{trans_mode=1;}
   | assignment
-  | CALL seps STRING   {if(!skip){
-                          exec($3);
+  | CALL STRING   {if(!skip){
+                          exec($2);
                         }
                        }
   | LABEL              {
@@ -353,18 +319,18 @@ expr:
                           //not_found:
                         }
                        }
-  | GOTO SEP ID   {if(!skip){
-                          request_jump($3);}
+  | GOTO ID   {if(!skip){
+                          request_jump($2);}
                         }
-  | REPEAT SEP ID %prec LOW_PREC
+  | REPEAT ID %prec LOW_PREC
                         {if(!skip){
                             char start_end_l[32+11];
-                            snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $3);
-                            handle_repeat($3,start_end_l,(size_t)get_var_val("line"));}
+                            snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $2);
+                            handle_repeat($2,start_end_l,(size_t)get_var_val("line"));}
                         }
-  | REPEAT SEP ID SEP ID
+  | REPEAT ID ID
                         {if(!skip){
-                            handle_repeat($3,$5,(size_t)get_var_val("line"));}
+                            handle_repeat($2,$3,(size_t)get_var_val("line"));}
                         }
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
@@ -379,7 +345,7 @@ expr:
                             write_track_line();
                           }
                          }
-  | MSG SEP STRING
+  | MSG STRING
   | fn
 ;
 
@@ -390,29 +356,28 @@ if_body:
 
 if_element:
   expr
-  | SEP
-  | NEWLINE
+  | NEWLINE //TODO Better / Working Solution
 ;
 
 
 assignment:
-   XYZ_CMD opt_seps '=' opt_seps arith_expr
+   XYZ_CMD '=' arith_expr
     {if(!skip){
       if (rot_mode) {
-        set_var_rot($1,$5);
+        set_var_rot($1,$3);
       }
       else {
-       set_var_incr((char[]){$1, '\0'},$5);
+       set_var_incr((char[]){$1, '\0'},$3);
     }}}
-  | ABC_CMD opt_seps '=' opt_seps arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$5);}}
-  | G_CMD opt_seps '=' opt_seps arith_expr      {if(!skip){set_var((char[]){$1, '\0'},$5);}}
-| CMD opt_seps '=' opt_seps arith_expr
-  {if(!skip){
-    if($1 == 'F') { //machine_speed
-      set_var("VIT_TIR",$5);}}}
-  | VAR opt_seps '=' opt_seps arith_expr        {if(!skip){set_var($1,$5);}}
-  | ID opt_seps '=' opt_seps arith_expr {if(!skip){set_var($1,$5);}}
-  | ID seps arith_expr                   {if(!skip){set_var($1,$3);}}
+  | ABC_CMD '=' arith_expr    {if(!skip){set_var_incr((char[]){$1, '\0'},$3);}}
+  | G_CMD '=' arith_expr      {if(!skip){set_var((char[]){$1, '\0'},$3);}}
+  | CMD '=' arith_expr
+    {if(!skip){
+      if($1 == 'F') { //machine_speed
+      set_var("VIT_TIR",$3);}}}
+  | VAR '=' arith_expr        {if(!skip){set_var($1,$3);}}
+  | ID '=' arith_expr {if(!skip){set_var($1,$3);}}
+  | ID arith_expr %prec ASSIGNMENT {if(!skip){set_var($1,$2);}}
 ;
 
 
@@ -436,7 +401,8 @@ fn:
 
 params:
   %empty       {$$=0;}
-  | arith_expr {$$=$1;/*return val of most left param*/}
+| arith_expr %prec FN {/*interpret "ID(arith_expr)", as params for a FN and not as an "ID (val)" assignment*/
+    $$=$1;/*return val of most left param*/}
   | params ',' arith_expr
 ;
 
@@ -446,12 +412,12 @@ bool_expr:
   | '!' bool_expr                 {$$=!$2;}
   | '(' bool_expr ')'             {$$=$2;}
 
-  | arith_expr opt_seps '<' opt_seps arith_expr  {$$=$1<$5;}
-  | arith_expr opt_seps '>' opt_seps arith_expr  {$$=$1>$5;}
-  | arith_expr opt_seps EQ opt_seps arith_expr   {$$=$1==$5;}
-  | arith_expr opt_seps NEQ opt_seps arith_expr  {$$=$1!=$5;}
-  | arith_expr opt_seps LTEQ opt_seps arith_expr {$$=$1<=$5;}
-  | arith_expr opt_seps GTEQ opt_seps arith_expr {$$=$1>=$5;}
+  | arith_expr '<' arith_expr  {$$=$1<$3;}
+  | arith_expr '>' arith_expr  {$$=$1>$3;}
+  | arith_expr EQ arith_expr   {$$=$1==$3;}
+  | arith_expr NEQ arith_expr  {$$=$1!=$3;}
+  | arith_expr LTEQ arith_expr {$$=$1<=$3;}
+  | arith_expr GTEQ arith_expr {$$=$1>=$3;}
 ;
 
 arith_expr:

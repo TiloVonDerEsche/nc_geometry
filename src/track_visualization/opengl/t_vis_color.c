@@ -101,7 +101,7 @@ void read_track_list(const char* filename) {
         exit(1);
     }
 
-    const char* fname="color_config.c";
+    const char* fname="color_config.ctxt";
     printf("Opening %s...\n", fname);
     FILE* colorf = fopen(fname, "r");
     if (colorf == NULL) {
@@ -330,11 +330,7 @@ void handle_movement(int garbage) {
 }
 
 int main(int argc, char** argv) {
-    read_config("plot_config.txt", &config);
-
-    /*ColorMapEntry color_mapping[MAX_COLOR_MAPS];
-    read_color_config("color_config.txt", color_mapping);*/
-
+    read_config("plot_config.ctxt", &config);
     read_track_list(config.tracks_to_plot);
 
 

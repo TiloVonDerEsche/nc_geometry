@@ -1,15 +1,17 @@
+STANDALONE_ID R1=R2+R1 ;unexpected VAR
+VIT_TIR (1750)
+STANDALONE_ID SE_FUNCTION(500) ; unexpected ID
+;CYCLE832(0.05,_ROUGH,1) ;standalone function / function with side effect
+
+
+;CALL "./data/nc_code/CONST.SPF" ;For _ROUGH
+
 R1=-300 ; x correspondend
 R2=-200 ; y correspondend
 R3=0 ; z correspondend
-Loop:
-  X=R1 Y=R2
-  LASER_ON
-    R1=R1+4
-    R2=R2+2
-    X=R1 Y=R2
-  LASER_OFF
-  ;R1=R1+1
-  ;R2=R2+1
-IF (R1 < 300) THEN GOTO Loop ENDIF
+
+
+
+;SUPA CYCLE832(0.05,_ROUGH,1) ;the standalone ID SUPA has its own Token
 
 MSG "End of File, reached!"

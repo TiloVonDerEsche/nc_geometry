@@ -125,7 +125,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return STRING;
 }
 
-[ \t]      		 { if(debug){ printf("A SEP!\n");}  return SEP;}
+[ \t]      		 { if(debug){ printf("A SEP!\n");}}
 "\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 "\n"           {if(debug){ printf("A NEWLINE!\n\n");}

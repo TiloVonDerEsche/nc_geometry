@@ -122,11 +122,13 @@ void read_track_list(const char* filename) {
     //initialize tracks
     int i = 0;
     while (fgets(line, sizeof(line), file) && i < numTracks) {
-        sscanf(line, "%d,%f,%f,%f, %f,%f,%f, %f,%f,%u",
+        sscanf(line, "%u,%f,%f,%f, %f,%f,%f, %f,%f, %f, %f,%u, %u",
                &tracks[i].id,
                &tracks[i].start_x, &tracks[i].start_y, &tracks[i].start_z,
                &tracks[i].end_x, &tracks[i].end_y, &tracks[i].end_z,
-               &tracks[i].laser_power, &tracks[i].machine_speed,
+               &tracks[i].b, &tracks[i].c,
+               &tracks[i].machine_speed,
+               &tracks[i].laser_power, &tracks[i].laser_status,
                &tracks[i].g_code);
         tracks[i].hradius = config.horizontal_radius;
         tracks[i].vradius = config.vertical_radius;

@@ -47,6 +47,9 @@ float fps = 0.0f;
 int previousTime = 0;
 char fpsString[32] = "FPS: 0";
 
+unsigned int currentT_ID = 0;
+char T_IDString[32] = "T_ID: 0";
+
 //unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
@@ -206,12 +209,12 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
     glPopMatrix();
 }
 
-void renderFPS() {
-    //Licht und Z-Buffer für das 2D-Overlay deaktivieren
+void renderText() {
+    //Lighting and Z-Buffer Depth Testing unwanted for rendering Text
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 
-    //Projektionsmatrix auf 2D (Orthogonal) umstellen
+    //Set Projection-Matrix to 2D (Orthogonal)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -223,22 +226,32 @@ void renderFPS() {
     glPushMatrix();
     glLoadIdentity();
 
-    //Textfarbe festlegen (Grün) und Position setzen (oben links)
+    //Textcolor green, position top left
     glColor3f(0.0f, 1.0f, 0.0f);
-    glRasterPos2i(10, height - 20); // 10px von links, 20px von oben
+    glRasterPos2i(10, height - 20); // 10px right, 20px down
 
-    //Zeichen einzeln rendern
+    //(Render?) char by char
     for (char* c = fpsString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
-    //Matrizen zurücksetzen
+    glRasterPos2i(10, height - 40);  // 10px right, 40px down
+    for (char* c = T_IDString; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    glRasterPos2i(10, height - 60);  // 10px right, 60px down
+    for (char* c = ambientString; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    //Reset Matrices
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
-    //Licht und Z-Buffer für das nächste 3D-Rendering wieder aktivieren
+    //Reactivate Lighting and Z-Buffer Depth Testing
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 }
@@ -283,7 +296,7 @@ void display() {
                        tracks[i].hradius, tracks[i].vradius);
         }
     }
-    renderFPS(); //display FPS counter str
+    renderText(); //display FPS counter str
     glutSwapBuffers();
 }
 
@@ -327,10 +340,20 @@ void keyDown(unsigned char key, int x, int y) {
         ambientIntensity += 0.05f;
         if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
         printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
+        snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
     } else if (key == '-' || key == '_') {
         ambientIntensity -= 0.05f;
         if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
         printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
+        snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+    } else if (key == ',' || key == ';') {
+        if (isShiftPressed) {currentT_ID -= 10;}
+        else {currentT_ID -= 1;}
+        snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", currentT_ID);
+    } else if (key == '.' || key == ':') {
+        if (isShiftPressed) {currentT_ID += 10;}
+        else {currentT_ID += 1;}
+        snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", currentT_ID);
     }
 }
 
@@ -352,7 +375,7 @@ void modeKeyUp(int key, int x, int y) {
 
 void handle_movement(int garbage) {
     float speed = SPEED;
-    if (isShiftPressed) speed = SPEED + SHIFT_BOOST;
+    if (isShiftPressed) {speed = SPEED + SHIFT_BOOST;}
 
     float yawRad = camYaw * M_PI / 180.0f;
     float forwardX = sinf(yawRad);

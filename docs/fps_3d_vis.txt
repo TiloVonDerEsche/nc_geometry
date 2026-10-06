@@ -1,0 +1,3 @@
+Vase tracks_def_by_laser=0 mode, track_mid_len=0:
+06.10.2026
+~1,5FPS

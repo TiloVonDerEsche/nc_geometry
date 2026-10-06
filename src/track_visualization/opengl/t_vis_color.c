@@ -289,11 +289,13 @@ void display() {
     // Draw tracks
     for (int i = 0; i < numTracks; i++) {
         glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
-        //don't render tracks, if they're black
-        if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
-          drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
-                       tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
-                       tracks[i].hradius, tracks[i].vradius);
+        if(tracks[i].id < currentT_ID) {
+          //don't render tracks, if they're black
+          if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
+            drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
+                         tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
+                         tracks[i].hradius, tracks[i].vradius);
+          }
         }
     }
     renderText(); //display FPS counter str

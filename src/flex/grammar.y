@@ -89,6 +89,9 @@
 %token EQ NEQ
 %token LTEQ GTEQ
 
+%token B_OR B_XOR B_AND B_NOT
+%token DIV MOD
+
 
 %token <char> G_CMD
 %token <char> XYZ_CMD
@@ -111,21 +114,24 @@
 %nterm <float> arith_expr
 %nterm <int> bool_expr
 
+/*From Page 435 of sinumerik handbook*/
+%left '=' EQ NEQ '<' '>' LTEQ GTEQ //x<(5 AND y)>10, instead of  (x<5) AND (y>10)
 %left OR //Bool Algebra, OR ^= ADD, AND ^= MULT
-%left AND // (x < 5) && (y > 10), instead of x < (5 && y) > 10
-%left '=' EQ NEQ
-%left '<' '>' LTEQ GTEQ
+%left XOR
+%left AND
+%left B_OR
+%left B_XOR
+%left B_AND
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' DIV MOD
 %left '(' ')'
-%right '!' UNEG //unary negate
+%right NOT B_NOT UNEG //unary negate
 //%nonassoc '<' '>' //forbid: 1<2<3
 
 %nonassoc LOW_PREC
 %nonassoc ID VAR
 %nonassoc FN
 %nonassoc ASSIGNMENT
-
 
 %initial-action {
     //h = init_hashmap(); //h is global in helper.c for now
@@ -407,10 +413,11 @@ params:
 ;
 
 bool_expr:
-  bool_expr OR bool_expr {$$=$1||$3;}
-  | bool_expr AND bool_expr {$$=$1&&$3;}
-  | '!' bool_expr                 {$$=!$2;}
-  | '(' bool_expr ')'             {$$=$2;}
+  bool_expr OR bool_expr       {$$=$1||$3;}
+| bool_expr XOR bool_expr      {$$=(!$1)!=(!$3); /*! converts them to 1,0*/}
+  | bool_expr AND bool_expr    {$$=$1&&$3;}
+  | NOT bool_expr              {$$=!$2;}
+  | '(' bool_expr ')'          {$$=$2;}
 
   | arith_expr '<' arith_expr  {$$=$1<$3;}
   | arith_expr '>' arith_expr  {$$=$1>$3;}
@@ -421,13 +428,17 @@ bool_expr:
 ;
 
 arith_expr:
-  val         {$$=$1;}
+  val                         {$$=$1;}
   | arith_expr '+' arith_expr {$$=$1+$3; /*printf("%f+%f=%f\n", $1,$3,$$);*/}
   | arith_expr '-' arith_expr {$$=$1-$3;}
   | arith_expr '*' arith_expr {$$=$1*$3;}
   | arith_expr '/' arith_expr {$$=$1/$3;}
-  | '(' arith_expr ')'        {$$=$2;}
+  /*| arith_expr B_OR arith_expr {$$=(int)$1|(int)$3;}
+  | arith_expr B_XOR arith_expr {$$=(int)$1^(int)$3;}
+  | arith_expr B_AND arith_expr {$$=(int)$1&(int)$3;}
+  | B_NOT arith_expr           {$$=~(int)$2; //NOTE depends on the sizeof(int)}*/
   | '-' arith_expr %prec UNEG {$$=-$2;}
+  | '(' arith_expr ')'        {$$=$2;}
 ;
 
 %%

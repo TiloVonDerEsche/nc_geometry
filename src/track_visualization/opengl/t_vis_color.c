@@ -40,8 +40,14 @@ Config config = {0};
 
 // Ambient Light Control Variable
 float ambientIntensity = 0.2f; // Default 20% ambient light
+char ambientString[32] = "Ambient Light Intensity: 0.2"; //"0.1" ->3 chars
 
-unsigned int valid_color_maps = 0;
+int frameCount = 0;
+float fps = 0.0f;
+int previousTime = 0;
+char fpsString[32] = "FPS: 0";
+
+//unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
 int read_config(const char* filename, Config* config) {
@@ -200,7 +206,57 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
     glPopMatrix();
 }
 
+void renderFPS() {
+    //Licht und Z-Buffer für das 2D-Overlay deaktivieren
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+
+    //Projektionsmatrix auf 2D (Orthogonal) umstellen
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    int width = glutGet(GLUT_WINDOW_WIDTH);
+    int height = glutGet(GLUT_WINDOW_HEIGHT);
+    gluOrtho2D(0, width, 0, height);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    //Textfarbe festlegen (Grün) und Position setzen (oben links)
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glRasterPos2i(10, height - 20); // 10px von links, 20px von oben
+
+    //Zeichen einzeln rendern
+    for (char* c = fpsString; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    //Matrizen zurücksetzen
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+
+    //Licht und Z-Buffer für das nächste 3D-Rendering wieder aktivieren
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+}
+
 void display() {
+    // --- Calculate FPS ---
+    frameCount++;
+    int currentTime = glutGet(GLUT_ELAPSED_TIME); // Time in ms since glutInit
+    int timeInterval = currentTime - previousTime;
+
+    // Once a second (1000 ms) update FPS count
+    if (timeInterval > 1000) {
+        fps = frameCount / (timeInterval / 1000.0f);
+        previousTime = currentTime;
+        frameCount = 0;
+        snprintf(fpsString, sizeof(fpsString), "FPS: %.1f", fps);
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -219,22 +275,6 @@ void display() {
 
     // Draw tracks
     for (int i = 0; i < numTracks; i++) {
-
-        //interpolate color in Z
-        /*float z_avg = (tracks[i].start_z + tracks[i].end_z) / 2.0f;
-        float t = (max_z - min_z) > 0 ? (z_avg - min_z) / (max_z - min_z) : 0.5f;
-        float r, g, b;
-
-        if (t < 0.25f) {
-            r = 0.0f; g = 4.0f * t; b = 1.0f;
-        } else if (t < 0.5f) {
-            r = 0.0f; g = 1.0f; b = 1.0f - 4.0f * (t - 0.25f);
-        } else if (t < 0.75f) {
-            r = 4.0f * (t - 0.5f); g = 1.0f; b = 0.0f;
-        } else {
-            r = 1.0f; g = 1.0f - 4.0f * (t - 0.75f); b = 0.0f;
-        }*/
-
         glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
         //don't render tracks, if they're black
         if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
@@ -243,7 +283,7 @@ void display() {
                        tracks[i].hradius, tracks[i].vradius);
         }
     }
-
+    renderFPS(); //display FPS counter str
     glutSwapBuffers();
 }
 

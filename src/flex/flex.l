@@ -62,7 +62,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return THEN;}
 "ENDIF" {if(debug){puts("An ENDIF!");}
   return ENDIF;}
-"GOTOB"|"GOTOF"|"GOTO" {if(debug){puts("A GOTO!");}
+"GOTOB"|"GOTOF"|"GOTOC"|"GOTO"  {if(debug){puts("A GOTO!");}
   return GOTO;}
 "REPEAT" {if(debug){puts("A REPEAT!");}
   return REPEAT;}
@@ -77,6 +77,28 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 "MSG" {if(debug){printf("A MSG:'%s'\n",yytext);}
   return MSG;}
 
+"B_OR"   {return B_OR;}
+"B_XOR"   {return B_XOR;}
+"B_AND"  {return B_AND;}
+"B_NOT"  {return B_NOT;}
+
+"OR"      {return OR;}
+"XOR"     {return XOR;}
+"AND"     {return AND;}
+"NOT"     {return NOT;}
+"=="      {return EQ;}
+"<>"      {return NEQ;}
+"<="      {return LTEQ;}
+">="      {return GTEQ;}
+[=]       {if(debug){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
+[+\-*/]   {if(debug){ printf("An arithmetic operator: %s\n",yytext);} return yytext[0];}
+[><]   {if(debug){ printf("An boolean operator: %s\n",yytext);} return yytext[0];}
+
+[()]      {return yytext[0];}
+[,]       {return yytext[0];}
+";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
+
+
 {id} {if(debug){printf("An ID:'%s'\n",yytext);}
   yylval.ID = strdup(yytext);
   return ID;}
@@ -84,28 +106,6 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 "_"{id} {if(debug){printf("An hidden ID:'%s'\n",yytext);}
   yylval.ID = strdup(yytext);
   return ID;}
-
-[G]      {yylval.G_CMD = yytext[0]; return G_CMD;}
-[XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
-[ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
-{cap_letter} {yylval.CMD = yytext[0];
-  if(debug){ printf("A command: %c\n", yytext[0]); }
-  return CMD;
-}
-
-"||"      {return OR;}
-"&&"      {return AND;}
-"=="      {return EQ;}
-"!="      {return NEQ;}
-"<="      {return LTEQ;}
-">="      {return GTEQ;}
-[=]       {if(debug){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
-[+\-*/]   {if(debug){ printf("An arithmetic operator: %s\n",yytext);} return yytext[0];}
-[<>!&|]   {if(debug){ printf("An boolean operator: %s\n",yytext);} return yytext[0];}
-
-[()]      {return yytext[0];}
-[,]       {return yytext[0];}
-";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
 
 
 "\""[^\"]*"\"" {
@@ -123,6 +123,14 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   }
 
   return STRING;
+}
+
+[G]      {yylval.G_CMD = yytext[0]; return G_CMD;}
+[XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
+[ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
+{cap_letter} {yylval.CMD = yytext[0];
+  if(debug){ printf("A command: %c\n", yytext[0]); }
+  return CMD;
 }
 
 [ \t]      		 { if(debug){ printf("A SEP!\n");}}

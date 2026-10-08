@@ -25,9 +25,11 @@ void apply_color_config(FILE* fp, Track* t_ptr);
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
+char camString[64] = "Cam: {0.0, 0.0, 0.0}";
 
 int buttonDown = 0;
 unsigned int rate_of_change = 1;
+char rocString[32] = "Rate of Change: 1";
 int keys[256] = {0};
 
 // Track data
@@ -44,10 +46,10 @@ char ambientString[32] = "Ambient Light Intensity: 0.2"; //"0.1" ->3 chars
 int frameCount = 0;
 float fps = 0.0f;
 int previousTime = 0;
-char fpsString[32] = "FPS: 0";
+char fpsString[16] = "FPS: 0";
 
 unsigned int current_TID = 0;
-char T_IDString[32] = "T_ID: 0";
+char TID_String[16] = "T_ID: 0";
 
 //unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
@@ -227,19 +229,29 @@ void renderText() {
 
     //Textcolor green, position top left
     glColor3f(0.0f, 1.0f, 0.0f);
-    glRasterPos2i(10, height - 20); // 10px right, 20px down
 
-    //(Render?) char by char
+    //Render char by char
+    glRasterPos2i(10, height - 20); // 10px right, 20px down
     for (char* c = fpsString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
     glRasterPos2i(10, height - 40);  // 10px right, 40px down
-    for (char* c = T_IDString; *c != '\0'; c++) {
+    for (char* c = camString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
-    glRasterPos2i(10, height - 60);  // 10px right, 60px down
+    glRasterPos2i(10, height - 60);
+    for (char* c = rocString; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    glRasterPos2i(10, height - 80);
+    for (char* c = TID_String; *c != '\0'; c++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    }
+
+    glRasterPos2i(10, height - 100);
     for (char* c = ambientString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
@@ -367,7 +379,7 @@ void keyDown(unsigned char key, int x, int y) {
       snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
     }
     if (current_TID_changed) {
-      snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", current_TID);
+      snprintf(TID_String, sizeof(TID_String), "T_ID: %u", current_TID);
     }
 }
 
@@ -408,6 +420,9 @@ void handle_movement(int garbage) {
     if (keys['d']) { camX += rightX * speed; camZ += rightZ * speed; }
     if (keys[' ']) { camY += speed; }
     if (keys['c']) { camY -= speed; }
+
+    snprintf(camString, sizeof(camString), "Cam: {%.2f, %.2f, %.2f}", camX,camY,camZ);
+    snprintf(rocString, sizeof(rocString), "Rate of Change: %u", rate_of_change);
 
     glutPostRedisplay();
     glutTimerFunc(16, handle_movement, 0);

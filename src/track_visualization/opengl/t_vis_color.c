@@ -47,7 +47,7 @@ float fps = 0.0f;
 int previousTime = 0;
 char fpsString[32] = "FPS: 0";
 
-unsigned int currentT_ID = 0;
+unsigned int current_TID = 0;
 char T_IDString[32] = "T_ID: 0";
 
 //unsigned int valid_color_maps = 0;
@@ -289,7 +289,7 @@ void display() {
     // Draw tracks
     for (int i = 0; i < numTracks; i++) {
         glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
-        if(tracks[i].id < currentT_ID) {
+        if(tracks[i].id < current_TID) {
           //don't render tracks, if they're black
           if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
             drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
@@ -335,27 +335,41 @@ void motion(int x, int y) {
 }
 
 void keyDown(unsigned char key, int x, int y) {
-    keys[tolower(key)] = 1;
+    keys[tolower(key)] = 1; //remember which key was downed, for WASD and co.
 
+    unsigned int ambient_changed=0;
+    unsigned int current_TID_changed=0;
     // Controls for Ambient Light Intensity (+ / -)
     if (key == '+' || key == '=') {
         ambientIntensity += 0.05f;
         if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
-        printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
-        snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+        ambient_changed=1;
     } else if (key == '-' || key == '_') {
         ambientIntensity -= 0.05f;
         if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
-        printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
-        snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+        ambient_changed=1;
     } else if (key == ',' || key == ';') {
-        if (isShiftPressed) {currentT_ID -= 10;}
-        else {currentT_ID -= 1;}
-        snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", currentT_ID);
+        if (isShiftPressed) {current_TID -= 10;}
+        else {current_TID -= 1;}
+        current_TID_changed=1;
+        if(numTracks<=current_TID) {//underflow is a feature
+          current_TID=numTracks; //instead of current_TID=sizeof(unsigned int)
+        }
     } else if (key == '.' || key == ':') {
-        if (isShiftPressed) {currentT_ID += 10;}
-        else {currentT_ID += 1;}
-        snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", currentT_ID);
+        if (isShiftPressed) {current_TID += 10;}
+        else {current_TID += 1;}
+        if(numTracks<=current_TID) {//overflow is a feature
+          current_TID=0;  //no more tracks to draw -> start from beginning
+        }
+        current_TID_changed=1;
+    }
+
+    if (ambient_changed) {
+      printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
+      snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+    }
+    if (current_TID_changed) {
+      snprintf(T_IDString, sizeof(T_IDString), "T_ID: %u", current_TID);
     }
 }
 

@@ -20,7 +20,6 @@ void apply_color_config(FILE* fp, Track* t_ptr);
 
 
 #define SPEED 0.3f
-#define SHIFT_BOOST 0.5f
 
 // Camera variables
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
@@ -28,8 +27,6 @@ float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
 
 int buttonDown = 0;
-int isShiftPressed = 0;
-int isCtrlPressed = 0;
 unsigned int rate_of_change = 1;
 int keys[256] = {0};
 
@@ -380,22 +377,18 @@ void keyUp(unsigned char key, int x, int y) {
 
 void modeKeyDown(int key, int x, int y) {
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-        isCtrlPressed=1;
         rate_of_change*=100;
     }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        isShiftPressed=1;
         rate_of_change*=10;
     }
 }
 
 void modeKeyUp(int key, int x, int y) {
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-        isCtrlPressed=0;
         rate_of_change*=0.01;
     }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        isShiftPressed=0;
         rate_of_change*=0.1;
     }
 }

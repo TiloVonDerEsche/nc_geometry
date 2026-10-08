@@ -29,6 +29,8 @@ int lastX = 0, lastY = 0;
 
 int buttonDown = 0;
 int isShiftPressed = 0;
+int isCtrlPressed = 0;
+unsigned int rate_of_change = 1;
 int keys[256] = {0};
 
 // Track data
@@ -339,6 +341,7 @@ void keyDown(unsigned char key, int x, int y) {
 
     unsigned int ambient_changed=0;
     unsigned int current_TID_changed=0;
+
     // Controls for Ambient Light Intensity (+ / -)
     if (key == '+' || key == '=') {
         ambientIntensity += 0.05f;
@@ -349,15 +352,13 @@ void keyDown(unsigned char key, int x, int y) {
         if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
         ambient_changed=1;
     } else if (key == ',' || key == ';') {
-        if (isShiftPressed) {current_TID -= 10;}
-        else {current_TID -= 1;}
-        current_TID_changed=1;
+        current_TID -= rate_of_change;
         if(numTracks<=current_TID) {//underflow is a feature
           current_TID=numTracks; //instead of current_TID=sizeof(unsigned int)
         }
+        current_TID_changed=1;
     } else if (key == '.' || key == ':') {
-        if (isShiftPressed) {current_TID += 10;}
-        else {current_TID += 1;}
+        current_TID += rate_of_change;
         if(numTracks<=current_TID) {//overflow is a feature
           current_TID=0;  //no more tracks to draw -> start from beginning
         }
@@ -378,20 +379,29 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void modeKeyDown(int key, int x, int y) {
+    if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
+        isCtrlPressed=1;
+        rate_of_change*=100;
+    }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        isShiftPressed = 1;
+        isShiftPressed=1;
+        rate_of_change*=10;
     }
 }
 
 void modeKeyUp(int key, int x, int y) {
+    if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
+        isCtrlPressed=0;
+        rate_of_change*=0.01;
+    }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        isShiftPressed = 0;
+        isShiftPressed=0;
+        rate_of_change*=0.1;
     }
 }
 
 void handle_movement(int garbage) {
-    float speed = SPEED;
-    if (isShiftPressed) {speed = SPEED + SHIFT_BOOST;}
+    float speed = SPEED * rate_of_change;
 
     float yawRad = camYaw * M_PI / 180.0f;
     float forwardX = sinf(yawRad);

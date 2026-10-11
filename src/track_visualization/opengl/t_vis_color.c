@@ -314,11 +314,21 @@ void display() {
 }
 
 void reshape(int w, int h) {
+    //NOTE what does it do?
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(45.0, (float)w / h, 0.1, 1000.0);
     glMatrixMode(GL_MODELVIEW);
+}
+
+void mouseEntry(int state) {
+    if (state == GLUT_ENTERED) {
+        // Reset rate_of_change when (tabbing/)mouse re-entering
+        rate_of_change = 1;
+        for (int i = 0; i < 256; i++) keys[i] = 0; // Clear stuck regular keys
+        //printf("Window re-entered: resetting rate_of_change to 1\n");
+    }
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -398,11 +408,13 @@ void modeKeyDown(int key, int x, int y) {
 
 void modeKeyUp(int key, int x, int y) {
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-        rate_of_change*=0.01;
+        rate_of_change/=100;
     }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        rate_of_change*=0.1;
+        rate_of_change/=10;
     }
+
+    if (rate_of_change<1) {rate_of_change=1;} //lower clamp to 1
 }
 
 void handle_movement(int garbage) {
@@ -481,6 +493,7 @@ int main(int argc, char** argv) {
     // GLUT Callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutEntryFunc(mouseEntry);
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutKeyboardFunc(keyDown);

@@ -1,3 +1,7 @@
+Rotate the camera to face t_start of track with tid=0
+
+->create a release
+
 |=================Finish Include CALL'S ==========================|
 Better syntax error msgs through seperate line var counting per nc_file
 F.e.:

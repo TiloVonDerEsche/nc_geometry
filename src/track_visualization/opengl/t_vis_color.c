@@ -357,56 +357,45 @@ void motion(int x, int y) {
 
 void keyDown(unsigned char key, int x, int y) {
     keys[tolower(key)] = 1; //remember which key was downed, for WASD and co.
-
-    unsigned int ambient_changed=0;
-    unsigned int current_TID_changed=0;
-
-    // Controls for Ambient Light Intensity (+ / -)
-    if (key == '+' || key == '=') {
-        ambientIntensity += 0.05f;
-        if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
-        ambient_changed=1;
-    } else if (key == '-' || key == '_') {
-        ambientIntensity -= 0.05f;
-        if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
-        ambient_changed=1;
-    } else if (key == ',' || key == ';') {
-        current_TID -= rate_of_change;
-        if(numTracks<=current_TID) {//underflow is a feature
-          current_TID=numTracks; //instead of current_TID=sizeof(unsigned int)
-        }
-        current_TID_changed=1;
-    } else if (key == '.' || key == ':') {
-        current_TID += rate_of_change;
-        if(numTracks<=current_TID) {//overflow is a feature
-          current_TID=0;  //no more tracks to draw -> start from beginning
-        }
-        current_TID_changed=1;
-    }
-
-    if (ambient_changed) {
-      printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
-      snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
-    }
-    if (current_TID_changed) {
-      snprintf(TID_String, sizeof(TID_String), "T_ID: %u", current_TID);
-    }
 }
 
 void keyUp(unsigned char key, int x, int y) {
     keys[tolower(key)] = 0;
 }
 
-void modeKeyDown(int key, int x, int y) {
-    if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-        rate_of_change*=100;
-    }
-    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        rate_of_change*=10;
-    }
+void specialKeyDown(int key, int x, int y) {
+  //mode keys
+  if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
+      rate_of_change*=100;
+  }
+  if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+      rate_of_change*=10;
+  }
+
+  //arrow keys
+  unsigned int current_TID_changed=0;
+
+  if (key == GLUT_KEY_LEFT) {
+      current_TID -= rate_of_change;
+      if(numTracks<=current_TID) {//underflow is a feature
+        current_TID=numTracks; //instead of current_TID=sizeof(unsigned int)
+      }
+      current_TID_changed=1;
+  } else if (key == GLUT_KEY_RIGHT) {
+      current_TID += rate_of_change;
+      if(numTracks<=current_TID) {//overflow is a feature
+        current_TID=0;  //no more tracks to draw -> start from beginning
+      }
+      current_TID_changed=1;
+  }
+
+  if (current_TID_changed) {
+    snprintf(TID_String, sizeof(TID_String), "T_ID: %u", current_TID);
+  }
 }
 
-void modeKeyUp(int key, int x, int y) {
+void specialKeyUp(int key, int x, int y) {
+    //mode keys
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
         rate_of_change/=100;
     }
@@ -432,6 +421,24 @@ void handle_movement(int garbage) {
     if (keys['d']) { camX += rightX * speed; camZ += rightZ * speed; }
     if (keys[' ']) { camY += speed; }
     if (keys['c']) { camY -= speed; }
+
+    unsigned int ambient_changed=0;
+
+    // Controls for Ambient Light Intensity (+ / -)
+    if (keys['i']) {
+        ambientIntensity += 0.01f;
+        if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
+        ambient_changed=1;
+    } else if (keys['k']) {
+        ambientIntensity -= 0.01f;
+        if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
+        ambient_changed=1;
+    }
+
+    if (ambient_changed) {
+      //printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
+      snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+    }
 
     snprintf(camString, sizeof(camString), "Cam: {%.2f, %.2f, %.2f}", camX,camY,camZ);
     snprintf(rocString, sizeof(rocString), "Rate of Change: %u", rate_of_change);
@@ -498,8 +505,8 @@ int main(int argc, char** argv) {
     glutMotionFunc(motion);
     glutKeyboardFunc(keyDown);
     glutKeyboardUpFunc(keyUp);
-    glutSpecialFunc(modeKeyDown);
-    glutSpecialUpFunc(modeKeyUp);
+    glutSpecialFunc(specialKeyDown);
+    glutSpecialUpFunc(specialKeyUp);
     glutTimerFunc(0, handle_movement, 0);
 
     glutMainLoop();

@@ -51,6 +51,8 @@ char fpsString[16] = "FPS: 0";
 unsigned int current_TID = 0;
 char TID_String[16] = "T_ID: 0";
 
+GLUquadric* shared_quadric = NULL;
+
 //unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
@@ -160,7 +162,7 @@ void read_track_list(const char* filename) {
 /****************************************************************/
 
 void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
-    const int segments = 32;
+    const int segments = 12; //reduced from 32
 
     float dx = bx - ax;
     float dy = by - ay;
@@ -203,10 +205,12 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
     glTranslatef(ax, ay, az);
     glMultMatrixf(rotationMatrix);
     glScalef(hradius, vradius, length);
-    GLUquadric* quad = gluNewQuadric();
-    gluQuadricNormals(quad, GLU_SMOOTH);
-    gluCylinder(quad, 1.0, 1.0, 1.0, segments, 1);
-    gluDeleteQuadric(quad);
+
+    /*GLUquadric* quad = gluNewQuadric();
+    gluQuadricNormals(quad, GLU_SMOOTH);*/
+
+    gluCylinder(shared_quadric, 1.0, 1.0, 1.0, segments, 1);
+    /*gluDeleteQuadric(quad);*/
     glPopMatrix();
 }
 
@@ -496,6 +500,10 @@ int main(int argc, char** argv) {
     GLfloat shininess[]        = {50.0f}; // Range: 0.0 to 128.0
     glMaterialfv(GL_FRONT, GL_SPECULAR, specularMaterial);
     glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+
+    //shared quad for cylinder rendering
+    shared_quadric = gluNewQuadric();
+    gluQuadricNormals(shared_quadric, GLU_SMOOTH);
 
     // GLUT Callbacks
     glutDisplayFunc(display);

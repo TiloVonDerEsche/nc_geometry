@@ -21,10 +21,17 @@ void apply_color_config(FILE* fp, Track* t_ptr);
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
 float camRoll = 0.0f, camPitch = 15.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
-char camString[256] = "Position: (0.0, 0.0, 0.0)\n"
-                      "Yaw: 0°\n"
-                      "Pitch: 0°\n"
-                      "Forward: (0.0, 0.0, 0.0)\n";
+
+
+char camStrPos[32] =     "Pos: (0.0, 0.0, 0.0)";
+char camStrTarget[32] =  "Target: (0.0, 0.0, 0.0)";
+char camStrYaw[32] =     "Yaw: 0.0°";
+char camStrPitch[32] =   "Pitch: 0.0°";
+char camStrTYaw[32] =    "Target Yaw: 0.0°";
+char camStrTPitch[32] =  "Target Pitch: 0.0°";
+char camStrDir[32] =     "Direction: (0.0, 0.0, 0.0)";
+char camStrDis[32] =     "Distance: 0.0";
+char camStrForward[32] = "Forward: (0.0, 0.0, 0.0)";
 
 int buttonDown = 0;
 unsigned int rate_of_change = 1;
@@ -350,8 +357,7 @@ void initInstancedBuffers() {
 
 void cameraText(void)
 {
-    int idx = 0;
-
+    int idx = current_TID;
 
     // Vector from camera position to track 0's start point.
     float dx = tracks[idx].start_x - camX;
@@ -384,56 +390,27 @@ void cameraText(void)
     float forwardY = -sinf(pitchRad);
     float forwardZ = -cosf(yawRad) * cosf(pitchRad);
 
-    //TODO Add proper multi-line debug, rendered text
-    //TODO Add Cam Pitch and Yaw to text
     //TODO Z Axis should be up, as in the machine / nc-code
 
-    snprintf(camString, sizeof(camString),
-        "Cam: (%.2f, %.2f, %.2f)\n"
-        "Target: (%.2f, %.2f, %.2f)\n"
-        "Direction: (%.3f, %.3f, %.3f)\n"
-        "Distance: %.2f\n"
-        "Target yaw: %.2f deg\n"
-        "Target pitch: %.2f deg",
-        camX, camY, camZ,
-        tracks[idx].start_x,
-        tracks[idx].start_y,
-        tracks[idx].start_z,
-        dirX, dirY, dirZ,
-        distance,
-        targetYaw, targetPitch
-    );
+    snprintf(camStrPos, sizeof(camStrPos), "Pos: (%.2f, %.2f, %.2f)",
+      camX, camY, camZ);
+    snprintf(camStrTarget, sizeof(camStrTarget), "Target: (%.2f, %.2f, %.2f)",
+      tracks[idx].start_x,tracks[idx].start_y,tracks[idx].start_z);
+    snprintf(camStrYaw, sizeof(camStrYaw), "Yaw: %.2f°",
+      camYaw);
+    snprintf(camStrPitch, sizeof(camStrPitch), "Pitch: %.2f°",
+      camPitch);
+    snprintf(camStrTYaw, sizeof(camStrTYaw), "Target Yaw: %.2f°",
+      targetYaw);
+    snprintf(camStrTPitch, sizeof(camStrTPitch), "Target Pitch: %.2f°",
+      targetPitch);
+    snprintf(camStrDir, sizeof(camStrDir), "Direction: (%.2f, %.2f, %.2f)",
+      dirX, dirY, dirZ);
+    snprintf(camStrDis, sizeof(camStrDis), "Distance: %.2f",
+      distance);
+    snprintf(camStrForward, sizeof(camStrForward), "Forward: (%.2f, %.2f, %.2f)",
+      forwardX, forwardY, forwardZ);
 }
-
-/*void cameraText(void)
-{
-    float yawRad = camYaw * (float)M_PI / 180.0f;
-    float pitchRad = camPitch * (float)M_PI / 180.0f;
-
-    // Forward vector consistent with yaw/pitch convention
-    float forwardX = sinf(yawRad) * cosf(pitchRad);
-    float forwardY = -sinf(pitchRad);
-    float forwardZ = -cosf(yawRad) * cosf(pitchRad);
-
-    snprintf(camString, sizeof(camString),
-            "Position: (%.3f, %.3f, %.3f)\n"
-            "Yaw: %.3f°\n"
-            "Pitch: %.3f°\n"
-            "Forward: (%.3f, %.3f, %.3f)\n",
-              camX, camY, camZ,
-              camYaw, camPitch,
-              forwardX, forwardY, forwardZ
-    );
-
-    if (numTracks > 0) {
-        printf(
-            "Track 0 target: (%.3f, %.3f, %.3f)\n",
-            tracks[0].start_x,
-            tracks[0].start_y,
-            tracks[0].start_z
-        );
-    }
-}*/
 
 void renderText() {
     glDisable(GL_DEPTH_TEST);
@@ -459,8 +436,24 @@ void renderText() {
     for (char* c = TID_String; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     glRasterPos2i(10, height - 80);
     for (char* c = ambientString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    glRasterPos2i(10, height - 100);
-    for (char* c = camString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 120);
+    for (char* c = camStrPos; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 140);
+    for (char* c = camStrTarget; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 160);
+    for (char* c = camStrYaw; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 180);
+    for (char* c = camStrPitch; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 200);
+    for (char* c = camStrTYaw; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 220);
+    for (char* c = camStrTPitch; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 240);
+    for (char* c = camStrDir; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 260);
+    for (char* c = camStrDis; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
+    glRasterPos2i(10, height - 280);
+    for (char* c = camStrForward; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);

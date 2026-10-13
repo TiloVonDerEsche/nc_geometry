@@ -13,11 +13,7 @@
 #include "helper_funcs.h"
 #include "color_mapper.tab.h"
 
-//mutate color attr of t
-//access other attrs for bool eval
-//Color map_color(const char* expr_str, Track* t);
 void apply_color_config(FILE* fp, Track* t_ptr);
-
 
 #define SPEED 0.3f
 
@@ -35,13 +31,13 @@ int keys[256] = {0};
 // Track data
 Track* tracks = NULL;
 int numTracks = 0;
-float min_z, max_z;  // Global variables for z-range color mapping
+float min_z, max_z;
 
 Config config = {0};
 
 // Ambient Light Control Variable
-float ambientIntensity = 0.2f; // Default 20% ambient light
-char ambientString[32] = "Ambient Light Intensity: 0.2"; //"0.1" ->3 chars
+float ambientIntensity = 0.2f;
+char ambientString[32] = "Ambient Light Intensity: 0.2";
 
 int frameCount = 0;
 float fps = 0.0f;
@@ -51,9 +47,11 @@ char fpsString[16] = "FPS: 0";
 unsigned int current_TID = 0;
 char TID_String[16] = "T_ID: 0";
 
-GLUquadric* shared_quadric = NULL;
+// VBO Handles for Cylinder Template
+GLuint cylinderVBO = 0;
+GLuint cylinderNormalVBO = 0;
+int cylinderVertexCount = 0;
 
-//unsigned int valid_color_maps = 0;
 /**************************File / Str Functions**************************************/
 
 int read_config(const char* filename, Config* config) {
@@ -68,7 +66,6 @@ int read_config(const char* filename, Config* config) {
     while (fgets(line, sizeof(line), file)) {
         char* trimmed = trim(line);
 
-        // ignore comments and empty lines
         if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
             continue;
         }
@@ -92,10 +89,10 @@ int read_config(const char* filename, Config* config) {
         } else if (strcmp(key, "default_color") == 0) {
             if(sscanf(value, "{%hhu,%hhu,%hhu}",
             &config->default_color.r, &config->default_color.g, &config->default_color.b) != 3) {
-              fprintf(stderr,"Failed to read default_color!\n");
+                fprintf(stderr,"Failed to read default_color!\n");
             } else{
-              printf("Read default_color={%hhu,%hhu,%hhu}\n",
-                config->default_color.r, config->default_color.g, config->default_color.b);
+                printf("Read default_color={%hhu,%hhu,%hhu}\n",
+                    config->default_color.r, config->default_color.g, config->default_color.b);
             }
         }
     }
@@ -104,7 +101,6 @@ int read_config(const char* filename, Config* config) {
     return SUCCESS;
 }
 
-// Read CSV file
 void read_track_list(const char* filename) {
     printf("Opening %s...\n", filename);
     FILE* file = fopen(filename, "r");
@@ -118,7 +114,6 @@ void read_track_list(const char* filename) {
     FILE* colorf = fopen(fname, "r");
     if (colorf == NULL) {
         fprintf(stderr, "Error: Could not open file %s\n", fname);
-        //return FAILURE;
     }
 
     char line[256];
@@ -131,7 +126,6 @@ void read_track_list(const char* filename) {
     rewind(file);
     fgets(line, sizeof(line), file); // Skip header again
 
-    //initialize tracks
     int i = 0;
     while (fgets(line, sizeof(line), file) && i < numTracks) {
         sscanf(line, "%u,%f,%f,%f, %f,%f,%f, %f,%f, %f, %f,%u, %u",
@@ -146,13 +140,8 @@ void read_track_list(const char* filename) {
         tracks[i].vradius = config.vertical_radius;
         tracks[i].color = config.default_color;
 
-        apply_color_config(colorf,&tracks[i]);
+        apply_color_config(colorf, &tracks[i]);
         rewind(colorf);
-        /*for(unsigned int j=0; j<valid_color_maps; j++) {
-          if(tracks[i].g_code == color_mapping[j].g_code) {
-            tracks[i].color = color_mapping[j].color;
-          }
-        }*/
 
         i++;
     }
@@ -161,9 +150,61 @@ void read_track_list(const char* filename) {
 
 /****************************************************************/
 
-void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
-    const int segments = 12; //reduced from 32
+void initCylinderVBO() {
+    const int segments = 12; // Balanced detail vs performance
+    cylinderVertexCount = segments * 6; // 2 triangles per segment * 3 vertices
 
+    float* vertices = (float*)malloc(cylinderVertexCount * 3 * sizeof(float));
+    float* normals = (float*)malloc(cylinderVertexCount * 3 * sizeof(float));
+
+    int v_idx = 0;
+    for (int i = 0; i < segments; i++) {
+        float theta1 = (float)i * 2.0f * M_PI / segments;
+        float theta2 = (float)(i + 1) * 2.0f * M_PI / segments;
+
+        float x1 = cosf(theta1), y1 = sinf(theta1);
+        float x2 = cosf(theta2), y2 = sinf(theta2);
+
+        // Triangle 1: Bottom-Left -> Top-Left -> Bottom-Right
+        vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+
+        vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 1.0f;
+        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+
+        vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+
+        // Triangle 2: Bottom-Right -> Top-Left -> Top-Right
+        vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+
+        vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 1.0f;
+        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+
+        vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 1.0f;
+        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        v_idx++;
+    }
+
+    glGenBuffers(1, &cylinderVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
+    glBufferData(GL_ARRAY_BUFFER, cylinderVertexCount * 3 * sizeof(float), vertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &cylinderNormalVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderNormalVBO);
+    glBufferData(GL_ARRAY_BUFFER, cylinderVertexCount * 3 * sizeof(float), normals, GL_STATIC_DRAW);
+
+    free(vertices);
+    free(normals);
+}
+
+void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
     float dx = bx - ax;
     float dy = by - ay;
     float dz = bz - az;
@@ -206,20 +247,28 @@ void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, fl
     glMultMatrixf(rotationMatrix);
     glScalef(hradius, vradius, length);
 
-    /*GLUquadric* quad = gluNewQuadric();
-    gluQuadricNormals(quad, GLU_SMOOTH);*/
+    // Bind VBOs and draw using client arrays
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
-    gluCylinder(shared_quadric, 1.0, 1.0, 1.0, segments, 1);
-    /*gluDeleteQuadric(quad);*/
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderNormalVBO);
+    glNormalPointer(GL_FLOAT, 0, 0);
+
+    glDrawArrays(GL_TRIANGLES, 0, cylinderVertexCount);
+
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+
     glPopMatrix();
 }
 
 void renderText() {
-    //Lighting and Z-Buffer Depth Testing unwanted for rendering Text
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 
-    //Set Projection-Matrix to 2D (Orthogonal)
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -231,16 +280,14 @@ void renderText() {
     glPushMatrix();
     glLoadIdentity();
 
-    //Textcolor green, position top left
     glColor3f(0.0f, 1.0f, 0.0f);
 
-    //Render char by char
-    glRasterPos2i(10, height - 20); // 10px right, 20px down
+    glRasterPos2i(10, height - 20);
     for (char* c = fpsString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
-    glRasterPos2i(10, height - 40);  // 10px right, 40px down
+    glRasterPos2i(10, height - 40);
     for (char* c = camString; *c != '\0'; c++) {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
@@ -260,24 +307,20 @@ void renderText() {
         glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     }
 
-    //Reset Matrices
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glMatrixMode(GL_MODELVIEW);
 
-    //Reactivate Lighting and Z-Buffer Depth Testing
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
 }
 
 void display() {
-    // --- Calculate FPS ---
     frameCount++;
-    int currentTime = glutGet(GLUT_ELAPSED_TIME); // Time in ms since glutInit
+    int currentTime = glutGet(GLUT_ELAPSED_TIME);
     int timeInterval = currentTime - previousTime;
 
-    // Once a second (1000 ms) update FPS count
     if (timeInterval > 1000) {
         fps = frameCount / (timeInterval / 1000.0f);
         previousTime = currentTime;
@@ -288,11 +331,9 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    // Dynamically update ambient light intensity
     GLfloat ambientLight[] = {ambientIntensity, ambientIntensity, ambientIntensity, 1.0f};
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
 
-    // Set directional light position
     GLfloat lightPos[] = {1.0f, 1.0f, 1.0f, 0.0f};
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
@@ -305,20 +346,18 @@ void display() {
     for (int i = 0; i < numTracks; i++) {
         glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
         if(tracks[i].id < current_TID) {
-          //don't render tracks, if they're black
-          if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
-            drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
-                         tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
-                         tracks[i].hradius, tracks[i].vradius);
-          }
+            if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
+                drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
+                             tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
+                             tracks[i].hradius, tracks[i].vradius);
+            }
         }
     }
-    renderText(); //display FPS counter str
+    renderText();
     glutSwapBuffers();
 }
 
 void reshape(int w, int h) {
-    //NOTE what does it do?
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -328,10 +367,8 @@ void reshape(int w, int h) {
 
 void mouseEntry(int state) {
     if (state == GLUT_ENTERED) {
-        // Reset rate_of_change when (tabbing/)mouse re-entering
         rate_of_change = 1;
-        for (int i = 0; i < 256; i++) keys[i] = 0; // Clear stuck regular keys
-        //printf("Window re-entered: resetting rate_of_change to 1\n");
+        for (int i = 0; i < 256; i++) keys[i] = 0;
     }
 }
 
@@ -360,7 +397,7 @@ void motion(int x, int y) {
 }
 
 void keyDown(unsigned char key, int x, int y) {
-    keys[tolower(key)] = 1; //remember which key was downed, for WASD and co.
+    keys[tolower(key)] = 1;
 }
 
 void keyUp(unsigned char key, int x, int y) {
@@ -368,7 +405,6 @@ void keyUp(unsigned char key, int x, int y) {
 }
 
 void specialKeyDown(int key, int x, int y) {
-  //mode keys
   if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
       rate_of_change*=100;
   }
@@ -376,19 +412,18 @@ void specialKeyDown(int key, int x, int y) {
       rate_of_change*=10;
   }
 
-  //arrow keys
   unsigned int current_TID_changed=0;
 
   if (key == GLUT_KEY_LEFT) {
       current_TID -= rate_of_change;
-      if(numTracks<=current_TID) {//underflow is a feature
-        current_TID=numTracks; //instead of current_TID=sizeof(unsigned int)
+      if(numTracks<=current_TID) {
+        current_TID=numTracks;
       }
       current_TID_changed=1;
   } else if (key == GLUT_KEY_RIGHT) {
       current_TID += rate_of_change;
-      if(numTracks<=current_TID) {//overflow is a feature
-        current_TID=0;  //no more tracks to draw -> start from beginning
+      if(numTracks<=current_TID) {
+        current_TID=0;
       }
       current_TID_changed=1;
   }
@@ -399,7 +434,6 @@ void specialKeyDown(int key, int x, int y) {
 }
 
 void specialKeyUp(int key, int x, int y) {
-    //mode keys
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
         rate_of_change/=100;
     }
@@ -407,7 +441,7 @@ void specialKeyUp(int key, int x, int y) {
         rate_of_change/=10;
     }
 
-    if (rate_of_change<1) {rate_of_change=1;} //lower clamp to 1
+    if (rate_of_change<1) {rate_of_change=1;}
 }
 
 void handle_movement(int garbage) {
@@ -428,7 +462,6 @@ void handle_movement(int garbage) {
 
     unsigned int ambient_changed=0;
 
-    // Controls for Ambient Light Intensity (+ / -)
     if (keys['i']) {
         ambientIntensity += 0.01f;
         if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
@@ -440,7 +473,6 @@ void handle_movement(int garbage) {
     }
 
     if (ambient_changed) {
-      //printf("Ambient Light Intensity: %.2f\n", ambientIntensity);
       snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
     }
 
@@ -455,8 +487,6 @@ int main(int argc, char** argv) {
     read_config("plot_config.ctxt", &config);
     read_track_list(config.tracks_to_plot);
 
-
-    //NOTE set Z values of near and far plane, of view frustum
     min_z = tracks[0].start_z;
     max_z = tracks[0].start_z;
     for (int i = 0; i < numTracks; i++) {
@@ -478,32 +508,27 @@ int main(int argc, char** argv) {
 
     // OpenGL Setup
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_NORMALIZE); // Rescales normal vectors after glScalef
+    glEnable(GL_NORMALIZE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    // Enable Lighting Pipeline
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    // Light Colors
     GLfloat diffuseLight[]  = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat specularLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 
-    // Enable Material Color Mapping (binds glColor3f to Ambient and Diffuse)
     glEnable(GL_COLOR_MATERIAL);
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-    // Material Specular Properties
     GLfloat specularMaterial[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat shininess[]        = {50.0f}; // Range: 0.0 to 128.0
+    GLfloat shininess[]        = {50.0f};
     glMaterialfv(GL_FRONT, GL_SPECULAR, specularMaterial);
     glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
 
-    //shared quad for cylinder rendering
-    shared_quadric = gluNewQuadric();
-    gluQuadricNormals(shared_quadric, GLU_SMOOTH);
+    // Initialize VBO templates on GPU after GLEW setup
+    initCylinderVBO();
 
     // GLUT Callbacks
     glutDisplayFunc(display);

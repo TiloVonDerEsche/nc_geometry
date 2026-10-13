@@ -17,11 +17,14 @@ void apply_color_config(FILE* fp, Track* t_ptr);
 
 #define SPEED 0.3f
 
-// Camera variables
+// Camera variables (will be initialized around track 0 in main)
 float camX = 0.0f, camY = 0.0f, camZ = 50.0f;
-float camRoll = 0.0f, camPitch = 0.0f, camYaw = 0.0f;
+float camRoll = 0.0f, camPitch = 15.0f, camYaw = 0.0f;
 int lastX = 0, lastY = 0;
-char camString[64] = "Cam: {0.0, 0.0, 0.0}";
+char camString[256] = "Position: (0.0, 0.0, 0.0)\n"
+                      "Yaw: 0°\n"
+                      "Pitch: 0°\n"
+                      "Forward: (0.0, 0.0, 0.0)\n";
 
 int buttonDown = 0;
 unsigned int rate_of_change = 1;
@@ -44,15 +47,140 @@ float fps = 0.0f;
 int previousTime = 0;
 char fpsString[16] = "FPS: 0";
 
-unsigned int current_TID = 0;
+unsigned int current_TID = 0; // Starts at 0 as requested
 char TID_String[16] = "T_ID: 0";
 
-// VBO Handles for Cylinder Template
+// OpenGL / Instancing Handles
 GLuint cylinderVBO = 0;
 GLuint cylinderNormalVBO = 0;
+GLuint instanceVBO = 0;
+GLuint shaderProgram = 0;
 int cylinderVertexCount = 0;
 
-/**************************File / Str Functions**************************************/
+// Instance data structure for GPU
+typedef struct {
+    float start[3];
+    float end[3];
+    float radii[2]; // hradius, vradius
+    float color[3];
+} TrackInstanceData;
+
+/************************** GLSL Shaders **************************************/
+
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 1) in vec3 aNormal;\n"
+"layout (location = 2) in vec3 aStart;\n"
+"layout (location = 3) in vec3 aEnd;\n"
+"layout (location = 4) in vec2 aRadii;\n"
+"layout (location = 5) in vec3 aColor;\n"
+"\n"
+"out vec3 FragPos;\n"
+"out vec3 Normal;\n"
+"out vec3 TrackColor;\n"
+"\n"
+"uniform mat4 projection;\n"
+"uniform mat4 view;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    vec3 dz = aEnd - aStart;\n"
+"    float lengthVal = length(dz);\n"
+"    if (lengthVal == 0.0) lengthVal = 0.0001;\n"
+"    vec3 dir = dz / lengthVal;\n"
+"\n"
+"    vec3 up = vec3(0.0, 0.0, 1.0);\n"
+"    float dotUp = up.z * dir.z;\n"
+"    vec3 v = up - dotUp * dir;\n"
+"    float vLen = length(v);\n"
+"    if (vLen > 0.0) {\n"
+"        v /= vLen;\n"
+"    } else {\n"
+"        v = vec3(1.0, 0.0, 0.0);\n"
+"    }\n"
+"    vec3 u = cross(dir, v);\n"
+"\n"
+"    mat3 rotMat = mat3(u, v, dir);\n"
+"\n"
+"    // Scale unit cylinder (radius 1, height 1) by radii and length, then rotate and translate\n"
+"    vec3 scaledPos = vec3(aPos.x * aRadii.x, aPos.y * aRadii.y, aPos.z * lengthVal);\n"
+"    vec3 worldPos = aStart + rotMat * scaledPos;\n"
+"\n"
+"    FragPos = worldPos;\n"
+"    Normal = normalize(rotMat * aNormal);\n"
+"    TrackColor = aColor;\n"
+"\n"
+"    gl_Position = projection * view * vec4(worldPos, 1.0);\n"
+"}\n";
+
+const char* fragmentShaderSource = "#version 330 core\n"
+"in vec3 FragPos;\n"
+"in vec3 Normal;\n"
+"in vec3 TrackColor;\n"
+"\n"
+"out vec4 FragColor;\n"
+"\n"
+"uniform float ambientIntensity;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    vec3 norm = normalize(Normal);\n"
+"    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));\n"
+"    \n"
+"    float diff = max(dot(norm, lightDir), 0.0);\n"
+"    vec3 ambient = ambientIntensity * TrackColor;\n"
+"    vec3 diffuse = diff * TrackColor;\n"
+"    \n"
+"    FragColor = vec4(ambient + diffuse, 1.0);\n"
+"}\n";
+
+GLuint compileShader(GLenum type, const char* source) {
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &source, NULL);
+    glCompileShader(shader);
+
+    GLint success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    const char* typeStr = (type == GL_VERTEX_SHADER) ? "VERTEX" : "FRAGMENT";
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(shader, 512, NULL, infoLog);
+        fprintf(stderr, "ERROR: %s shader compilation failed:\n%s\n", typeStr, infoLog);
+    } else {
+        printf("SUCCESS: %s shader compiled successfully.\n", typeStr);
+    }
+    return shader;
+}
+
+void initShaders() {
+    GLuint vs = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
+    GLuint fs = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vs);
+    printf("DEBUG: Vertex shader attached to program ID %u.\n", shaderProgram);
+
+    glAttachShader(shaderProgram, fs);
+    printf("DEBUG: Fragment shader attached to program ID %u.\n", shaderProgram);
+
+    glLinkProgram(shaderProgram);
+
+    GLint success;
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        fprintf(stderr, "ERROR: Shader program linking failed:\n%s\n", infoLog);
+    } else {
+        printf("SUCCESS: Shader program linked successfully (Program ID: %u).\n", shaderProgram);
+    }
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+}
+
+/************************** File / Str Functions **********************************/
 
 int read_config(const char* filename, Config* config) {
     printf("Opening %s...\n", filename);
@@ -65,17 +193,13 @@ int read_config(const char* filename, Config* config) {
     char line[512];
     while (fgets(line, sizeof(line), file)) {
         char* trimmed = trim(line);
-
         if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
             continue;
         }
         char* key;
         char* value;
         parse_line(trimmed, &key, &value);
-        if (!key || !value) {
-            fprintf(stderr, "Error: Invalid line format: %s\n", line);
-            continue;
-        }
+        if (!key || !value) continue;
 
         if (strcmp(key, "tracks_to_plot") == 0) {
             strncpy(config->tracks_to_plot, value, sizeof(config->tracks_to_plot) - 1);
@@ -87,16 +211,9 @@ int read_config(const char* filename, Config* config) {
         } else if (strcmp(key, "debug_prints") == 0) {
             config->debug = atoi(value);
         } else if (strcmp(key, "default_color") == 0) {
-            if(sscanf(value, "{%hhu,%hhu,%hhu}",
-            &config->default_color.r, &config->default_color.g, &config->default_color.b) != 3) {
-                fprintf(stderr,"Failed to read default_color!\n");
-            } else{
-                printf("Read default_color={%hhu,%hhu,%hhu}\n",
-                    config->default_color.r, config->default_color.g, config->default_color.b);
-            }
+            sscanf(value, "{%hhu,%hhu,%hhu}", &config->default_color.r, &config->default_color.g, &config->default_color.b);
         }
     }
-
     fclose(file);
     return SUCCESS;
 }
@@ -109,12 +226,8 @@ void read_track_list(const char* filename) {
         exit(1);
     }
 
-    const char* fname="color_config.ctxt";
-    printf("Opening %s...\n", fname);
+    const char* fname = "color_config.ctxt";
     FILE* colorf = fopen(fname, "r");
-    if (colorf == NULL) {
-        fprintf(stderr, "Error: Could not open file %s\n", fname);
-    }
 
     char line[256];
     fgets(line, sizeof(line), file); // Skip header
@@ -140,19 +253,21 @@ void read_track_list(const char* filename) {
         tracks[i].vradius = config.vertical_radius;
         tracks[i].color = config.default_color;
 
-        apply_color_config(colorf, &tracks[i]);
-        rewind(colorf);
-
+        if (colorf) {
+            apply_color_config(colorf, &tracks[i]);
+            rewind(colorf);
+        }
         i++;
     }
     fclose(file);
+    if (colorf) fclose(colorf);
 }
 
 /****************************************************************/
 
-void initCylinderVBO() {
-    const int segments = 12; // Balanced detail vs performance
-    cylinderVertexCount = segments * 6; // 2 triangles per segment * 3 vertices
+void initInstancedBuffers() {
+    const int segments = 12;
+    cylinderVertexCount = segments * 6;
 
     float* vertices = (float*)malloc(cylinderVertexCount * 3 * sizeof(float));
     float* normals = (float*)malloc(cylinderVertexCount * 3 * sizeof(float));
@@ -165,33 +280,30 @@ void initCylinderVBO() {
         float x1 = cosf(theta1), y1 = sinf(theta1);
         float x2 = cosf(theta2), y2 = sinf(theta2);
 
-        // Triangle 1: Bottom-Left -> Top-Left -> Bottom-Right
+        // Triangle 1
         vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 0.0f;
-        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x1; normals[v_idx*3 + 1]  = y1; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
-
         vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 1.0f;
-        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x1; normals[v_idx*3 + 1]  = y1; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
-
         vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 0.0f;
-        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x2; normals[v_idx*3 + 1]  = y2; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
 
-        // Triangle 2: Bottom-Right -> Top-Left -> Top-Right
+        // Triangle 2
         vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 0.0f;
-        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x2; normals[v_idx*3 + 1]  = y2; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
-
         vertices[v_idx*3 + 0] = x1; vertices[v_idx*3 + 1] = y1; vertices[v_idx*3 + 2] = 1.0f;
-        normals[v_idx*3 + 0] = x1;  normals[v_idx*3 + 1] = y1;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x1; normals[v_idx*3 + 1]  = y1; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
-
         vertices[v_idx*3 + 0] = x2; vertices[v_idx*3 + 1] = y2; vertices[v_idx*3 + 2] = 1.0f;
-        normals[v_idx*3 + 0] = x2;  normals[v_idx*3 + 1] = y2;  normals[v_idx*3 + 2] = 0.0f;
+        normals[v_idx*3 + 0]  = x2; normals[v_idx*3 + 1]  = y2; normals[v_idx*3 + 2]  = 0.0f;
         v_idx++;
     }
 
+    // Base mesh buffers
     glGenBuffers(1, &cylinderVBO);
     glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
     glBufferData(GL_ARRAY_BUFFER, cylinderVertexCount * 3 * sizeof(float), vertices, GL_STATIC_DRAW);
@@ -202,71 +314,128 @@ void initCylinderVBO() {
 
     free(vertices);
     free(normals);
-}
 
-void drawCylinder(float ax, float ay, float az, float bx, float by, float bz, float hradius, float vradius) {
-    float dx = bx - ax;
-    float dy = by - ay;
-    float dz = bz - az;
-    float length = sqrt(dx * dx + dy * dy + dz * dz);
-    if (length == 0) return;
-    dx /= length;
-    dy /= length;
-    dz /= length;
+    // Build Instance Data Array
+    TrackInstanceData* instanceData = (TrackInstanceData*)malloc(numTracks * sizeof(TrackInstanceData));
+    int validCount = 0;
+    for (int i = 0; i < numTracks; i++) {
+        instanceData[validCount].start[0] = tracks[i].start_x;
+        instanceData[validCount].start[1] = tracks[i].start_y;
+        instanceData[validCount].start[2] = tracks[i].start_z;
 
-    float up[3] = {0.0f, 0.0f, 1.0f};
+        instanceData[validCount].end[0] = tracks[i].end_x;
+        instanceData[validCount].end[1] = tracks[i].end_y;
+        instanceData[validCount].end[2] = tracks[i].end_z;
 
-    float dot_up_w = up[2] * dz;
-    float v[3];
-    v[0] = up[0] - dot_up_w * dx;
-    v[1] = up[1] - dot_up_w * dy;
-    v[2] = up[2] - dot_up_w * dz;
-    float v_len = sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    if (v_len > 0) {
-        v[0] /= v_len;
-        v[1] /= v_len;
-        v[2] /= v_len;
-    } else {
-        v[0] = 1.0f; v[1] = 0.0f; v[2] = 0.0f;
+        instanceData[validCount].radii[0] = tracks[i].hradius;
+        instanceData[validCount].radii[1] = tracks[i].vradius;
+
+        if (tracks[i].color.r == 0 && tracks[i].color.g == 0 && tracks[i].color.b == 0) {
+            instanceData[validCount].color[0] = 0.0f;
+            instanceData[validCount].color[1] = 0.0f;
+            instanceData[validCount].color[2] = 0.0f;
+        } else {
+            instanceData[validCount].color[0] = tracks[i].color.r / 255.0f;
+            instanceData[validCount].color[1] = tracks[i].color.g / 255.0f;
+            instanceData[validCount].color[2] = tracks[i].color.b / 255.0f;
+        }
+        validCount++;
     }
 
-    float u[3];
-    u[0] = dy * v[2] - dz * v[1];
-    u[1] = dz * v[0] - dx * v[2];
-    u[2] = dx * v[1] - dy * v[0];
-
-    GLfloat rotationMatrix[16] = {
-        u[0], u[1], u[2], 0.0f,
-        v[0], v[1], v[2], 0.0f,
-        dx, dy, dz, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    glPushMatrix();
-    glTranslatef(ax, ay, az);
-    glMultMatrixf(rotationMatrix);
-    glScalef(hradius, vradius, length);
-
-    // Bind VBOs and draw using client arrays
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-
-    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
-    glVertexPointer(3, GL_FLOAT, 0, 0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, cylinderNormalVBO);
-    glNormalPointer(GL_FLOAT, 0, 0);
-
-    glDrawArrays(GL_TRIANGLES, 0, cylinderVertexCount);
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-
-    glPopMatrix();
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, numTracks * sizeof(TrackInstanceData), instanceData, GL_STATIC_DRAW);
+    free(instanceData);
 }
 
+void cameraText(void)
+{
+    int idx = 0;
+
+
+    // Vector from camera position to track 0's start point.
+    float dx = tracks[idx].start_x - camX;
+    float dy = tracks[idx].start_y - camY;
+    float dz = tracks[idx].start_z - camZ;
+
+    float horizontal = sqrtf(dx * dx + dy * dy);
+    float distance = sqrtf(dx * dx + dy * dy + dz * dz);
+
+    // Z-up convention:
+    // yaw = angle in XY plane, measured from +Y toward +X
+    // pitch = elevation above the XY plane
+    float targetYaw = atan2f(dx, dy) * 180.0f / (float)M_PI;
+    float targetPitch = atan2f(dz, horizontal)
+                      * 180.0f / (float)M_PI;
+
+    // Direction vector from camera toward track start.
+    float dirX = 0.0f, dirY = 0.0f, dirZ = 0.0f;
+    if (distance > 1e-6f) {
+        dirX = dx / distance;
+        dirY = dy / distance;
+        dirZ = dz / distance;
+    }
+
+    float yawRad = camYaw * (float)M_PI / 180.0f;
+    float pitchRad = camPitch * (float)M_PI / 180.0f;
+
+    // Forward vector consistent with yaw/pitch convention
+    float forwardX = sinf(yawRad) * cosf(pitchRad);
+    float forwardY = -sinf(pitchRad);
+    float forwardZ = -cosf(yawRad) * cosf(pitchRad);
+
+    //TODO Add proper multi-line debug, rendered text
+    //TODO Add Cam Pitch and Yaw to text
+    //TODO Z Axis should be up, as in the machine / nc-code
+
+    snprintf(camString, sizeof(camString),
+        "Cam: (%.2f, %.2f, %.2f)\n"
+        "Target: (%.2f, %.2f, %.2f)\n"
+        "Direction: (%.3f, %.3f, %.3f)\n"
+        "Distance: %.2f\n"
+        "Target yaw: %.2f deg\n"
+        "Target pitch: %.2f deg",
+        camX, camY, camZ,
+        tracks[idx].start_x,
+        tracks[idx].start_y,
+        tracks[idx].start_z,
+        dirX, dirY, dirZ,
+        distance,
+        targetYaw, targetPitch
+    );
+}
+
+/*void cameraText(void)
+{
+    float yawRad = camYaw * (float)M_PI / 180.0f;
+    float pitchRad = camPitch * (float)M_PI / 180.0f;
+
+    // Forward vector consistent with yaw/pitch convention
+    float forwardX = sinf(yawRad) * cosf(pitchRad);
+    float forwardY = -sinf(pitchRad);
+    float forwardZ = -cosf(yawRad) * cosf(pitchRad);
+
+    snprintf(camString, sizeof(camString),
+            "Position: (%.3f, %.3f, %.3f)\n"
+            "Yaw: %.3f°\n"
+            "Pitch: %.3f°\n"
+            "Forward: (%.3f, %.3f, %.3f)\n",
+              camX, camY, camZ,
+              camYaw, camPitch,
+              forwardX, forwardY, forwardZ
+    );
+
+    if (numTracks > 0) {
+        printf(
+            "Track 0 target: (%.3f, %.3f, %.3f)\n",
+            tracks[0].start_x,
+            tracks[0].start_y,
+            tracks[0].start_z
+        );
+    }
+}*/
+
 void renderText() {
-    glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
@@ -283,29 +452,15 @@ void renderText() {
     glColor3f(0.0f, 1.0f, 0.0f);
 
     glRasterPos2i(10, height - 20);
-    for (char* c = fpsString; *c != '\0'; c++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    }
-
+    for (char* c = fpsString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     glRasterPos2i(10, height - 40);
-    for (char* c = camString; *c != '\0'; c++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    }
-
+    for (char* c = rocString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     glRasterPos2i(10, height - 60);
-    for (char* c = rocString; *c != '\0'; c++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    }
-
+    for (char* c = TID_String; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     glRasterPos2i(10, height - 80);
-    for (char* c = TID_String; *c != '\0'; c++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    }
-
+    for (char* c = ambientString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
     glRasterPos2i(10, height - 100);
-    for (char* c = ambientString; *c != '\0'; c++) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
-    }
+    for (char* c = camString; *c != '\0'; c++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *c);
 
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -313,7 +468,6 @@ void renderText() {
     glMatrixMode(GL_MODELVIEW);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
 }
 
 void display() {
@@ -329,40 +483,91 @@ void display() {
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    float aspect = (float)glutGet(GLUT_WINDOW_WIDTH) / (float)glutGet(GLUT_WINDOW_HEIGHT);
+
+    // Projection Matrix (gluPerspective equivalent)
+    float fov = 45.0f * M_PI / 180.0f;
+    float f = 1.0f / tanf(fov / 2.0f);
+    float zNear = 0.1f, zFar = 1000.0f;
+    GLfloat projMat[16] = {
+        f / aspect, 0.0f, 0.0f, 0.0f,
+        0.0f, f, 0.0f, 0.0f,
+        0.0f, 0.0f, (zFar + zNear) / (zNear - zFar), -1.0f,
+        0.0f, 0.0f, (2.0f * zFar * zNear) / (zNear - zFar), 0.0f
+    };
+
+    // View Matrix (Camera rotation + translation)
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    GLfloat ambientLight[] = {ambientIntensity, ambientIntensity, ambientIntensity, 1.0f};
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-
-    GLfloat lightPos[] = {1.0f, 1.0f, 1.0f, 0.0f};
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
-
-    // Camera
     glRotatef(camPitch, 1, 0, 0);
     glRotatef(camYaw, 0, 1, 0);
     glTranslatef(-camX, -camY, -camZ);
+    GLfloat viewMat[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, viewMat);
 
-    // Draw tracks
-    for (int i = 0; i < numTracks; i++) {
-        glColor3ub(tracks[i].color.r, tracks[i].color.g, tracks[i].color.b);
-        if(tracks[i].id < current_TID) {
-            if(tracks[i].color.r!=0 || tracks[i].color.g!=0 || tracks[i].color.b!=0) {
-                drawCylinder(tracks[i].start_x, tracks[i].start_y, tracks[i].start_z,
-                             tracks[i].end_x, tracks[i].end_y, tracks[i].end_z,
-                             tracks[i].hradius, tracks[i].vradius);
-            }
-        }
+    // Use Custom Shader Program
+    glUseProgram(shaderProgram);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, projMat);
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, viewMat);
+    glUniform1f(glGetUniformLocation(shaderProgram, "ambientIntensity"), ambientIntensity);
+
+    // Bind Cylinder Mesh & Instance Attributes
+    glEnableVertexAttribArray(0); // aPos
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1); // aNormal
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderNormalVBO);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    // Instance attributes from instanceVBO
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    size_t stride = sizeof(TrackInstanceData);
+
+    glEnableVertexAttribArray(2); // aStart
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
+    glVertexAttribDivisor(2, 1);
+
+    glEnableVertexAttribArray(3); // aEnd
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+    glVertexAttribDivisor(3, 1);
+
+    glEnableVertexAttribArray(4); // aRadii
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+    glVertexAttribDivisor(4, 1);
+
+    glEnableVertexAttribArray(5); // aColor
+    glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, stride, (void*)(8 * sizeof(float)));
+    glVertexAttribDivisor(5, 1);
+
+    // Draw all instances up to current_TID in a single call!
+    unsigned int drawCount = (current_TID < numTracks) ? current_TID : numTracks;
+    if (drawCount > 0) {
+        glDrawArraysInstanced(GL_TRIANGLES, 0, cylinderVertexCount, drawCount);
     }
+
+    // Reset divisors
+    glVertexAttribDivisor(2, 0);
+    glVertexAttribDivisor(3, 0);
+    glVertexAttribDivisor(4, 0);
+    glVertexAttribDivisor(5, 0);
+
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(4);
+    glDisableVertexAttribArray(5);
+    glUseProgram(0);
+
+    cameraText();
     renderText();
     glutSwapBuffers();
 }
 
 void reshape(int w, int h) {
     glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0, (float)w / h, 0.1, 1000.0);
-    glMatrixMode(GL_MODELVIEW);
 }
 
 void mouseEntry(int state) {
@@ -374,13 +579,9 @@ void mouseEntry(int state) {
 
 void mouse(int button, int state, int x, int y) {
     if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_DOWN) {
-            buttonDown = 1;
-            lastX = x;
-            lastY = y;
-        } else {
-            buttonDown = 0;
-        }
+        buttonDown = (state == GLUT_DOWN);
+        lastX = x;
+        lastY = y;
     }
 }
 
@@ -396,62 +597,57 @@ void motion(int x, int y) {
     }
 }
 
-void keyDown(unsigned char key, int x, int y) {
-    keys[tolower(key)] = 1;
-}
-
-void keyUp(unsigned char key, int x, int y) {
-    keys[tolower(key)] = 0;
-}
+void keyDown(unsigned char key, int x, int y) { keys[tolower(key)] = 1; }
+void keyUp(unsigned char key, int x, int y) { keys[tolower(key)] = 0; }
 
 void specialKeyDown(int key, int x, int y) {
-  if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-      rate_of_change*=100;
-  }
-  if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-      rate_of_change*=10;
-  }
+    // mode keys
+    if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
+        rate_of_change *= 100;
+    }
+    if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
+        rate_of_change *= 10;
+    }
 
-  unsigned int current_TID_changed=0;
+    // arrow keys
+    unsigned int current_TID_changed = 0;
 
-  if (key == GLUT_KEY_LEFT) {
-      current_TID -= rate_of_change;
-      if(numTracks<=current_TID) {
-        current_TID=numTracks;
-      }
-      current_TID_changed=1;
-  } else if (key == GLUT_KEY_RIGHT) {
-      current_TID += rate_of_change;
-      if(numTracks<=current_TID) {
-        current_TID=0;
-      }
-      current_TID_changed=1;
-  }
+    if (key == GLUT_KEY_LEFT) {
+        current_TID -= rate_of_change;
+        if (numTracks <= current_TID) { // underflow feature
+            current_TID = numTracks;
+        }
+        current_TID_changed = 1;
+    } else if (key == GLUT_KEY_RIGHT) {
+        current_TID += rate_of_change;
+        if (numTracks <= current_TID) { // overflow feature
+            current_TID = 0;
+        }
+        current_TID_changed = 1;
+    }
 
-  if (current_TID_changed) {
-    snprintf(TID_String, sizeof(TID_String), "T_ID: %u", current_TID);
-  }
+    if (current_TID_changed) {
+        snprintf(TID_String, sizeof(TID_String), "T_ID: %u", current_TID);
+    }
 }
 
 void specialKeyUp(int key, int x, int y) {
+    // mode keys
     if (key == GLUT_KEY_CTRL_L || key == GLUT_KEY_CTRL_R) {
-        rate_of_change/=100;
+        rate_of_change /= 100;
     }
     if (key == GLUT_KEY_SHIFT_L || key == GLUT_KEY_SHIFT_R) {
-        rate_of_change/=10;
+        rate_of_change /= 10;
     }
 
-    if (rate_of_change<1) {rate_of_change=1;}
+    if (rate_of_change < 1) { rate_of_change = 1; } // lower clamp to 1
 }
 
 void handle_movement(int garbage) {
     float speed = SPEED * rate_of_change;
-
     float yawRad = camYaw * M_PI / 180.0f;
-    float forwardX = sinf(yawRad);
-    float forwardZ = -cosf(yawRad);
-    float rightX = cosf(yawRad);
-    float rightZ = sinf(yawRad);
+    float forwardX = sinf(yawRad), forwardZ = -cosf(yawRad);
+    float rightX = cosf(yawRad), rightZ = sinf(yawRad);
 
     if (keys['w']) { camX += forwardX * speed; camZ += forwardZ * speed; }
     if (keys['s']) { camX -= forwardX * speed; camZ -= forwardZ * speed; }
@@ -460,23 +656,14 @@ void handle_movement(int garbage) {
     if (keys[' ']) { camY += speed; }
     if (keys['c']) { camY -= speed; }
 
-    unsigned int ambient_changed=0;
-
-    if (keys['i']) {
-        ambientIntensity += 0.01f;
-        if (ambientIntensity > 1.0f) ambientIntensity = 1.0f;
-        ambient_changed=1;
-    } else if (keys['k']) {
-        ambientIntensity -= 0.01f;
-        if (ambientIntensity < 0.0f) ambientIntensity = 0.0f;
-        ambient_changed=1;
-    }
+    unsigned int ambient_changed = 0;
+    if (keys['i']) { ambientIntensity += 0.01f; if (ambientIntensity > 1.0f) ambientIntensity = 1.0f; ambient_changed = 1; }
+    else if (keys['k']) { ambientIntensity -= 0.01f; if (ambientIntensity < 0.0f) ambientIntensity = 0.0f; ambient_changed = 1; }
 
     if (ambient_changed) {
-      snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
+        snprintf(ambientString, sizeof(ambientString), "Ambient Light Intensity: %.2f", ambientIntensity);
     }
 
-    snprintf(camString, sizeof(camString), "Cam: {%.2f, %.2f, %.2f}", camX,camY,camZ);
     snprintf(rocString, sizeof(rocString), "Rate of Change: %u", rate_of_change);
 
     glutPostRedisplay();
@@ -486,6 +673,15 @@ void handle_movement(int garbage) {
 int main(int argc, char** argv) {
     read_config("plot_config.ctxt", &config);
     read_track_list(config.tracks_to_plot);
+
+    // Initialize camera facing track 0's start point
+    if (numTracks > 0) {
+        camX = tracks[0].start_x;
+        camY = tracks[0].start_y - 40.0f; // Position camera back along Y
+        camZ = tracks[0].start_z + 15.0f; // Position slightly above Z
+        camPitch = 20.0f;
+        camYaw = 0.0f;
+    }
 
     min_z = tracks[0].start_z;
     max_z = tracks[0].start_z;
@@ -499,38 +695,21 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("3D Track Visualizer");
+    glutCreateWindow("3D Track Visualizer - Instanced");
 
     if (glewInit() != GLEW_OK) {
         printf("GLEW initialization failed\n");
         return 1;
     }
 
-    // OpenGL Setup
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_NORMALIZE);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    // Initialize Shaders and GPU Instanced Buffers
+    initShaders();
+    initInstancedBuffers();
 
-    GLfloat diffuseLight[]  = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat specularLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-    GLfloat specularMaterial[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat shininess[]        = {50.0f};
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specularMaterial);
-    glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
-
-    // Initialize VBO templates on GPU after GLEW setup
-    initCylinderVBO();
-
-    // GLUT Callbacks
+    //register callbacks
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutEntryFunc(mouseEntry);

@@ -11,3 +11,17 @@ Vase tracks_def_by_laser=0 mode, track_mid_len=0:
 
 strangly we get more FPS when in Fullscreen
 / full focus
+Also looking away from the Vase does not yield more FPS.
+So f.s.r the whole model seems to be rendered at all times,
+instead of just rendering the visible ones.
+->So (backface,) frustum culling?
+
+Adaptive LOD (Level of Detail)
+-> Fewer Segments for far away tracks -> Or even GL_LINES
+
+Reducing Track_Num
+-> Merge collinear tracks, into super track
+-> But also sub-divide straight track into straight sub-tracks, which approx a curve
+
+
+Hardware Instanced Rendering.

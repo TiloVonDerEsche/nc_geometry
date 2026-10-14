@@ -423,13 +423,39 @@ void display() {
     };
 
     // View Matrix (Camera rotation + translation)
-    glMatrixMode(GL_MODELVIEW);
+    /*glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    glRotatef(camYaw, 0, 0, 1);
     glRotatef(camPitch, 1, 0, 0);
-    glRotatef(camYaw, 0, 1, 0);
     glTranslatef(-camX, -camY, -camZ);
     GLfloat viewMat[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, viewMat);*/
+    // View Matrix: Z-up coordinate system.
+    // Yaw 0 looks along +Y.
+    // Positive yaw turns toward +X.
+    // Positive pitch looks upward toward +Z.
+
+    float yawRad = camYaw * (float)M_PI / 180.0f;
+    float pitchRad = camPitch * (float)M_PI / 180.0f;
+
+    float forwardX = sinf(yawRad) * cosf(pitchRad);
+    float forwardY = cosf(yawRad) * cosf(pitchRad);
+    float forwardZ = sinf(pitchRad);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    gluLookAt(
+        camX, camY, camZ,
+        camX + forwardX,
+        camY + forwardY,
+        camZ + forwardZ,
+        0.0f, 0.0f, 1.0f  // Z is up
+    );
+
+    GLfloat viewMat[16];
     glGetFloatv(GL_MODELVIEW_MATRIX, viewMat);
+
 
     // Use Custom Shader Program
     glUseProgram(shaderProgram);
@@ -513,7 +539,7 @@ void mouse(int button, int state, int x, int y) {
 void motion(int x, int y) {
     if (buttonDown) {
         camYaw += (x - lastX) * 0.1f;
-        camPitch += (y - lastY) * 0.1f;
+        camPitch -= (y - lastY) * 0.1f;
         if (camPitch > 89.0f) camPitch = 89.0f;
         if (camPitch < -89.0f) camPitch = -89.0f;
         lastX = x;
@@ -571,15 +597,15 @@ void specialKeyUp(int key, int x, int y) {
 void handle_movement(int garbage) {
     float speed = SPEED * rate_of_change;
     float yawRad = camYaw * M_PI / 180.0f;
-    float forwardX = sinf(yawRad), forwardZ = -cosf(yawRad);
-    float rightX = cosf(yawRad), rightZ = sinf(yawRad);
+    float forwardX = sinf(yawRad), forwardY = cosf(yawRad);
+    float rightX = cosf(yawRad), rightY = -sinf(yawRad);
 
-    if (keys['w']) { camX += forwardX * speed; camZ += forwardZ * speed; }
-    if (keys['s']) { camX -= forwardX * speed; camZ -= forwardZ * speed; }
-    if (keys['a']) { camX -= rightX * speed; camZ -= rightZ * speed; }
-    if (keys['d']) { camX += rightX * speed; camZ += rightZ * speed; }
-    if (keys[' ']) { camY += speed; }
-    if (keys['c']) { camY -= speed; }
+    if (keys['w']) { camX += forwardX * speed; camY += forwardY * speed; }
+    if (keys['s']) { camX -= forwardX * speed; camY -= forwardY * speed; }
+    if (keys['a']) { camX -= rightX * speed; camY -= rightY * speed; }
+    if (keys['d']) { camX += rightX * speed; camY += rightY * speed; }
+    if (keys[' ']) { camZ += speed; }
+    if (keys['c']) { camZ -= speed; }
 
     unsigned int ambient_changed = 0;
     if (keys['i']) { ambientIntensity += 0.01f; if (ambientIntensity > 1.0f) ambientIntensity = 1.0f; ambient_changed = 1; }
@@ -602,9 +628,9 @@ int main(int argc, char** argv) {
     // Initialize camera facing track 0's start point
     if (numTracks > 0) {
         camX = tracks[0].start_x;
-        camY = tracks[0].start_y - 40.0f; // Position camera back along Y
-        camZ = tracks[0].start_z + 15.0f; // Position slightly above Z
-        camPitch = 20.0f;
+        camY = tracks[0].start_y; // Position camera back along Y
+        camZ = tracks[0].start_z; // Position slightly above Z
+        camPitch = 0.0f;
         camYaw = 0.0f;
     }
 

@@ -345,10 +345,10 @@ expr:
 
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
-                            set_var("laser_status",0);
                             if (config.tracks_def_by_laser){t_end=net_point();}
-
                             write_track_line();
+
+                            set_var("laser_status",0);
                           }
                          }
   | MSG STRING

@@ -266,17 +266,23 @@ void initInstancedBuffers() {
         instanceData[validCount].end[1] = tracks[i].end_y;
         instanceData[validCount].end[2] = tracks[i].end_z;
 
-        instanceData[validCount].radii[0] = tracks[i].hradius;
-        instanceData[validCount].radii[1] = tracks[i].vradius;
-
         if (tracks[i].color.r == 0 && tracks[i].color.g == 0 && tracks[i].color.b == 0) {
             instanceData[validCount].color[0] = 0.0f;
             instanceData[validCount].color[1] = 0.0f;
             instanceData[validCount].color[2] = 0.0f;
+
+            //vertex shader will calculate a zero-sized cylinder,
+            //GPU rasterizer will discard it
+            //-> do not render tracks with color {0,0,0}
+            instanceData[validCount].radii[0] = 0.0f;
+            instanceData[validCount].radii[1] = 0.0f;
         } else {
             instanceData[validCount].color[0] = tracks[i].color.r / 255.0f;
             instanceData[validCount].color[1] = tracks[i].color.g / 255.0f;
             instanceData[validCount].color[2] = tracks[i].color.b / 255.0f;
+
+            instanceData[validCount].radii[0] = tracks[i].hradius;
+            instanceData[validCount].radii[1] = tracks[i].vradius;
         }
         validCount++;
     }
@@ -650,6 +656,8 @@ int main(int argc, char** argv) {
         printf("GLEW initialization failed\n");
         return 1;
     }
+    const GLubyte* version = glGetString(GL_VERSION);
+    printf("OpenGL Version: %s\n", version);
 
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

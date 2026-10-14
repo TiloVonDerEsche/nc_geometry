@@ -319,10 +319,8 @@ void cameraText(void)
 
     // Forward vector consistent with yaw/pitch convention
     float forwardX = sinf(yawRad) * cosf(pitchRad);
-    float forwardY = -sinf(pitchRad);
-    float forwardZ = -cosf(yawRad) * cosf(pitchRad);
-
-    //TODO Z Axis should be up, as in the machine / nc-code
+    float forwardY = cosf(yawRad) * cosf(pitchRad);
+    float forwardZ = sinf(pitchRad);
 
     snprintf(camStrPos, sizeof(camStrPos), "Pos: (%.2f, %.2f, %.2f)",
       camX, camY, camZ);

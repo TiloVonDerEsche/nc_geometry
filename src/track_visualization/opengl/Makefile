@@ -51,9 +51,12 @@ lex.yy.c: color_mapper/cm_lex.l
 color_mapper.tab.h color_mapper.tab.c: color_mapper/color_mapper.y
 	bison -dv color_mapper/color_mapper.y
 
-$(OUT): $(SRC) color_mapper.tab.c lex.yy.c
+shaders_embedded.h: vertex.glsl fragment.glsl embed_shaders.py
+	python3 embed_shaders.py
+
+$(OUT): $(SRC) color_mapper.tab.c lex.yy.c shaders_embedded.h
 	@echo "Building for Target: $(TARGET) [$(CC)]"
-	$(CC) $(SRC) color_mapper.tab.c lex.yy.c -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
+	$(CC) $(SRC) color_mapper.tab.c lex.yy.c shaders_embedded.h -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
 	@echo "Compilation successful: $(OUT)"
 
 clean:

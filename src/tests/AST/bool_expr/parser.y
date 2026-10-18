@@ -1,5 +1,6 @@
 %{
 #include "ast.h"
+#include "typedefs.h"
 #include <iostream>
 #include <memory>
 
@@ -110,7 +111,7 @@ void yyerror(const char *s) { std::cerr << "Fehler: " << s << "\n"; }
 int main() {
     std::cout <<
     "Geben Sie einen Ausdruck mit 'x' ein (z.B. x * 2 + 5) und Strg+D:\n";
-
+    
     // 1. COMPILE PHASE: Parse ONCE from stdin (e.g. typing: x * 2 + 5)
     if (yyparse() == 0 && rootAST) {
         std::cout << "\n--- Generierter Abstract Syntax Tree (AST) ---\n";

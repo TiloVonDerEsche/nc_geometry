@@ -64,6 +64,37 @@ public:
             case '-': return l_val - r_val;
             case '*': return l_val * r_val;
             case '/': return (r_val != 0) ? (l_val / r_val) : 0;
+            case '<': return l_val < r_val;
+            case '>': return l_val < r_val;
+            default: return 0;
+        }
+    }
+};
+
+class UnaryOpNode : public ASTNode {
+private:
+    char op;
+    std::unique_ptr<ASTNode> val_node;
+public:
+    UnaryOpNode(char op, ASTNode* v)
+        : op(op), val_node(v) {}
+
+    void print(int depth) const override {
+        std::cout << std::string(depth, ' ') << "└─ Operator: [" << op << "]\n";
+        if (val_node)  val_node->print(depth + 4);
+        //TODO What is depth? Is +4 correct for Unary?
+    }
+
+    double evaluate(double x_val) const override {
+        double val = val_node ? val_node->evaluate(x_val) : 0;
+
+        switch (op) {
+            case '+': return val;
+            case '-': return -val;
+            case '!': return !val;
+            //TODO perhaps seperate float / int nodes
+            //NOTE So bool_expr arith_expr seperation
+            //TODO Or type int/float union
             default: return 0;
         }
     }

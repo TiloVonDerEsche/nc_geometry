@@ -25,6 +25,8 @@ std::unique_ptr<ASTNode> rootAST = nullptr;
 
 %left '+' '-'
 %left '*' '/'
+%left '(' ')'
+%right '!' UNEG
 
 %%
 
@@ -39,6 +41,7 @@ expr:
     | expr '-' expr { $$ = new BinaryOpNode('-', $1, $3); }
     | expr '*' expr { $$ = new BinaryOpNode('*', $1, $3); }
     | expr '/' expr { $$ = new BinaryOpNode('/', $1, $3); }
+    | '-' expr %prec UNEG {$$ = new UnaryOpNode('-', $2);}
     | '(' expr ')'  { $$ = $2; } // Klammern fallen im AST weg!
     ;
 

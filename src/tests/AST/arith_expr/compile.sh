@@ -5,4 +5,4 @@ bison -d parser.y
 flex lexer.l
 
 # 3. Alle C++ Dateien zusammen kompilieren
-g++ -std=c++17 -Wall parser.tab.c lex.yy.c -o ast_parser
+g++ -std=c++17 -Wall parser.tab.c lex.yy.c -o ast_parser.bin

@@ -1,0 +1,82 @@
+%{
+#include "ast.h"
+#include "parser.tab.h"  // Wird von Bison generiert und enthält die Token-Definitionen
+#include <cstdlib>
+
+void yyerror(const char *s);
+
+extern int debug;
+%}
+
+%option noyywrap
+%x COMMENT
+
+digit    [0-9]
+inum     {digit}+
+fnum    ({digit}+"."{digit}*)|({digit}*"."{digit}+)
+
+
+letter      [A-Z]
+id       [A-Za-z][_A-Za-z]*
+
+%%
+
+"/*"            { BEGIN(COMMENT); }
+<COMMENT>"*/"   { BEGIN(INITIAL); }
+<COMMENT>.      { /* ignore everything else*/ }
+"//"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
+
+{inum} {
+        yylval.INUM = atoi(yytext);
+        if(debug){ printf("An integer: %d\n", yylval.INUM); }
+        return INUM;
+        }
+
+{fnum} {
+        yylval.FNUM = atof(yytext);
+        if(debug){ printf("A float: %f\n", yylval.FNUM); }
+        return FNUM;
+        }
+
+"t_id" {return T_ID;}
+"t_start_x" {return T_START_X;}
+"t_start_y" {return T_START_Y;}
+"t_start_z" {return T_START_Z;}
+"t_end_x" {return T_END_X;}
+"t_end_y" {return T_END_Y;}
+"t_end_z" {return T_END_Z;}
+[bB] {return B_CMD;}
+[cC] {return C_CMD;}
+"machine_speed" {return MACHINE_SPEED;}
+"laser_power" {return LASER_POWER;}
+"laser_status" {return LASER_STATUS;}
+[gG] {return G_CODE;}
+"hradius" {return HRAD;}
+"vradius" {return VRAD;}
+"x"       { return VAR_X; }
+
+{id} {//if(debug){ printf("An ID: %s\n", yytext); }
+        fprintf(stderr,"An unknown ID: %s\n", yytext);
+      }
+
+[ \t\n\r]+            ; /* Trim SEPS */
+
+"->"      {if(debug){ printf("An arrow!\n");} return ARROW;}
+"||"      {return OR;}
+"&&"      {return AND;}
+"=="      {return EQ;}
+"!="      {return NEQ;}
+"<="      {return LTEQ;}
+">="      {return GTEQ;}
+"="       {if(debug){ printf("An equal sign: %s\n", yytext); } return yytext[0]; }
+[+\-*/]   { if(debug){ printf("An arithmetic operator: %s\n", yytext); } return yytext[0]; }
+[<>!|&]      { if(debug){ printf("An boolean operator: %s\n", yytext); } return yytext[0]; }
+
+
+[(){}]    {if(debug){ printf("A brace: %s\n", yytext);} return yytext[0];}
+[;]       {if(debug){ printf("A semicolon: %s\n", yytext);} return yytext[0];}
+[,]       {if(debug){ printf("A comma: %s\n", yytext);} return yytext[0];}
+
+.          {fprintf(stderr,"An unknown Token: %s\n", yytext); /*return yytext[0];*/ }
+
+%%

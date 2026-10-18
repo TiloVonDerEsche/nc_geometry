@@ -65,7 +65,7 @@ public:
             case '*': return l_val * r_val;
             case '/': return (r_val != 0) ? (l_val / r_val) : 0;
             case '<': return l_val < r_val;
-            case '>': return l_val < r_val;
+            case '>': return l_val > r_val;
             default: return 0;
         }
     }

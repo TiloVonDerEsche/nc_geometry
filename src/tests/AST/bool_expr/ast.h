@@ -71,7 +71,7 @@ public:
             case 'L': return l_val <= r_val;
             case 'G': return l_val >= r_val;
             case '<': return l_val < r_val;
-            case '>': return l_val < r_val;
+            case '>': return l_val > r_val;
             default: return 0;
         }
     }

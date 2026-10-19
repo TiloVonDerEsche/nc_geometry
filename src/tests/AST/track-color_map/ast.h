@@ -36,7 +36,8 @@ public:
     VariableNode(unsigned int tan) : track_attr_num(tan) {}
 
     void print(int depth) const override {
-        std::cout << std::string(depth, ' ') << "└─ Variable: [x]\n";
+        std::cout << std::string(depth, ' ') << "└─ Track Attr Num: "
+        << track_attr_num << "\n";
     }
 
     double evaluate(Track* t) const override {
@@ -130,6 +131,29 @@ public:
             //TODO Or type int/float union
             default: return 0;
         }
+    }
+};
+
+class MappingNode : public ASTNode {
+private:
+    std::unique_ptr<ASTNode> bool_expr_node;
+    Color color;
+public:
+    MappingNode(ASTNode* ben, Color c)
+      : bool_expr_node(ben), color(c) {}
+
+    void print(int depth) const override {
+        std::cout << "Bool_Expr:\n";
+        if (bool_expr_node)  bool_expr_node->print(depth + 4);
+        std::cout << std::string(depth+8, ' ') <<
+        "└─Color=(" << (int)color.r << ", " << (int)color.g << ", " << (int)color.b << ")\n";
+    }
+
+    double evaluate(Track* t) const override {
+        int r_eval = bool_expr_node ? bool_expr_node->evaluate(t) : 0;
+        if(r_eval) {t->color=color;} //mutating track color, if bool_expr true
+        //TODO finish after successfully mapping the first color
+        return r_eval;
     }
 };
 

@@ -1,29 +1,25 @@
 %{
 #include "ast.h"
+#include <stdint.h>
 #include <iostream>
 #include <memory>
 
 extern int yylex();
 extern int yyparse();
 void yyerror(const char *s);
+uint8_t is_valid_uint8(int ui);
 
 // Globaler Pointer für die Wurzel des ASTs
 std::unique_ptr<ASTNode> rootAST = nullptr;
-// Das finale Wurzel-Objekt des ASTs
-//ASTNode* rootAST;
+ASTNode* prevMapNode = nullptr;
 
 int debug = 0;
 %}
 
-// Steuerung der Typen für modernere Bison C++ Parser
-%union {
-    ASTNode* node;
-    int INUM;
-    float FNUM;
-}
+%define api.value.type union /* Generate YYSTYPE from these types: */
 
-%token <INUM> INUM
-%token <FNUM> FNUM
+%token <int> INUM
+%token <float> FNUM
 %token ARROW
 %token OR AND
 %token EQ NEQ
@@ -40,9 +36,10 @@ int debug = 0;
 
 
 //%type <float> arith_expr
-//%type <Color> rgb_color
-%type <node> val
-%type <node> bool_expr
+%type <Color> rgb_color
+%type <ASTNode*> val
+%type <ASTNode*> mapping
+%type <ASTNode*> bool_expr
 
 
 %left OR //Bool Algebra, OR ^= ADD, AND ^= MULT
@@ -56,14 +53,36 @@ int debug = 0;
 
 %%
 
-program:
-    bool_expr { rootAST = std::unique_ptr<ASTNode>($1); }
+maps:
+    %empty
+    | maps mapping { rootAST = std::unique_ptr<ASTNode>($2); }
+;
+
+mapping:
+  bool_expr ARROW rgb_color ';' {
+    $$ = new MappingNode($1,$3);
+    prevMapNode = $$;
+  }
+;
+
+rgb_color:
+  '{' INUM ',' INUM ',' INUM '}' {
+      if(!is_valid_uint8($2)) {fprintf(stderr,"First argument of rgb_color: %d, is not in range [0,255]!\n",$2);}
+      if(!is_valid_uint8($4)) {fprintf(stderr,"Second argument of rgb_color: %d, is not in range [0,255]!\n",$4);}
+      if(!is_valid_uint8($6)) {fprintf(stderr,"Third argument of rgb_color: %d, is not in range [0,255]!\n",$6);}
+      $$.r = $2;
+      $$.g = $4;
+      $$.b = $6;
+      if(debug){printf("Parsed RGB: R=%d, G=%d, B=%d\n", $$.r, $$.g, $$.b);}
+  }
 ;
 
 val:
   INUM   { $$ = new NumberNode($1); }
   | FNUM { $$ = new NumberNode($1); /*TODO resolve INT / FLOAT problem*/}
   //Track Attributes:
+  //NOTE arbitrary 0 to 14, mapping for switch case VariableNode,
+  //NOTE to avoid string compare if/else chain
   | T_ID          {$$ = new VariableNode(0); }
   | T_START_X     {$$ = new VariableNode(1); }
   | T_START_Y     {$$ = new VariableNode(2); }
@@ -104,19 +123,62 @@ bool_expr:
 %%
 void yyerror(const char *s) { std::cerr << "Fehler: " << s << "\n"; }
 
+uint8_t is_valid_uint8(int ui) {
+  return (0<=ui && ui<=255);
+}
+
+Color eval(Track t) {
+  double result = rootAST->evaluate(&t);
+  std::cout << "Eingabe Track=\n"
+  "t_id=" << t.id << "\n" <<
+  "t_start=(" << t.start_x << ", " << t.start_y << ", " << t.start_z << ")\n" <<
+  "t_end=(" << t.end_x << ", " << t.end_y << ", " << t.end_z << ")\n" <<
+  "t_b=" << t.b << " t_c=" << t.c << "\n" <<
+  "machine_speed=" << t.machine_speed << "\n" <<
+  "laser_power=" << t.laser_power << " laser_status=" << t.laser_status << "\n" <<
+  "g_code=" << t.g_code << "\n" <<
+  "color=(" << (int)t.color.r << ", " << (int)t.color.g << ", " << (int)t.color.b << ")\n" <<
+  "t_hrad=" << t.hradius << " t_vrad=" << t.vradius << "\n" <<
+  " ---> Ergebnis = "
+  << result << "\n"
+  << "---------------------------\n\n";
+
+  return (Color){0,0,0};
+}
+
 int main() {
-  Track t = (Track){12,         //id
+  Track t1 = (Track){1,         //id
              2.3, 11.2, -7.9,   //start
              5.12, 17.10, -0.9, //end
              20,350.9,          //b,c
              200, 1750,         //machine_speed, laser_power
              1,                 //laser_status
              0,                 //g_code
-             (Color){0,0,0},
+             (Color){66,77,88},
+             0.5,0.5
+            };
+  Track t2 = (Track){2,         //id
+             2.3, 11.2, -7.9,   //start
+             5.12, 17.10, -0.9, //end
+             40,350.9,          //b,c
+             200, 1750,         //machine_speed, laser_power
+             1,                 //laser_status
+             0,                 //g_code
+             (Color){66,77,88},
+             0.5,0.5
+            };
+  Track t3 = (Track){3,         //id
+             2.3, 11.2, -7.9,   //start
+             5.12, 17.10, -0.9, //end
+             60,350.9,          //b,c
+             200, 1750,         //machine_speed, laser_power
+             1,                 //laser_status
+             0,                 //g_code
+             (Color){66,77,88},
              0.5,0.5
             };
 
-
+    //t_id==1->{1,0,0};t_id==2->{0,1,0};t_id==3->{0,0,1};
 
     // 1. COMPILE PHASE: Parse ONCE from stdin TODO read color_config
     if (yyparse() == 0 && rootAST) {
@@ -127,11 +189,10 @@ int main() {
 
         // 2. RUNTIME PHASE: Execute the AST multiple times
         //TODO Read a track in, return mapped Color
-        //for (double x_input = 1.0; x_input <= 500.0; x_input += 1.0) {
-        double result = rootAST->evaluate(&t);
-        std::cout << "Eingabe Track t = _"" ---> Ergebnis = "
-        << result << "\n";
-        //}
+
+        eval(t1);
+        eval(t2);
+        eval(t3);
     } else {
         std::cerr << "Fehler beim Parsen des Ausdrucks.\n";
     }

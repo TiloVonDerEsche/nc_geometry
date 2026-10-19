@@ -12,7 +12,8 @@
 // parse_line and trim
 #include "helper_funcs.h"
 #include "shaders_embedded.h"
-#include "color_mapper.tab.h"
+//#include "color_mapper.tab.h"
+
 void apply_color_config(FILE* fp, Track* t_ptr);
 
 #define SPEED 0.3f

@@ -1,6 +1,6 @@
 %code requires {
   #include <stdint.h>
-  #include "typedefs.h"
+  #include "../typedefs.h"
   uint8_t is_valid_uint8(int ui);
 }
 %parse-param { Track* t }

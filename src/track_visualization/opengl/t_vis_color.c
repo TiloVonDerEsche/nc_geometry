@@ -12,9 +12,12 @@
 // parse_line and trim
 #include "helper_funcs.h"
 #include "shaders_embedded.h"
-//#include "color_mapper.tab.h"
+#include "cm/cm.h" //color_mapper
 
-void apply_color_config(FILE* fp, Track* t_ptr);
+//void apply_color_config(FILE* fp, Track* t_ptr);
+
+int compile_color_config(FILE* fp);
+void map_color(Track* t);
 
 #define SPEED 0.3f
 
@@ -150,8 +153,6 @@ int read_config(const char* filename, Config* config) {
             config->vertical_radius = atof(value);
         } else if (strcmp(key, "debug_prints") == 0) {
             config->debug = atoi(value);
-        } else if (strcmp(key, "default_color") == 0) {
-            sscanf(value, "{%hhu,%hhu,%hhu}", &config->default_color.r, &config->default_color.g, &config->default_color.b);
         }
     }
     fclose(file);
@@ -168,15 +169,23 @@ void read_track_list(const char* filename) {
 
     const char* fname = "color_config.ctxt";
     FILE* colorf = fopen(fname, "r");
+    if(compile_color_config(colorf) == SUCCESS) {
+      printf("Compiled %s successfully!",fname);
+    } else {
+      fprintf(stderr,"Failed to compile %s!",fname);
+      //NOTE should we exit here?
+      exit(1);
+    }
 
     char line[256];
     fgets(line, sizeof(line), file); // Skip header
 
     int count = 0;
+    //TODO Replace with fseek end, see NOTE
     while (fgets(line, sizeof(line), file)) count++;
     numTracks = count;
     tracks = (Track*)calloc(numTracks, sizeof(Track));
-    rewind(file);
+    rewind(file); //NOTE seek END and then rewind should be better
     fgets(line, sizeof(line), file); // Skip header again
 
     int i = 0;
@@ -191,12 +200,8 @@ void read_track_list(const char* filename) {
                &tracks[i].g_code);
         tracks[i].hradius = config.horizontal_radius;
         tracks[i].vradius = config.vertical_radius;
-        tracks[i].color = config.default_color;
-
-        if (colorf) {
-            apply_color_config(colorf, &tracks[i]);
-            rewind(colorf);
-        }
+        tracks[i].color = (Color){0,0,0};
+        map_color(&tracks[i]); //NOTE Uses compiled color_mapper AST
         i++;
     }
     fclose(file);

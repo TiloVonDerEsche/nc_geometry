@@ -1,6 +1,6 @@
 %{
 #include "ast.h"
-#include "parser.tab.h"  // Wird von Bison generiert und enthält die Token-Definitionen
+#include "color_mapper.tab.h"  // Wird von Bison generiert und enthält die Token-Definitionen
 #include <cstdlib>
 
 void yyerror(const char *s);

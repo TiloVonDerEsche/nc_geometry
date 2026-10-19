@@ -33,7 +33,7 @@ else ifeq ($(TARGET), XP)
 
 else
     # Default: Linux (Mint)
-    CC = gcc
+    CC = g++
     OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).bin
     CFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
     LIBS = -L/home/tilo/res/freeglut/build/lib -L/home/tilo/res/glew/lib \
@@ -45,22 +45,23 @@ endif
 
 all: $(OUT)
 
-lex.yy.c: color_mapper/cm_lex.l
-		flex color_mapper/cm_lex.l
 
-color_mapper.tab.h color_mapper.tab.c: color_mapper/color_mapper.y
-	bison -dv color_mapper/color_mapper.y
+cm/color_mapper.tab.c: cm/color_mapper.y
+	cd cm && bison -d color_mapper.y
+
+cm/lex.yy.c: cm/cm_lex.l cm/color_mapper.tab.c
+	cd cm && flex cm_lex.l
 
 shaders_embedded.h: vertex.glsl fragment.glsl embed_shaders.py
 	python3 embed_shaders.py
 
-$(OUT): $(SRC) color_mapper.tab.c lex.yy.c shaders_embedded.h
+$(OUT): $(SRC) cm/color_mapper.tab.c cm/cm.h cm/lex.yy.c shaders_embedded.h
 	@echo "Building for Target: $(TARGET) [$(CC)]"
-	$(CC) $(SRC) color_mapper.tab.c lex.yy.c shaders_embedded.h -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
+	$(CC) $(SRC) cm/lex.yy.c shaders_embedded.h -o $(OUT) $(CFLAGS) $(LDFLAGS) $(LIBS)
 	@echo "Compilation successful: $(OUT)"
 
 clean:
-	rm -f *.o
+	rm -f *.o *.output *.tab.* *.yy.* cm/*.tab.* cm/*.yy.* cm/*.output
 	@echo "Cleanup complete (Executable preserved)."
 
 .PHONY: all clean

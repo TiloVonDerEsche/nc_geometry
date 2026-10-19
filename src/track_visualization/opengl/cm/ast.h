@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include "typedefs.h"
+#include "../typedefs.h"
 
 class ASTNode {
 public:

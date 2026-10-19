@@ -12,7 +12,7 @@ SUFFIX = _x86_64
 
 ifeq ($(TARGET), WIN64)
     ARCH = x86_64-w64-mingw32.static
-    CC = $(MXE_PATH)/usr/bin/$(ARCH)-gcc
+    CC = $(MXE_PATH)/usr/bin/$(ARCH)-g++
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
     OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
     # Windows-specific flags
@@ -24,7 +24,7 @@ else ifeq ($(TARGET), XP)
     SUFFIX = _x86_32
     # Note: Ensure you have the i686 target installed in MXE
     ARCH = i686-w64-mingw32.static
-    CC = $(MXE_PATH)/usr/bin/$(ARCH)-gcc
+    CC = $(MXE_PATH)/usr/bin/$(ARCH)-g++
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
     OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`

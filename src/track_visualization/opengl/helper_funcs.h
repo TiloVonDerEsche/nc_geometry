@@ -48,12 +48,12 @@ vec3D vec_add(vec3D v1, vec3D v2) {
   return (vec3D) {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z};
 }
 
-vec3D vec_add_scaled(vec3D s, double scalar, vec3D t) {
+vec3D vec_add_scaled(vec3D s, float scalar, vec3D t) {
   return (vec3D) {s.x + scalar * t.x, s.y + scalar * t.y, s.z + scalar * t.z};
 }
 
 vec3D norm_vec(vec3D v) {
-  double v_len = vec_len(v);
+  float v_len = vec_len(v);
   if (v_len == 0) {printf("Error: Trying to norm zero vec!\n");
     return (vec3D) {0,0,0};}
   return (vec3D) {v.x / v_len, v.y / v_len, v.z / v_len};

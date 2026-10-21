@@ -133,10 +133,10 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return CMD;
 }
 
-[ \t]      		 { if(debug){ printf("A SEP!\n");}}
-"\r\n"         {if(debug){ printf("A NEWLINE!\n\n");}
+[ \t]      		 { if(debug){ printf("\t");}}
+"\r\n"         {if(debug){ puts("\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
-"\n"           {if(debug){ printf("A NEWLINE!\n\n");}
+"\n"           {if(debug){ puts("\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 
 

@@ -93,21 +93,22 @@ val:
   //Track Attributes:
   //NOTE arbitrary 0 to 14, mapping for switch case VariableNode,
   //NOTE to avoid string compare if/else chain
-  | T_ID          {$$ = new VariableNode(0); }
-  | T_START_X     {$$ = new VariableNode(1); }
-  | T_START_Y     {$$ = new VariableNode(2); }
-  | T_START_Z     {$$ = new VariableNode(3); }
-  | T_END_X       {$$ = new VariableNode(4); }
-  | T_END_Y       {$$ = new VariableNode(5); }
-  | T_END_Z       {$$ = new VariableNode(6); }
-  | B_CMD         {$$ = new VariableNode(7); }
-  | C_CMD         {$$ = new VariableNode(8); }
-  | MACHINE_SPEED {$$ = new VariableNode(9); }
-  | LASER_POWER   {$$ = new VariableNode(10);}
-  | LASER_STATUS  {$$ = new VariableNode(11);}
-  | G_CODE        {$$ = new VariableNode(12);}
-  | VRAD          {$$ = new VariableNode(13);}
-  | HRAD          {$$ = new VariableNode(14);}
+  | T_ID          {$$ = new VariableNode("t_id"); }
+  | T_START_X     {$$ = new VariableNode("t_start_x"); }
+  | T_START_Y     {$$ = new VariableNode("t_start_y"); }
+  | T_START_Z     {$$ = new VariableNode("t_start_z"); }
+  | T_END_X       {$$ = new VariableNode("t_end_x"); }
+  | T_END_Y       {$$ = new VariableNode("t_end_y"); }
+  | T_END_Z       {$$ = new VariableNode("t_end_z"); }
+  | B_CMD         {$$ = new VariableNode("b"); }
+  | C_CMD         {$$ = new VariableNode("c"); }
+  | MACHINE_SPEED {$$ = new VariableNode("machine_speed"); }
+  | LASER_POWER   {$$ = new VariableNode("laser_power");}
+  | LASER_STATUS  {$$ = new VariableNode("laser_status");}
+  | G_CODE        {$$ = new VariableNode("g");}
+  | HRAD          {$$ = new VariableNode("hradius");}
+  | VRAD          {$$ = new VariableNode("vradius");}
+
 ;
 
 bool_expr:

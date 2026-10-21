@@ -31,40 +31,35 @@ public:
 //Node representing a variable input, i.e. a track attribute
 class VariableNode : public ASTNode {
 private:
-    unsigned int track_attr_num;
+    const char* track_attr_name;
 public:
-    VariableNode(unsigned int tan) : track_attr_num(tan) {}
+    VariableNode(const char* tan) : track_attr_name(tan) {}
 
     void print(int depth) const override {
-        std::cout << std::string(depth, ' ') << "└─ Track Attr Num: "
-        << track_attr_num << "\n";
+        std::cout << std::string(depth, ' ') << "└─ Track Attr: "
+        << track_attr_name << "\n";
     }
 
     double evaluate(Track* t) const override {
-        switch (track_attr_num) {
-          case 0: return t->id;
-
-          case 1: return t->start_x;
-          case 2: return t->start_y;
-          case 3: return t->start_z;
-
-          case 4: return t->end_x;
-          case 5: return t->end_y;
-          case 6: return t->end_z;
-
-          case 7: return t->b;
-          case 8: return t->c;
-
-          case 9: return t->machine_speed;
-          case 10: return t->laser_power;
-          case 11: return t->laser_status;
-
-          case 12: return t->g_code;
-
-          case 13: return t->vradius;
-          case 14: return t->hradius;
-          default: return 0;
-      }
+      const char* key = track_attr_name;
+      if (strcmp(key, "t_id") == 0) {return t->id;}
+      else if (strcmp(key, "t_start_x") == 0) {return t->start_x;}
+      else if (strcmp(key, "t_start_y") == 0) {return t->start_y;}
+      else if (strcmp(key, "t_start_z") == 0) {return t->start_z;}
+      else if (strcmp(key, "t_end_x") == 0) {return t->end_x;}
+      else if (strcmp(key, "t_end_y") == 0) {return t->end_y;}
+      else if (strcmp(key, "t_end_z") == 0) {return t->end_z;}
+      else if (strcmp(key, "b") == 0) {return t->b;}
+      else if (strcmp(key, "c") == 0) {return t->c;}
+      else if (strcmp(key, "machine_speed") == 0) {return t->machine_speed;}
+      else if (strcmp(key, "laser_power") == 0) {return t->laser_power;}
+      else if (strcmp(key, "laser_status") == 0) {return t->laser_status;}
+      else if (strcmp(key, "g") == 0) {return t->g_code;}
+      else if (strcmp(key, "hradius") == 0) {return t->hradius;}
+      else if (strcmp(key, "vradius") == 0) {return t->vradius;}
+      fprintf(stderr,"Invalid track_attr_name: %s,"
+        "given to VariableNode eval fn!\n",key);
+      return -1; //Invalid track_attr_name!
     }
 };
 

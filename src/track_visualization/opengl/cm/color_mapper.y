@@ -100,12 +100,12 @@ val:
   | T_END_X       {$$ = new VariableNode("t_end_x"); }
   | T_END_Y       {$$ = new VariableNode("t_end_y"); }
   | T_END_Z       {$$ = new VariableNode("t_end_z"); }
-  | B_CMD         {$$ = new VariableNode("b"); }
-  | C_CMD         {$$ = new VariableNode("c"); }
+  | B_CMD         {$$ = new VariableNode("B"); }
+  | C_CMD         {$$ = new VariableNode("C"); }
   | MACHINE_SPEED {$$ = new VariableNode("machine_speed"); }
   | LASER_POWER   {$$ = new VariableNode("laser_power");}
   | LASER_STATUS  {$$ = new VariableNode("laser_status");}
-  | G_CODE        {$$ = new VariableNode("g");}
+  | G_CODE        {$$ = new VariableNode("G");}
   | HRAD          {$$ = new VariableNode("hradius");}
   | VRAD          {$$ = new VariableNode("vradius");}
 

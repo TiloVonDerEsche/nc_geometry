@@ -71,8 +71,6 @@ void modify_tl() {
     fclose(fr);
 }
 
-
-
 //-----hashmap functions-----//
 strfloat_t* init_hashmap() {
   khint_t k;
@@ -108,29 +106,7 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
 
 //set_var_incr in grammar.y
 
-void set_var(char* varname, float fnum) {
-  khint_t k;
-  int absent;
 
-  k = strfloat_put(h, varname, &absent);
-  if (absent) {
-    kh_key(h, k) = strdup(varname);}
-  kh_val(h, k) = fnum;
-  //printf("Set %s to %f\n", varname, fnum);
-}
-
-float get_var_val(char* varname) {
-  if (!varname) return 0;
-
-  khint_t k;
-  int absent;
-  k = strfloat_get(h, varname);
-  if ( kh_exist(h, k) ) {
-    return kh_val(h, k);
-  }
-
-  return 0;
-}
 
 //------Math Functions------//
 
@@ -302,13 +278,15 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "hmhis_to_file") == 0) {
             config->hmhis_to_file = atoi(value);
         }
-        else if (strcmp(key, "tracks_def_by_laser") == 0) {
-            config->tracks_def_by_laser = atoi(value);
+        else if (strcmp(key, "tracks_def_by") == 0) {
+            config->tracks_def_by = atoi(value);
         }
          else if (strcmp(key, "track_mid_len") == 0) {
             config->track_mid_len = atoi(value);
         }
-
+        else if (strcmp(key, "tracks_def_by_attrs") == 0) {
+           config->tracks_def_by_attrs = (unsigned char) atoi(value);
+        }
         else if (strcmp(key, "mpf_file") == 0) {
             strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
             config->mpf_file[sizeof(config->mpf_file) - 1] = '\0';

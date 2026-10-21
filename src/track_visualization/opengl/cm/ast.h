@@ -49,12 +49,12 @@ public:
       else if (strcmp(key, "t_end_x") == 0) {return t->end_x;}
       else if (strcmp(key, "t_end_y") == 0) {return t->end_y;}
       else if (strcmp(key, "t_end_z") == 0) {return t->end_z;}
-      else if (strcmp(key, "b") == 0) {return t->b;}
-      else if (strcmp(key, "c") == 0) {return t->c;}
+      else if (strcmp(key, "B") == 0) {return t->b;}
+      else if (strcmp(key, "C") == 0) {return t->c;}
       else if (strcmp(key, "machine_speed") == 0) {return t->machine_speed;}
       else if (strcmp(key, "laser_power") == 0) {return t->laser_power;}
       else if (strcmp(key, "laser_status") == 0) {return t->laser_status;}
-      else if (strcmp(key, "g") == 0) {return t->g_code;}
+      else if (strcmp(key, "G") == 0) {return t->g_code;}
       else if (strcmp(key, "hradius") == 0) {return t->hradius;}
       else if (strcmp(key, "vradius") == 0) {return t->vradius;}
       fprintf(stderr,"Invalid track_attr_name: %s,"

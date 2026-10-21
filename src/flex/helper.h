@@ -15,8 +15,9 @@ typedef struct {
   int print_strs;
   int hmhis_to_stdout;
   int hmhis_to_file;
-  int tracks_def_by_laser;
+  int tracks_def_by;
   int track_mid_len;
+  unsigned char tracks_def_by_attrs; //8-Bitmap
 
   char mpf_file[256];
   char track_list_csv[256];
@@ -28,6 +29,22 @@ KHASHL_MAP_INIT(KH_LOCAL,
   strfloat_t, strfloat,
   const char*, float,
   kh_hash_str, kh_eq_str)
+
+
+//Bitmap Mapping:
+#define XYZ 1
+#define B 2
+#define C 4
+#define MACHINE_SPEED 8
+#define LASER_POWER 16
+#define LASER_STATUS 32
+#define G_CODE 64
+
+#define TRUE 1 //normally every int != 0
+#define FALSE 0
+
+#define SUCCESS 0
+#define FAILURE -1
 
 #define NOMINAL 0
 #define NOT_FOUND -1

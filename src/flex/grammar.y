@@ -37,6 +37,7 @@
   void jump(size_t,long);
   void handle_repeat(char*, char*, size_t);
   void handle_tracks_def_by_coord_lines();
+  void handle_tracks_def_attrs();
 
   /* --- Flex Buffer API Declarations --- */
   typedef struct yy_buffer_state *YY_BUFFER_STATE;
@@ -62,8 +63,9 @@
 
   int coord_line_counter = 0;
   int is_coord_line = 0;
+  int save_track = 0;
 
-  size_t tid = 0; size_t pid = 0;
+  size_t tid = 0; size_t pid = 0; //track-/point-id
   vec3D t_start = {0,0,0};
   vec3D t_end = {0,0,0};
 
@@ -173,9 +175,14 @@ line:
 
      if(config.hmhis_to_file) {print_hashmap(h, hmhis);}
      if(config.hmhis_to_stdout) {print_hashmap(h, stdout);}
-     if(is_coord_line) {write_ncc_line(net_point());is_coord_line=0;
+     if(is_coord_line) {is_coord_line=0;
+       write_ncc_line(net_point());
        coord_line_counter--;
        handle_tracks_def_by_coord_lines();
+     }
+     if(save_track) {save_track=0;
+       write_ncc_line(net_point()); //nca points
+       handle_tracks_def_attrs();
      }
 
      if (jump_requested) {
@@ -237,7 +244,7 @@ expr:
         case 500: break; //TODO Readup on: $P_ACTBFRAME, $P_UIFR
         default: break;
       }
-    set_var("G", $2);
+      set_var("G", $2);
     }
   }
   | XYZ_CMD arith_expr {
@@ -246,6 +253,7 @@ expr:
         set_var_rot($1, $2);
       } else {
         set_var((char[]){$1, '\0'},$2);
+
         is_coord_line=1;
       }
     }
@@ -341,11 +349,11 @@ expr:
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
                             set_var("laser_status",1);
-                            if (config.tracks_def_by_laser){t_start=net_point();}
+                            if (config.tracks_def_by == 1){t_start=net_point();}
 
                           }
                           else if(strcmp($1,"LASER_OFF") == 0) {
-                            if (config.tracks_def_by_laser){t_end=net_point();
+                            if (config.tracks_def_by == 1){t_end=net_point();
                               write_track_line();}
 
                             set_var("laser_status",0);
@@ -549,7 +557,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
 void handle_tracks_def_by_coord_lines() {
   //handle (X,Y,Z) points rotated
   //in the experimental tracks_def_by_coord_lines mode
-  if (!rot_mode && !config.tracks_def_by_laser && coord_line_counter<0)
+  if (!rot_mode && config.tracks_def_by == 0 && coord_line_counter<0)
   {
     t_end = net_point();
     write_track_line();
@@ -558,6 +566,35 @@ void handle_tracks_def_by_coord_lines() {
     coord_line_counter = config.track_mid_len;
   }
 }
+
+void handle_tracks_def_attrs() {
+  //handle (X,Y,Z) points rotated
+  //in the experimental tracks_def_by_coord_lines mode
+  if (!rot_mode && config.tracks_def_by == 2)
+  {
+    t_end = net_point();
+    write_track_line();
+    t_start = net_point(); //TODO perhaps cleaner sol, than net_point weird global var inline function
+    //prevent mult writes in line with mult coord cmds
+  }
+}
+
+int has_track_attr_changed(char* varname) {
+  //NOTE doesn't check if attr has changed numerically
+  //NOTE only that set_var has been called for that attr
+  char* key = varname;
+  char c = key[0];
+  unsigned char bm = config.tracks_def_by_attrs;
+  if (bm & XYZ && (c=='X' || c=='Y' || c=='Z')) {save_track=TRUE;return TRUE;}
+  if (bm & B && c=='B') {save_track=TRUE;return TRUE;}
+  if (bm & C && c=='C') {save_track=TRUE;return TRUE;}
+  if (strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
+  if (strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
+  if (strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & G_CODE && c=='G') {save_track=TRUE;return TRUE;}
+  return FALSE;
+}
+
 
 void write_track_line() {
   fprintf(tl,"%lu,  %f, %f, %f,   %f, %f, %f,   %f, %f,   %f, %f, %d, %d\n",
@@ -577,6 +614,32 @@ void write_ncc_line(vec3D p) {
   get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"));
 }
 
+//-----hashmap fns
+float get_var_val(char* varname) {
+  if (!varname) return 0;
+
+  khint_t k;
+  int absent;
+  k = strfloat_get(h, varname);
+  if ( kh_exist(h, k) ) {
+    return kh_val(h, k);
+  }
+
+  return 0;
+}
+
+void set_var(char* varname, float fnum) {
+  khint_t k;
+  int absent;
+
+  k = strfloat_put(h, varname, &absent);
+  if (absent) {
+    kh_key(h, k) = strdup(varname);}
+  kh_val(h, k) = fnum;
+  //printf("Set %s to %f\n", varname, fnum);
+
+  has_track_attr_changed(varname);
+}
 
 void set_var_incr(char* varname, float fnum) {
     //incr_mode only applies to (X,Y,Z) & (A,B,C), which we call coords

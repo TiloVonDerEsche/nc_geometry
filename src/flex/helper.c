@@ -284,8 +284,8 @@ int read_config(const char* fpath, Config* config) {
          else if (strcmp(key, "track_mid_len") == 0) {
             config->track_mid_len = atoi(value);
         }
-        else if (strcmp(key, "tracks_def_by_attrs") == 0) {
-           config->tracks_def_by_attrs = (unsigned char) atoi(value);
+        else if (strcmp(key, "attrs_bitmap") == 0) {
+           config->attrs_bitmap = (unsigned char) atoi(value);
         }
         else if (strcmp(key, "mpf_file") == 0) {
             strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);
@@ -303,19 +303,6 @@ int read_config(const char* fpath, Config* config) {
             strncpy(config->hmhis_json, value, sizeof(config->hmhis_json) - 1);
             config->hmhis_json[sizeof(config->hmhis_json) - 1] = '\0';
         }
-        /*
-        else if (strcmp(key, "tracks_to_plot") == 0) {
-          //Do nothing; Used by t_vis_color.c
-        }
-        else if (strcmp(key, "interpolation_csv") == 0) {}
-        else if (strcmp(key, "horizontal_radius") == 0) {
-            config->hrad = atof(value);
-        }
-        else if (strcmp(key, "vertical_radius") == 0) {
-            config->vrad = atof(value);
-        }
-        else if (strcmp(key, "step_distance") == 0) {}
-        else if (strcmp(key, "track_accel_margin") == 0) {}*/
         else {
           fprintf(stderr, "Warning: Unknown key: %s in config file: %s!\n", key,fpath);
         }

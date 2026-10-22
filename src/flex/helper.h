@@ -17,7 +17,7 @@ typedef struct {
   int hmhis_to_file;
   int tracks_def_by;
   int track_mid_len;
-  unsigned char tracks_def_by_attrs; //8-Bitmap
+  unsigned char attrs_bitmap; //8-Bitmap
 
   char mpf_file[256];
   char track_list_csv[256];
@@ -39,6 +39,11 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define LASER_POWER 16
 #define LASER_STATUS 32
 #define G_CODE 64
+
+//tracks_def_by
+#define TDB_COORD_LINES 0
+#define TDB_LASER 1
+#define TDB_ATTRS 2
 
 #define TRUE 1 //normally every int != 0
 #define FALSE 0

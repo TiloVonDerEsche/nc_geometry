@@ -27,7 +27,7 @@ hmhis_to_file = 0;
 64->G_Code
 128-> [Unmapped]
 */
-tracks_def_by_attrs = 16;//Bitmap for attrs.
+attrs_bitmap = 32;//Bitmap for attrs.
 tracks_def_by = 2; //0->coord_lines,1->laser,2->attrs //0 for Vase; 1 for LASER_ON / LASER_OFF used
 track_mid_len = 0; //10 for Vase
 save_laser_off_tracks = 1;

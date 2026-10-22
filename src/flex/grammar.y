@@ -584,13 +584,13 @@ int has_track_attr_changed(char* varname) {
   //NOTE only that set_var has been called for that attr
   char* key = varname;
   char c = key[0];
-  unsigned char bm = config.tracks_def_by_attrs;
+  unsigned char bm = config.attrs_bitmap;
   if (bm & XYZ && (c=='X' || c=='Y' || c=='Z')) {save_track=TRUE;return TRUE;}
   if (bm & B && c=='B') {save_track=TRUE;return TRUE;}
   if (bm & C && c=='C') {save_track=TRUE;return TRUE;}
-  if (strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
-  if (strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
-  if (strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & MACHINE_SPEED && strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & LASER_POWER && strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & LASER_STATUS && strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
   if (bm & G_CODE && c=='G') {save_track=TRUE;return TRUE;}
   return FALSE;
 }

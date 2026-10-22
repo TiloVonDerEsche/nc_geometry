@@ -143,14 +143,6 @@
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
-//%expect 1
-/**
-  NOTE Bison allegedly chooses Shift before Reduce
-  NOTE F.e.: 'SPEED 100', should be recognised as an assignment,
-       since it shifts to 100, before reducing SPEED to an ID
-  TODO Readup on Shift/Reduce Conflicts
-**/
-
 %%
 
 file:

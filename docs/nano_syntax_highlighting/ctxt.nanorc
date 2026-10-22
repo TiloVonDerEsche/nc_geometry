@@ -16,7 +16,22 @@ color brightred "[[:alpha:]_][[:alnum:]_]*[[:blank:]]*="
 
 # Valid Parameters (Overlays bright yellow for correct parameter names)
 # Add or remove parameter names inside the list using the '|' separator
-color green "\<(B|C|G|camera_orient|debug_prints|default_color|hmhis_json|hmhis_to_file|hmhis_to_stdout|horizontal_radius|interpolation_csv|machine_speed|mpf_file|ncc_points_csv|print_strs|save_laser_off_tracks|shift_boost|step_distance|t_end_z|t_start_z|track_accel_margin|track_list_csv|track_mid_len|tracks_def_by_laser|tracks_to_plot|vertical_radius)\>[[:blank:]]*(=|==|!=|<=|<|>=|>)"
+#config.ctxt && plot_config.ctxt
+color green "print_strs|debug_prints"
+color green "mpf_file|ncc_points_csv|track_list_csv|tracks_to_plot"
+color green "hmhis_json|hmhis_to_file|hmhis_to_stdout"
+color green "track_mid_len|tracks_def_by|attrs_bitmap"
+color green "camera_orient"
+color green "vertical_radius|horizontal_radius"
+
+#color_config.ctxt
+color green "B|C|G"
+color green "t_id"
+color green "t_start_x|t_start_y|t_start_z"
+color green "t_end_x|t_end_y|t_end_z"
+color green "machine_speed|laser_power|laser_status"
+color green "vradius|hradius"
+color green "=|==|!=|<=|<|>=|>"
 
 # Single-quoted stuff (characters, backslash escapes, hex and octal byte codes).
 color brightmagenta "'([^'\]|\\(["'\abfnrtv]|x[[:xdigit:]]{1,2}|[0-3]?[0-7]{1,2}))'"

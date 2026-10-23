@@ -443,12 +443,13 @@ arith_expr:
 
 %%
 int exec(char* fpath) {
-  yyin = fopen(fpath, "rb");
-  if (yyin == NULL) {
+  FILE* fp = fopen(fpath, "rb");
+  if (fp == NULL) {
     fprintf(stderr, "Error: Could not open %s (in read mode)!\
     \n\rDoes that file exist?\n",fpath);
     return NOT_FOUND;
   }
+  yyin = fp; //set yyin, only when file is correctly opened
 
   //--------Preprocessor for Labels
   label_finder(yyin);
@@ -458,7 +459,7 @@ int exec(char* fpath) {
     printf("Labels of '%s':\n",fpath);
     print_hashmap(h,stdout);}
 
-  yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
+  yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
 
   if(debug){
     printf("Hashmap after executing '%s':\n",fpath);

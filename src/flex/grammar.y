@@ -220,7 +220,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-  | ID //NOTE Giving this LOW_PREC or removing it causes infinite REPEAT jmps
+ //NOTE Giving this LOW_PREC or removing it causes infinite REPEAT jmps
   | SUPA /*{//acts like G153, also supresses:
               DRF, "überlagerte Bewegungen"
              ,extern NPV, PRESET-Translation}*/
@@ -377,7 +377,7 @@ if_body:
 
 if_element:
   expr
-  | NEWLINE //TODO Better / Working Solution
+  //| NEWLINE //TODO Better / Working Solution
 ;
 
 

@@ -170,9 +170,9 @@ void read_track_list(const char* filename) {
     const char* fname = "color_config.ctxt";
     FILE* colorf = fopen(fname, "r");
     if(compile_color_config(colorf) == SUCCESS) {
-      printf("Compiled %s successfully!",fname);
+      printf("Compiled %s successfully!\n",fname);
     } else {
-      fprintf(stderr,"Failed to compile %s!",fname);
+      fprintf(stderr,"Failed to compile %s!\n",fname);
       //NOTE should we exit here?
       exit(1);
     }

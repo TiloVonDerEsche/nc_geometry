@@ -130,11 +130,11 @@
 %right NOT B_NOT UNEG //unary negate
 //%nonassoc '<' '>' //forbid: 1<2<3
 
-%nonassoc LOW_PREC
+%nonassoc LOW
 %nonassoc ID VAR
 %nonassoc FN
 %nonassoc ASSIGNMENT
-%nonassoc HIGH_PREC
+%nonassoc HIGH
 
 %initial-action {
     //h = init_hashmap(); //h is global in helper.c for now
@@ -220,7 +220,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
- //NOTE Giving this LOW_PREC or removing it causes infinite REPEAT jmps
+  | ID %prec LOW //NOTE Giving this LOW prec or removing it causes infinite REPEAT jmps
   | SUPA /*{//acts like G153, also supresses:
               DRF, "überlagerte Bewegungen"
              ,extern NPV, PRESET-Translation}*/
@@ -343,13 +343,13 @@ expr:
   | GOTO ID   {if(!skip){
                           request_jump($2);}
                         }
-  | REPEAT ID %prec LOW_PREC
+  | REPEAT ID %prec LOW
                         {if(!skip){
                             char start_end_l[32+11];
                             snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $2);
                             handle_repeat($2,start_end_l,(size_t)get_var_val("line"));}
                         }
-  | REPEAT ID ID %prec HIGH_PREC
+  | REPEAT ID ID %prec HIGH
                         {if(!skip){
                             handle_repeat($2,$3,(size_t)get_var_val("line"));}
                         }
@@ -372,13 +372,14 @@ expr:
 
 if_body:
   %empty
-  | if_body if_element
+  | exprs
+  //| if_body if_element
 ;
 
-if_element:
+/*if_element:
   expr
   //| NEWLINE //TODO Better / Working Solution
-;
+;*/
 
 
 assignment:

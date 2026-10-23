@@ -134,6 +134,7 @@
 %nonassoc ID VAR
 %nonassoc FN
 %nonassoc ASSIGNMENT
+%nonassoc HIGH_PREC
 
 %initial-action {
     //h = init_hashmap(); //h is global in helper.c for now
@@ -181,7 +182,8 @@ line:
           jump_requested = 0;
           skip = 0;
           jump(target_line,target_byte_offset);
-          printf("Jumped to line=%lu, byte=%ld\n\n",target_line, target_byte_offset);
+          if(debug){printf("Jumped to line=%lu, byte=%ld\n\n",
+            target_line, target_byte_offset);}
      }
     }
   | error
@@ -192,13 +194,18 @@ opt_skip:
     | '/'
 ;
 
+opt_then:
+  %empty
+  | THEN
+;
+
 exprs:
   expr
   | exprs expr
 ;
 
 expr:
-  IF bool_expr THEN {
+  IF bool_expr opt_then {
       if (!$2) {
           skip++; //ignore code lines, if condition is false
           if(debug) {printf("Skip=%d\n",skip);}
@@ -213,7 +220,7 @@ expr:
         if(debug) {printf("Skip=%d\n",skip);}
       }
     }
-  | ID
+  | ID //NOTE Giving this LOW_PREC or removing it causes infinite REPEAT jmps
   | SUPA /*{//acts like G153, also supresses:
               DRF, "überlagerte Bewegungen"
              ,extern NPV, PRESET-Translation}*/
@@ -271,16 +278,20 @@ expr:
                           JmpFrame top;
                           //Get stack top, without removing it from the stack
                           peek(&jmp_stack, &top);
-                          printf("$1_LABEL=%s, jmp_stack_top.label=%s\n",$1,top.label);
+                          if(debug){
+                            printf("$1_LABEL=%s, jmp_stack_top.label=%s\n",
+                            $1,top.label);}
 
                           //if the currently read LABEL="END_LABEL"
-                          printf("strcmp($1,'END_LABEL')=%d\n",strcmp($1,"END_LABEL"));
+                          if(debug){
+                            printf("strcmp($1,'END_LABEL')=%d\n",
+                            strcmp($1,"END_LABEL"));}
                           if((strcmp($1,"END_LABEL") == 0)) {
                             //d->distance btw
                             //current runtime line and
                             //noted line of "<start_label>_END_LABEL" construct
                             int d = get_var_val("line")-get_var_val(top.label);
-                            printf("d=%d\n...\n",d);
+                            if(debug){printf("d=%d\n...\n",d);}
 
                             //lf -> label_finder
                             //tolerate off by one error, btw runtime- and lf-line
@@ -288,7 +299,8 @@ expr:
                                //if the lines of "<start_label>_END_LABEL" construct,
                                //and the runtime line match, then we found the END_LABEL,
                                //to the currently active REPEAT block
-                               printf("'END_LABEL' found! top.label=%s\n",top.label);
+                               if(debug){
+                                 printf("'END_LABEL' found! top.label=%s\n",top.label);}
 
                                jump_requested = 1;
                                skip = 1;
@@ -296,9 +308,12 @@ expr:
                                target_line = top.line;
                                target_byte_offset = top.byte_offset;
 
-                               printf("Jump Requested!\
-                               \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
-                               target_line, target_byte_offset);
+                               //TODO Add multiple debug levels
+                               //Perhaps debug bitmap, where for example
+                               //1->Token_Printing, 2->Jump_Strs
+                               if(debug){printf("Jump Requested!\
+                                 \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
+                                 target_line, target_byte_offset);}
 
                                pop(&jmp_stack, &top);
                             }
@@ -310,9 +325,9 @@ expr:
                             target_line = top.line;
                             target_byte_offset = top.byte_offset;
 
-                            printf("Jump Requested!\
-                            \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
-                            target_line, target_byte_offset);
+                            if(debug){printf("Jump Requested!\
+                              \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
+                              target_line, target_byte_offset);}
 
                             pop(&jmp_stack, &top);
                           }
@@ -334,7 +349,7 @@ expr:
                             snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $2);
                             handle_repeat($2,start_end_l,(size_t)get_var_val("line"));}
                         }
-  | REPEAT ID ID
+  | REPEAT ID ID %prec HIGH_PREC
                         {if(!skip){
                             handle_repeat($2,$3,(size_t)get_var_val("line"));}
                         }

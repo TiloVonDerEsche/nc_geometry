@@ -58,6 +58,7 @@
 
   int jump_requested = 0;
   int skip = 0;
+  int if_skip_depth = 0; //NOTE IDK if we need it
   int incr_mode = 0;
   int rot_mode = 0;
 
@@ -199,6 +200,7 @@ opt_then:
   | THEN
 ;
 
+/*
 if_body:
   %empty
   | if_body if_line
@@ -206,7 +208,7 @@ if_body:
 
 if_line:
   line NEWLINE
-;
+;*/
 
 exprs:
   expr
@@ -215,19 +217,20 @@ exprs:
 
 expr:
   IF bool_expr opt_then {
-      if (!$2) {
+      if (!skip && !$2) {
           skip++; //ignore code lines, if condition is false
-          if(debug) {printf("Skip=%d\n",skip);}
+          if_skip_depth++;
+          if(debug) {printf("IF cond false:\nSkip=%d\n",skip);}
+          //NOTE seperate debug bitmapping for if-clauses
       }
-  } if_body ENDIF {
-      if (skip > 0) {
-        skip--; //decr skip, to resume to normal code line execution
-        //we are using skip as a counter, to allow nested false IF blocks
-        //ToDo: Are nested false IF blocks possible?
-        //Can't we just ignore the inner IF blocks, if the outer is false
-        //-> I guess?
-        if(debug) {printf("Skip=%d\n",skip);}
-      }
+  }
+  | ENDIF {
+      if(if_skip_depth > 0) { //close FALSE If clause -> resume exec
+        if_skip_depth--;
+        if (skip > 0) {
+          skip--; //NOTE Are nested false IF blocks possible? i.e. skip > 1
+          if(debug) {printf("ENDIF reached:\nSkip=%d\n",skip);}
+        }}
     }
   | ID %prec LOW //NOTE Giving this LOW prec or removing it causes infinite REPEAT jmps
   | SUPA /*{//acts like G153, also supresses:

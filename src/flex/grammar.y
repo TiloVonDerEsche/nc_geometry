@@ -199,6 +199,15 @@ opt_then:
   | THEN
 ;
 
+if_body:
+  %empty
+  | if_body if_line
+;
+
+if_line:
+  line NEWLINE
+;
+
 exprs:
   expr
   | exprs expr
@@ -369,17 +378,6 @@ expr:
   | MSG STRING
   | fn
 ;
-
-if_body:
-  %empty
-  | exprs
-  //| if_body if_element
-;
-
-/*if_element:
-  expr
-  //| NEWLINE //TODO Better / Working Solution
-;*/
 
 
 assignment:

@@ -1,4 +1,4 @@
-//mpf_file = "./test.nc"
+mpf_file = "./test.nc"
 
 //mpf_file = "./data/nc_code/Niere/Layer10_2.spf";
 //mpf_file = "./data/nc_code/Niere/round_channel/main.mpf";
@@ -8,7 +8,7 @@
 
 //mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
 
-mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
+//mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/color/g.mpf";

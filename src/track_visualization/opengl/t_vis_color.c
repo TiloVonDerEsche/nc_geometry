@@ -167,7 +167,7 @@ void read_track_list(const char* filename) {
         exit(1);
     }
 
-    const char* fname = "color_config.ctxt";
+    const char* fname = "color.cconf";
     FILE* colorf = fopen(fname, "r");
     if(compile_color_config(colorf) == SUCCESS) {
       printf("Compiled %s successfully!\n",fname);
@@ -632,7 +632,7 @@ void handle_movement(int garbage) {
 }
 
 int main(int argc, char** argv) {
-    read_config("plot_config.ctxt", &config);
+    read_config("plot.cconf", &config);
     read_track_list(config.tracks_to_plot);
 
     // Initialize camera facing track 0's start point

@@ -1,8 +1,13 @@
-ctxt -> c syntax highlight
-cconf -> c-like syntax config
+|================Debug Bitmap===============|
+Advantage over enum: I can select multiple debug options, at once. Mapping:
+  1
+  2
+  4
+  8
 
 |=================IF clauses=====================|
 int pending_endif=1;
+-> Skip until ENDIF is found, set to  pending_endif=0, when using GOTO or REPEAT
 
 |=================Finish Include CALL'S ==========================|
 Better syntax error msgs through seperate line var counting per nc_file

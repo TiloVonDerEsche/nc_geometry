@@ -216,7 +216,8 @@ exprs:
 ;
 
 expr:
-  IF bool_expr opt_then {
+  //IF bool_expr
+  IF bool_expr {
       if (!skip && !$2) {
           skip++; //ignore code lines, if condition is false
           if_skip_depth++;

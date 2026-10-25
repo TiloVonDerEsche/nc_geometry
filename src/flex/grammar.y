@@ -507,12 +507,12 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     long byte_offsetp = (long)get_var_val(labelp);
     long byte_offsetn = (long)get_var_val(labeln);
 
-    printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
-      labelp,labeln,linep,linen,(size_t)get_var_val("line"));
+    if(debug){
+      printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
+        labelp,labeln,linep,linen,(size_t)get_var_val("line"));}
+    
     if (byte_offsetp <= 0 && byte_offsetn <= 0) {
-      if (debug) {
-        printf("Error: REPEAT return byte_offset=%ld\n",byte_offset);
-      }
+        fprintf(stderr,"Error: REPEAT return byte_offset=%ld\n",byte_offset);
     }
     else {
       if (byte_offsetp > 0) {
@@ -527,7 +527,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     }
     linen--;linep++;
   }
-  printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);
+  if(debug){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
 
   push_jmp_frame(&jmp_stack,
     strdup(end_label), //return label

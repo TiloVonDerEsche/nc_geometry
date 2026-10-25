@@ -1,6 +1,9 @@
-|=================Shader=================|
-Cache compiled shader binaries.
-Check if shader binary is cached, otherwise compile them.
+ctxt -> c syntax highlight
+cconf -> c-like syntax config
+
+|=================IF clauses=====================|
+int pending_endif=1;
+
 |=================Finish Include CALL'S ==========================|
 Better syntax error msgs through seperate line var counting per nc_file
 F.e.:
@@ -15,24 +18,10 @@ Error: syntax error, unexpected end of file, expecting NEWLINE, in line: 50
 -> Error: syntax error, unexpected end of file, expecting NEWLINE, in line: X.mpf:25
 
 So new format of err in line reporting: <nc_file>:<line_in_that_nc_file>
-
-
-|=======================Color Property Selection, 3d_track_vis==========================|
-[main 63a1234] Fixed color_config color map. The first layer of round_channel still has a too low Z value fsr.
-Instead of 139.4+43.5 it is between 139.4+42.0 139.4+43.0
-
-
-[main b1ef8d5] Now using color_mapper (bison/flex) in the 3d_vis.
-In read_track_list, we also open color_config.txt, and for each track,
-we give its file pointer and a track to apply_color_config,
-which mutates the color attr of the track.
-So after each track we rewind the file pointer of color_config.
-This solution doesn't seem very efficient.
-It seems smarter to create a decision tree,
-from reading color_config.txt once, and then querying the tree instead.
-->reduce start-up overhead
-->This could be viewed as compiling color_config,
-  so the decision tree could be cached as a binary.
+Does FILE* yyin contain file_path information?
+Probably extra str* active_file global required.
+->Save line on stack, and set it to 0, for newly exec'd file.
+	->file CALL finished -> restore line from stack
 |=======================================================|
 Fix line off by one error
 -> Stop with ball search non-sense
@@ -51,7 +40,6 @@ Z-wise -> Drehradius von B
  ||-||
   |-|
 ---.---
-
 
 G51
 -> TRANS ROT
@@ -77,14 +65,24 @@ Can we combine the X-Y-Z-wise Rotation matricies into one?
 Should we use ABC and ROT/AROT? If yes how?
 
 We should look into Basisframes, and implement them as 4x4 Matrix Transformations, as in OpenGL f.e. :)
+
+Vase and Niere, seem correct while ignoring Rotation
+-> Perhaps just for easier nozzle printing access.
+  The overhang of the cooling channel uses rotation,
+  so that we print from the side, instead of top-down.
+  This is forced, to not shoot down the void of the channel.
 |=======================================================|
 Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
 of a track to face any direction. The shorter radius is normally the vertical.
 Since the pull of gravity flattens the melting pool.
 We should consider the up (or down) vector, when setting the shape of the cylinders.
 
-nccp_to_mesh.py, exposed a flaw of the ncc_points generation. The machine paths, between the tracks, are currently mapped to a tid, making them part of a track. We need to think of a solution for the tid value, when LASER=OFF. Perhaps we set it to -1, or we just multiply the current tid with -1. Meaning that negative tid's, indicate that the point is part off an inbetween (machine path) track
-
+nccp_to_mesh.py, exposed a flaw of the ncc_points generation.
+The machine paths, between the tracks, are currently mapped to a tid,
+making them part of a track. We need to think of a solution for the tid value,
+when LASER=OFF.
+Perhaps multiply by -1.
+save_laser_off_tracks
 |=================== Export Function=================|
 nccp_to_mesh.py works for Niere and Vase.
 But the resulting obj file sizes are a bit large.
@@ -105,11 +103,14 @@ Metaballs should have a radius each, which later depends on the laser_power and 
 This should simulate the degree of meltedness.
 For this also experiment with the isosurface Interpolation between the metaballs.
 
-It is not enough to only construct Metaballs around the ncc points. We need to interpolate inside of the tracks, to create intermediate metaball-origins, or remove / merge ncc points.
+It is not enough to only construct Metaballs around the ncc points.
+We need to interpolate inside of the tracks,
+to create intermediate metaball-origins, or remove / merge ncc points.
 |=====>
 Steps:
 - During LASER_OFF section, multiply the tid with -1
-- Construct spheres around each ncc_point, with each vertex (ncc_point) having their own settable radius
+- Construct spheres around each ncc_point, with each vertex (ncc_point)
+  having their own settable radius
 
 
 |===============Stress Tests===============|
@@ -121,3 +122,4 @@ Construct Test Cases (Assertions)
 Try to avoid strdup, if possible
 
 -Latency-wise:
+Geometry merging into Isosurface

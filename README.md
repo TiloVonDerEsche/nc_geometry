@@ -1,13 +1,19 @@
 # Info
 This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
-# The **`track_list.csv` contains**:
-- `track_index`
--  `start_point`, `end_point` of a welding track
-- laser_power (PUIS_LASER)
-- machine_speed (VIT_TIR)
+# The header of **`track_list.csv`**:
+- `Track_id`                            Track index
+-  `T_start_x`,`T_start_y`,`T_start_z`, Track start 3D Point
+-  `T_end_x`, `T_end_y`, `T_end_z`,     Track end 3D Point
+-  `B`, `C`,                            Pitch and Yaw of the printing table
+- `laser_power`                         Set via PUIS_LASER
+- `laser_status`                        Set via LASER_ON LASER_OFF
+- `machine_speed`                       Set via VIT_TIR or F
+- `G_code`                              Set via G
 - overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)
 <br>
-A track is traditionally detected through "LASER_ON" and "LASER_OFF" commands. The 3D points between those LASER commands form a track. <br>
+A track is traditionally defined through "LASER_ON" and "LASER_OFF" commands.
+The 3D points between those LASER commands form a track. <br>
+TODO Explain Tracks_def_by_coord_lines and Tracks_def_by_attrs 
 <br>
 The NC Interpreter is designed around the dialect of the AddUp M400 machine. <br>
 The following Sinumerik manual seems to describe that dialect: <br>
@@ -33,8 +39,10 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
 
-4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks, which are drawn as cylinders, with an elliptical base.  
-   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal, **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around. **+** and **-** to control the ambient light intensity.
+4. **Start `3d_track_visualizer.exe`** — This should open a window, with a 3D model of the tracks,
+   which are drawn as cylinders, with an elliptical base.  
+   **Exploring the 3D space:** **WASD** keys for XZ-Plane traversal,
+   **Space** and **C** for Y-Axis as-/descend, hold down **left mouse button**, to pan around. **+** and **-** to control the ambient light intensity.
 
 # Version-Features of **`generate_track_list.exe`**:
 - **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables.
@@ -48,8 +56,11 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.1`** Basic WASD and LMB Paning, which moves the world, instead of the camera. Which is troublesome, when viewing detail, distant from the origin.  
 - **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend.
 - **`0.3.7.5`** Less choppy movement. Move faster while holding **SHIFT**. 
-- **`0.3.7.7`** Added Lighting, with **+**, **-** controlling the ambient light intensity.
-- **`0.3.9.0`** color_config- and plot_config.txt. Selectivly color tracks depending on their G code.
+- **`0.3.7.7`** Added Lighting, with **i**, **j** controlling the ambient light intensity.
+- **`0.3.9.4`** Selectivly color tracks depending on their attribute valuations.
+- **`0.3.9.5`** Modify `current_TID` with **LEFT_** and **RIGHT_ARROW**. Model only drawn up to `current_TID`. Hold **SHIFT** and, or **CTRL** for increased `rate_of_change`.
+- **`0.4.0.0`** Shader, VBO use for increased FPS. Positional and rotational live debug text, in the 3D vis. Target is T_start of Track with `current_TID` 
+- **`0.4.0.5`** Compiling Color_Config into an AST, for greatly reduced start-up time.
 
 # Building **`generate_track_list.exe`** yourself:
 Requirements:

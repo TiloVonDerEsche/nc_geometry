@@ -123,3 +123,6 @@ Try to avoid strdup, if possible
 
 -Latency-wise:
 Geometry merging into Isosurface
+
+|===============Old ideas==============|
+overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)

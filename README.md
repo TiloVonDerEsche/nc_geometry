@@ -1,5 +1,5 @@
-# Info
-This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: `generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
+This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC Interpreter: <br>
+`generate_track_list.exe`, that reads a NC code file and outputs a `track_list.csv` file. <br>
 # The header of **`track_list.csv`**:
 - `Track_id`                            Track index
 -  `T_start_x`,`T_start_y`,`T_start_z`, Track start 3D Point
@@ -9,19 +9,28 @@ This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC I
 - `laser_status`                        Set via LASER_ON LASER_OFF
 - `machine_speed`                       Set via VIT_TIR or F
 - `G_code`                              Set via G
-- overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)
 <br>
-A track is traditionally defined through "LASER_ON" and "LASER_OFF" commands.
-The 3D points between those LASER commands form a track. <br>
-TODO Explain Tracks_def_by_coord_lines and Tracks_def_by_attrs 
+# Track Definition:
+The M400 NC programs often use `LASER_ON` and `LASER_OFF` commands.<br>
+We then define a track to be the span of 3D points, while the laser is active.<br>
+For that case select `tracks_def_by = 1;`, see below.<br>
+*NOTE*: We could set the type of tracks_def_by to enum, and have valuations: `LASER`, `ATTRS` 
+<br>
+
+`Tracks_def_by`_coord_lines
+should be equal to using 
+`Tracks_def_by`_attrs
+with `attrs_bitmap=7;`
+`Tracks_def_by`_attrs checks if an attribute which got selected through the attrs_bitmap,
+received a new value
 <br>
 The NC Interpreter is designed around the dialect of the AddUp M400 machine. <br>
 The following Sinumerik manual seems to describe that dialect: <br>
 https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf <br>
 
 # Guide to using the project
-1. Put `config.cconf` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
-2. **Set the desired values** for the vars in **`config.txt`**:
+1. Put `interpreter.cconf` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
+2. **Set the desired values** for the vars in **`interpreter.cconf`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
    - **`print_strs`** — Puts strings of the NC Code, which are denoted by these quotation marks: "A valid String!", when set to 1, on stdout.
    - **`hmhis_to_stdout`** — Enables hashmap (memory of variables) snapshot printing to stdout, for every NC code line, when set to 1.
@@ -35,20 +44,20 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
    - **`tracks_def_by = 2`** 0->coord_lines,1->laser,2->attrs 
 
-   - **`attrs_bitmap = 255`** Bitmap for tracks_def_by_attrs mode, with following mapping:
-    1->XYZ
-    2->B
-    4->C
-    8->Machine_Speed
-    16->Laser_Power
-    32->Laser_Status
-    64->G_Code
-    128-> [Unmapped]
-`plot_config.cconf`:
+   - **`attrs_bitmap = 255`** Bitmap for tracks_def_by_attrs mode, with following mapping: <br>
+<t>        1->XYZ <br>
+<t>        2->B <br>
+<t>        4->C <br>
+<t>        8->Machine_Speed <br>
+<t>        16->Laser_Power <br>
+<t>        32->Laser_Status <br>
+<t>        64->G_Code <br>
+<t>        128-> [Unmapped] <br>
+# Set desired values in `plot.cconf` for:
    - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which then will be read by the `3d_track_visualizer.exe`.
    - **`horizontal_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
    - **`vertical_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
-   - **`debug_prints = 1`**
+   - **`debug_prints`** - Set to 0 (False) normally, set to 1, if your trying to fix the code.
 
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.
@@ -68,7 +77,7 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 
 # Version-Features of **`3d_track_visualizer.exe`**:
 - **`0.1`** Basic WASD and LMB Paning, which moves the world, instead of the camera. Which is troublesome, when viewing detail, distant from the origin.  
-- **`0.3.7`** FPS-like camera control, enriched with Y-Axis as-/descend.
+- **`0.3.7`** First-Person camera control, enriched with as-/descend, using **SPACE** and **c**, respectivly.
 - **`0.3.7.5`** Less choppy movement. Move faster while holding **SHIFT**. 
 - **`0.3.7.7`** Added Lighting, with **i**, **j** controlling the ambient light intensity.
 - **`0.3.9.4`** Selectivly color tracks depending on their attribute valuations.

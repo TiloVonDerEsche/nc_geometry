@@ -14,8 +14,7 @@ This Repository contains GNU: `Bison`, `Flex` and `C` Code, which defines a NC I
 The M400 NC programs often use `LASER_ON` and `LASER_OFF` commands.<br>
 We then define a track to be the span of 3D points, while the laser is active.<br>
 For that case select `tracks_def_by = 1;`, see below.<br>
-*NOTE*: We could set the type of tracks_def_by to enum, and have valuations: `LASER`, `ATTRS` 
-<br>
+*NOTE*: We could set the type of tracks_def_by to enum, and have valuations: `LASER`, `ATTRS`, `COORD_LINES` <br>
 
 `Tracks_def_by`_coord_lines
 should be equal to using 
@@ -71,8 +70,9 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
 - **`0.1`** Saving X,Y,Z and (R) variables to Hashmap. Boolean expressions & arithmetic expressions, can used in assignments of variables.
 - **`0.2`** IF COND THEN BODY ENDIF Block. GOTOB jump command.
 - **`0.3`** A,B,C work-plain rotation & GOTOF, GOTO and REPEAT.
-- **`0.3.8.2`** Include CALL's
-- **`0.5`** (Binary benchmarking tool.)
+- **`0.3.8.2`** Include CALL's, which execute specified NC files.
+- **`0.3.9.3`** `SEP`arator free grammar. i.e. flex is ignoring them.
+  <t>Linebreaks are still used, since our track_def_by`COORD_LINES`/`ATTRS` logic, is linewise.
 - **`0.6`** Complex user-variable types and functions.
 
 # Version-Features of **`3d_track_visualizer.exe`**:

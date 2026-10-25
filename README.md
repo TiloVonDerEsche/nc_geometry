@@ -20,7 +20,7 @@ The following Sinumerik manual seems to describe that dialect: <br>
 https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncprogramming_progr_man_0220_de-DE.pdf <br>
 
 # Guide to using the project
-1. Put `config.txt` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
+1. Put `config.cconf` into the same folder as `generate_track_list.exe` and `3d_track_visualizer.exe`.
 2. **Set the desired values** for the vars in **`config.txt`**:
    - **`debug_prints`** — Enables token identification prints and jump-info prints, when set to 1.
    - **`print_strs`** — Puts strings of the NC Code, which are denoted by these quotation marks: "A valid String!", when set to 1, on stdout.
@@ -31,10 +31,24 @@ https://cache.industry.siemens.com/dl/files/354/109779354/att_1019648/v1/MC_ncpr
    - **`nc_file`** — Sets the path of the NC code file. 'mpf_file' is the deprecated name for 'nc_file'.
    - **`track_list_csv`** — Sets the path of the `track_list.csv` output file.
    - **`hmhis_json`** — When hmhis_to_file=1, then it sets the path of the strfloat Hashmap Snapshot History (Trace) writing target.
+   - **`track_accel_margin`** — Section-length from the end and start of a track, where the CNC machine (de-/)accelerates. WIP!
+
+   - **`tracks_def_by = 2`** 0->coord_lines,1->laser,2->attrs 
+
+   - **`attrs_bitmap = 255`** Bitmap for tracks_def_by_attrs mode, with following mapping:
+    1->XYZ
+    2->B
+    4->C
+    8->Machine_Speed
+    16->Laser_Power
+    32->Laser_Status
+    64->G_Code
+    128-> [Unmapped]
+`plot_config.cconf`:
    - **`tracks_to_plot`** — Sets the path of the `track_list.csv`, which then will be read by the `3d_track_visualizer.exe`.
    - **`horizontal_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
    - **`vertical_radius`** — The floating point value of the horizontal radius spanning the elliptical cylinder, track abstraction.
-   - **`track_accel_margin`** — Section-length from the end and start of a track, where the CNC machine (de-/)accelerates. WIP!
+   - **`debug_prints = 1`**
 
 3. **Start the `generate_track_list.exe`** in a terminal.
    Afterwards, `track_list.csv` should appear at the path, specified through the `track_list_csv` var.

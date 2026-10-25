@@ -195,43 +195,24 @@ opt_skip:
     | '/'
 ;
 
-opt_then:
-  %empty
-  | THEN
-;
-
-/*
-if_body:
-  %empty
-  | if_body if_line
-;
-
-if_line:
-  line NEWLINE
-;*/
-
 exprs:
   expr
   | exprs expr
 ;
 
 expr:
-  //IF bool_expr
-  IF bool_expr {
+   IF bool_expr {
       if (!skip && !$2) {
           skip++; //ignore code lines, if condition is false
-          if_skip_depth++;
           if(debug) {printf("IF cond false:\nSkip=%d\n",skip);}
           //NOTE seperate debug bitmapping for if-clauses
       }
   }
   | ENDIF {
-      if(if_skip_depth > 0) { //close FALSE If clause -> resume exec
-        if_skip_depth--;
-        if (skip > 0) {
-          skip--; //NOTE Are nested false IF blocks possible? i.e. skip > 1
-          if(debug) {printf("ENDIF reached:\nSkip=%d\n",skip);}
-        }}
+      if (skip > 0) {
+        skip--; //NOTE Are nested false IF blocks possible? i.e. skip > 1
+        if(debug) {printf("ENDIF reached:\nSkip=%d\n",skip);}
+      }
     }
   | ID %prec LOW //NOTE Giving this LOW prec or removing it causes infinite REPEAT jmps
   | SUPA /*{//acts like G153, also supresses:

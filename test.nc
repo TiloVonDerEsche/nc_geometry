@@ -247,19 +247,18 @@ N940	LASER_OFF					;Stop LASER Fire
 N640 ENDIF
 
 R23=R23+1
-CONSTRUCTION0:
+CONSTRUCTION0:			;TODO Don't exit here
 
 PARAMETER1:
 PUIS_LASER R91   		   ;Laser Power
 VIT_TIR=R81  			  ;Specifies the feed rate nozzle/laser (mm/min)
 Feeder_Speed_2 R61
 Feeder_Speed_3 R41
-REPEAT CONSTRUCTION1 PARAMETER1
+REPEAT CONSTRUCTION1  CONSTRUCTION0
 
 PARAMETER2:
 PUIS_LASER R92   		   ;Laser Power
 VIT_TIR=R82  			  ;Specifies the feed rate nozzle/laser (mm/min)
 Feeder_Speed_2 R62
 Feeder_Speed_3 R42
-REPEAT CONSTRUCTION1 PARAMETER2 ;Never reaches PARAMETER2, since it jumps away with the previous REPEAT
-				;TODO Look REPEAT Manual
+REPEAT CONSTRUCTION1  CONSTRUCTION0 ;TODO Exit here, instead of after CONSTRUCTION0 Label

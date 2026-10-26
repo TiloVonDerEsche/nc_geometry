@@ -523,16 +523,16 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
        byte_offset=byte_offsetn;
        line=linen;
      }
-     break; //REPEAT found, we are finished
-    }
+     break; //TODO Find End label: REPEAT Start End, and exit after REPEAT
+    }	    //TODO So jump to REPEAT_line, when End label has been found
     linen--;linep++;
   }
   if(debug){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
 
   push_jmp_frame(&jmp_stack,
-    strdup(end_label), //return label
-    line,       //return line
-    byte_offset //return byte_offset
+    strdup(end_label), //return label NOTE when reading this label
+    line,       //return line         NOTE reset line
+    byte_offset //return byte_offset  NOTE jmp to byte_offset
   );
 
   request_jump(start_label);

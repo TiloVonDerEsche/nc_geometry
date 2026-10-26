@@ -2,15 +2,15 @@
 /* the "incl" state is used for picking up the name
  * of an include file
  */
-%x incl
+%x call
 %%
-include             BEGIN(incl);
+CALL               BEGIN(call);
 
 [a-z]+              ECHO;
 [^a-z\n]*\n?        ECHO;
 
-<incl>[ \t]*      /* eat the whitespace */
-<incl>[^ \t\n]+   { /* got the include file name */
+<call>[ \t]*      /* eat the whitespace */
+<call>[^ \t\n]+   { /* got the include file name */
         yyin = fopen( yytext, "r" );
 
         if ( ! yyin )

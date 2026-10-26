@@ -3,6 +3,6 @@
 ;AC()
 ;Test
 
-include basement.nc
+CALL basement.nc
 
 ; sub after basement

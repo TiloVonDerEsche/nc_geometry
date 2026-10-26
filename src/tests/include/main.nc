@@ -1,5 +1,5 @@
 ; code before
 
-include sub.nc
+CALL sub.nc
 
 ; main.nc gets returned to

@@ -9,6 +9,7 @@ mpf_file = "./test.nc"
 //mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
 
 //mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
+//mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/color/g.mpf";
@@ -30,7 +31,7 @@ hmhis_to_file = 0;
 128-> [Unmapped]
 */
 attrs_bitmap = 255;//Bitmap for attrs.
-tracks_def_by = 2; //0->coord_lines,1->laser,2->attrs //0 for Vase; 1 for LASER_ON / LASER_OFF used
+tracks_def_by = 1; //0->coord_lines,1->laser,2->attrs //0 for Vase; 1 for LASER_ON / LASER_OFF used
 track_mid_len = 0; //10 for Vase
 //save_laser_off_tracks = 1;
 

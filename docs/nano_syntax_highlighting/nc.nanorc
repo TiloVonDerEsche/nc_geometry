@@ -1,0 +1,92 @@
+## Syntax Highlighting for Siemens Sinumerik NC-Code (840D / ONE)
+## Replicating Staniska's Sinumerik-Highlight mapping for GNU nano
+
+syntax "sinumerik" "\.(mpf|spf|def|tea|ini|arc|nc|gcode)$"
+comment ";"
+
+# -------------------------------------------------------------------
+#    General Identifiers & Words (Subtle Light Grey Base)
+#    (Placed early so specific keywords below can override them)
+# -------------------------------------------------------------------
+#color white "\<[A-Z_][A-Z0-9_]*\>"
+
+# -------------------------------------------------------------------
+# 1. Base Numbers & Numerical Values (Light White / Gray)
+# -------------------------------------------------------------------
+color lightwhite "\<[0-9]+(\.[0-9]+)?\>"
+
+# -------------------------------------------------------------------
+# 2. Block Numbers (N-codes) (Cyan)
+# -------------------------------------------------------------------
+color cyan "\<N[0-9]+\>"
+
+# -------------------------------------------------------------------
+# 3. Axis Identifiers & Coordinates (Light Cyan / Bright Blue)
+# -------------------------------------------------------------------
+color lightcyan "\<([XYZABCUVW]|CR|I|J|K|AR|AP|RP)\>"
+
+# -------------------------------------------------------------------
+# 4. G-Codes & M-Codes (Yellow)
+# -------------------------------------------------------------------
+color yellow "\<G[0-9]+(\.[0-9]+)?\>"
+color yellow "\<M[0-9]+\>"
+
+# -------------------------------------------------------------------
+# 5. Feed rate, Spindle Speed, Tooling & Offsets (Light Yellow)
+# -------------------------------------------------------------------
+color lightyellow "\<[FST][0-9]+\>"
+color lightyellow "\<D[0-9]+\>"
+
+# -------------------------------------------------------------------
+# 6. Sinumerik Control Words & Transformations (Bright Green)
+# -------------------------------------------------------------------
+color green "\<(TRANS|ATRANS|ROT|AROT|SCALE|ASCALE|MIRROR|AMIRROR)\>"
+color green "\<(DIAMON|DIAMOF|DIAM90|G70|G700|G71|G710)\>"
+color green "\<(G40|G41|G42|OFFN|NORM|KONT|G450|G451)\>"
+color green "\<(RND|RNDM|CHR|CHF)\>"
+
+# -------------------------------------------------------------------
+# 7. Built-in Math Functions (Magenta)
+# -------------------------------------------------------------------
+color magenta "\<(SIN|COS|TAN|ASIN|ACOS|ATAN2|POT|SQRT|TRUNC|ROUND|ABS)\>"
+
+# -------------------------------------------------------------------
+# 8. Control Flow / Keyword Statements (Bold Magenta)
+# -------------------------------------------------------------------
+color bold,magenta "\<(IF|ELSE|ENDIF|WHILE|ENDWHILE|FOR|TO|ENDFOR|REPEAT|UNTIL|GOTO[BF]?)\>"
+color bold,magenta "\<(PROC|ENDPROC|RET|M30|M02|M00|M01|STOPRE)\>"
+
+# -------------------------------------------------------------------
+# 9. Variables, System Parameters & R-Variables (Light Red)
+# -------------------------------------------------------------------
+color lightred "\<R[0-9]+\>"
+color lightred "\$P_[A-Z0-9_]+"
+color lightred "\$TC_[A-Z0-9_]+"
+color lightred "\$AA_[A-Z0-9_]+"
+color lightred "\<DEF\>|\<REAL\>|\<INT\>|\<STRING\>|\<CHAR\>|\<BOOL\>|\<AXIS\>"
+
+# -------------------------------------------------------------------
+# 10. Built-in Commands & Cycles (Light Blue)
+# -------------------------------------------------------------------
+color lightblue "\<(MSG|EXECSTRING|CYCLE[0-9]+|HOLES[0-9]+|LONGHOLE|SLOT[0-9]+|POCKET[0-9]+)\>"
+
+# -------------------------------------------------------------------
+# 11. Jump Labels (Bold Red) - Any identifier followed by a colon
+# -------------------------------------------------------------------
+color bold,red "\<[A-Z_][A-Z0-9_]*:"
+
+# -------------------------------------------------------------------
+# 12. Strings (Light Green)
+# -------------------------------------------------------------------
+color lightgreen ""([^"]|\\")*""
+
+# -------------------------------------------------------------------
+# 13. Comments (Blue) - Starts with ';' to the end of line
+# -------------------------------------------------------------------
+color blue ";.*$"
+
+# Trailing whitespace check
+color ,red "[[:space:]]+$"
+
+# Reminders.
+color brightwhite,yellow "\<(NOTE|TODO|DEL|HELP)\>"

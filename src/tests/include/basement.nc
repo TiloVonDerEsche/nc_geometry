@@ -1,3 +1,0 @@
-;basement rats
-
-; some mold

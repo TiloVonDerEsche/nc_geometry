@@ -1,15 +1,43 @@
-|================Debug Bitmap===============|
+//================Debug Bitmap===============//
 Advantage over enum: I can select multiple debug options, at once. Mapping:
-  1
+  1 Token printing
   2
   4
-  8
+  8 jump -> GOTO, REPEAT, Labels
+ 16 if clauses
 
-|=================IF clauses=====================|
-int pending_endif=1;
--> Skip until ENDIF is found, set to  pending_endif=0, when using GOTO or REPEAT
+ Hashmap printing, already set by hmhis_to_stdout
+What about hm printing after sucessfully read file
 
-|=================Finish Include CALL'S ==========================|
+//===============Advanced error printing==============//
+Remember Line count in stack -> line count, per file executed
+-> line count restored from stack, when finished with Include CALL
+
+Error: Syntax in <File>:<Line>:<Char>
+Expected: <Token> instead of <Token>
+Trace:
+//================cconf_Reader===================//
+-> Multiline c-comments, throgh flex comment state
+
+Interpreter-, Plot Confifg as Global singletons
+
+Color.cconf
+Is another language than cconf:
+bool_expr -> {R,G,B};
+Perhaps cmap -> color_map
+or bcmap boolean_color_map
+bcfilt boolean_color_filtering
+selecfilt selective filtering
+//=================IF clauses=====================//
+Seem to work.
+Test multiline IF clauses:
+IF bool_expr expr
+ expr
+ expr
+ expr ;ENDIF
+ ENDIF
+
+//=================Finish Include CALL'S ==========================//
 Better syntax error msgs through seperate line var counting per nc_file
 F.e.:
 test/call/X.mpf and Y.spf
@@ -27,7 +55,7 @@ Does FILE* yyin contain file_path information?
 Probably extra str* active_file global required.
 ->Save line on stack, and set it to 0, for newly exec'd file.
 	->file CALL finished -> restore line from stack
-|=======================================================|
+//=======================================================//
 Fix line off by one error
 -> Stop with ball search non-sense
 !Our runtime line should not be wrong!
@@ -35,7 +63,7 @@ Fix line off by one error
 Exprs before ENDIF don't seem to execute
      (^ ,in new lines,)
 
-|=================Fix Rotations====================|
+//=================Fix Rotations====================//
 
 X,Y-wise -> Drehradius von C
 Z-wise -> Drehradius von B
@@ -76,7 +104,7 @@ Vase and Niere, seem correct while ignoring Rotation
   The overhang of the cooling channel uses rotation,
   so that we print from the side, instead of top-down.
   This is forced, to not shoot down the void of the channel.
-|=======================================================|
+//=======================================================//
 Through rotation commands (ABC, ROT XYZ) we can rotate the flat / shorter side,
 of a track to face any direction. The shorter radius is normally the vertical.
 Since the pull of gravity flattens the melting pool.
@@ -88,7 +116,7 @@ making them part of a track. We need to think of a solution for the tid value,
 when LASER=OFF.
 Perhaps multiply by -1.
 save_laser_off_tracks
-|=================== Export Function=================|
+//=================== Export Function=================//
 nccp_to_mesh.py works for Niere and Vase.
 But the resulting obj file sizes are a bit large.
 120 MB for Vase and ~ 500MB for Niere.
@@ -98,7 +126,7 @@ The python code in nccp_to_mesh, seems to reconstruct the track eliptical bases,
 and then uses quads to mesh the tube / pipe, i.e. the body of the track cylinder.
 The nccps between track_start and track_end seem redundant in this process.
 
-|============== Advanced track vis =================|
+//============== Advanced track vis =================//
 Each ncc_point is the center of a metaball.
 Implement sliders in the 3d_track_vis, which sets the radius / radii of the metaballs.
 So that the user can experiment, when the beads will touch / flow into one-another.
@@ -111,23 +139,23 @@ For this also experiment with the isosurface Interpolation between the metaballs
 It is not enough to only construct Metaballs around the ncc points.
 We need to interpolate inside of the tracks,
 to create intermediate metaball-origins, or remove / merge ncc points.
-|=====>
+//=====>
 Steps:
 - During LASER_OFF section, multiply the tid with -1
 - Construct spheres around each ncc_point, with each vertex (ncc_point)
   having their own settable radius
 
 
-|===============Stress Tests===============|
+//===============Stress Tests===============//
 Build or find a simple benchmarking tool.
 Construct Test Cases (Assertions)
 ./src/benchmark/run_tests.bin
-|===============Performance=================|
+//===============Performance=================//
 -Memory-wise:
 Try to avoid strdup, if possible
 
 -Latency-wise:
 Geometry merging into Isosurface
 
-|===============Old ideas==============|
+//===============Old ideas==============//
 overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)

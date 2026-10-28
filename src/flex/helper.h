@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "khashl.h"
 
-//===========Structs===========//
+//===========Structs Typedefs===========//
 typedef struct {
   float x;
   float y;
@@ -11,19 +11,21 @@ typedef struct {
 } vec3D;
 
 typedef struct {
-  int debug_prints;
-  int print_strs;
   int hmhis_to_stdout;
   int hmhis_to_file;
   int tracks_def_by;
   int track_mid_len;
   unsigned char attrs_bitmap; //8-Bitmap
+  unsigned char debug_bitmap;
 
   char mpf_file[256];
   char track_list_csv[256];
   char ncc_points_csv[256];
   char hmhis_json[256];
 } Config;
+//==========Typedefs==========//
+typedef unsigned char ubyte;
+
 //===========Macros===========//
 KHASHL_MAP_INIT(KH_LOCAL,
   strfloat_t, strfloat,
@@ -31,7 +33,7 @@ KHASHL_MAP_INIT(KH_LOCAL,
   kh_hash_str, kh_eq_str)
 
 
-//Bitmap Mapping:
+//Track Attribute Bitmap:
 #define XYZ 1
 #define B 2
 #define C 4
@@ -39,6 +41,9 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define LASER_POWER 16
 #define LASER_STATUS 32
 #define G_CODE 64
+
+//Debug Bitmap:
+//TODO
 
 //tracks_def_by
 #define TDB_COORD_LINES 0
@@ -59,8 +64,7 @@ KHASHL_MAP_INIT(KH_LOCAL,
 //===========Extern Vars===========//
 
 extern Config config;
-extern int debug;
-extern int print_strs;
+extern ubyte debug_bm;
 
 extern vec3D origin_offset;
 extern strfloat_t* h;

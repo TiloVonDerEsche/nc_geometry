@@ -1,10 +1,16 @@
 //================Debug Bitmap===============//
 Advantage over enum: I can select multiple debug options, at once. Mapping:
+debug_bitmap:
   1 Token printing
-  2
-  4
+  2 Print strings
+  4 Comment printing
   8 jump -> GOTO, REPEAT, Labels
  16 if clauses
+ 32
+ 64
+ 128  hashmap after executing file
+
+
 
  Hashmap printing, already set by hmhis_to_stdout
 What about hm printing after sucessfully read file

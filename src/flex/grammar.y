@@ -6,7 +6,7 @@
   #include "stack/frames.h"
 
   extern Config config;
-  extern int debug;
+  extern ubyte debug_bm;
   extern strfloat_t* h;
 
   extern FILE* hmhis;
@@ -143,6 +143,7 @@
     // In initial setup:
     //stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
+    //debug_bm = config.debug_bitmap;
 }
 
 %%
@@ -183,7 +184,7 @@ line:
           jump_requested = 0;
           skip = 0;
           jump(target_line,target_byte_offset);
-          if(debug){printf("Jumped to line=%lu, byte=%ld\n\n",
+          if(debug_bm & 8){printf("Jumped to line=%lu, byte=%ld\n\n",
             target_line, target_byte_offset);}
      }
     }
@@ -204,14 +205,14 @@ expr:
    IF bool_expr {
       if (!skip && !$2) {
           skip++; //ignore code lines, if condition is false
-          if(debug) {printf("IF cond false:\nSkip=%d\n",skip);}
+          if(debug_bm & 16) {printf("IF cond false:\nSkip=%d\n",skip);}
           //NOTE seperate debug bitmapping for if-clauses
       }
   }
   | ENDIF {
       if (skip > 0) {
         skip--; //NOTE Are nested false IF blocks possible? i.e. skip > 1
-        if(debug) {printf("ENDIF reached:\nSkip=%d\n",skip);}
+        if(debug_bm & 16) {printf("ENDIF reached:\nSkip=%d\n",skip);}
       }
     }
   | ID %prec LOW //NOTE Giving this LOW prec or removing it causes infinite REPEAT jmps
@@ -272,12 +273,12 @@ expr:
                           JmpFrame top;
                           //Get stack top, without removing it from the stack
                           peek(&jmp_stack, &top);
-                          if(debug){
+                          if(debug_bm & 8){
                             printf("$1_LABEL=%s, jmp_stack_top.label=%s\n",
                             $1,top.label);}
 
                           //if the currently read LABEL="END_LABEL"
-                          if(debug){
+                          if(debug_bm & 8){
                             printf("strcmp($1,'END_LABEL')=%d\n",
                             strcmp($1,"END_LABEL"));}
                           if((strcmp($1,"END_LABEL") == 0)) {
@@ -285,7 +286,7 @@ expr:
                             //current runtime line and
                             //noted line of "<start_label>_END_LABEL" construct
                             int d = get_var_val("line")-get_var_val(top.label);
-                            if(debug){printf("d=%d\n...\n",d);}
+                            if(debug_bm & 8){printf("d=%d\n...\n",d);}
 
                             //lf -> label_finder
                             //tolerate off by one error, btw runtime- and lf-line
@@ -293,7 +294,7 @@ expr:
                                //if the lines of "<start_label>_END_LABEL" construct,
                                //and the runtime line match, then we found the END_LABEL,
                                //to the currently active REPEAT block
-                               if(debug){
+                               if(debug_bm & 8){
                                  printf("'END_LABEL' found! top.label=%s\n",top.label);}
 
                                jump_requested = 1;
@@ -302,10 +303,7 @@ expr:
                                target_line = top.line;
                                target_byte_offset = top.byte_offset;
 
-                               //TODO Add multiple debug levels
-                               //Perhaps debug bitmap, where for example
-                               //1->Token_Printing, 2->Jump_Strs
-                               if(debug){printf("Jump Requested!\
+                               if(debug_bm & 8){printf("Jump Requested!\
                                  \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                                  target_line, target_byte_offset);}
 
@@ -319,7 +317,7 @@ expr:
                             target_line = top.line;
                             target_byte_offset = top.byte_offset;
 
-                            if(debug){printf("Jump Requested!\
+                            if(debug_bm & 8){printf("Jump Requested!\
                               \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                               target_line, target_byte_offset);}
 
@@ -454,13 +452,13 @@ int exec(char* fpath) {
   label_finder(yyin);
   rewind(yyin);
 
-  if(debug){
+  if(debug_bm & 8){
     printf("Labels of '%s':\n",fpath);
     print_hashmap(h,stdout);}
 
   yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
 
-  if(debug){
+  if(debug_bm & 128){
     printf("Hashmap after executing '%s':\n",fpath);
     print_hashmap(h,stdout);}
 
@@ -483,7 +481,7 @@ void jump(size_t target_line,long target_byte_offset) {
       skip = 0;
       jump_requested = 0;
 
-      if(debug){
+      if(debug_bm & 8){
         printf("Jumping to line=%lu, offset=%ld\n\n",
         target_line,target_byte_offset);}
 
@@ -507,7 +505,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     long byte_offsetp = (long)get_var_val(labelp);
     long byte_offsetn = (long)get_var_val(labeln);
 
-    if(debug){
+    if(debug_bm & 8){
       printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
         labelp,labeln,linep,linen,(size_t)get_var_val("line"));}
     
@@ -527,7 +525,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     }	    //TODO So jump to REPEAT_line, when End label has been found
     linen--;linep++;
   }
-  if(debug){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
+  if(debug_bm & 8){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
 
   push_jmp_frame(&jmp_stack,
     strdup(end_label), //return label NOTE when reading this label
@@ -537,7 +535,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
 
   request_jump(start_label);
 
-  if (debug > 0) {
+  if (debug_bm & 8) {
     JmpFrame temp;
     if (peek(&jmp_stack, &temp)) {
         printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",

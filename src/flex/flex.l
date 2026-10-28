@@ -1,12 +1,11 @@
 %{
   #include "grammar.tab.h"
-  //#include "helper.h"
+  #include "helper.h"
 
   void set_var(char*, float);
   float get_var_val(char*);
 
-  extern int debug;
-  extern int print_strs;
+  extern ubyte debug_bm;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -30,13 +29,13 @@ id       {letter}{letter}+([_]*{alnum}+)*
 
 {inum} {
         yylval.INT = atoi(yytext);
-        if(debug){ printf("An integer: %d\n", yylval.INT); }
+        if(debug_bm & 1){ printf("An integer: %d\n", yylval.INT); }
         return INT;
         }
 
 {fnum} {
         yylval.FLOAT = atof(yytext);
-        if(debug){ printf("A float: %f\n", yylval.FLOAT); }
+        if(debug_bm & 1){ printf("A float: %f\n", yylval.FLOAT); }
         return FLOAT;
         }
 
@@ -47,34 +46,34 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   char* s = yytext;
   s[strlen(s) - 1] = '\0';
   yylval.LABEL = strdup(s);
-  if(debug){printf("A label:'%s'\n", s);}
+  if(debug_bm & 1){printf("A label:'%s'\n", s);}
   return LABEL;
 }
 
-"CALL" {if(debug){puts("An Include CALL!\n");}
+"CALL" {if(debug_bm & 1){puts("An Include CALL!\n");}
    return CALL;}
 "LASER_ON"|"LASER_OFF" {
   yylval.SPECIAL_CMD = strdup(yytext);
   return SPECIAL_CMD;}
-"IF" {if(debug){puts("An IF!");}
+"IF" {if(debug_bm & 1){puts("An IF!");}
   return IF;}
-"THEN" {if(debug){puts("A THEN!");}
+"THEN" {if(debug_bm & 1){puts("A THEN!");}
   return THEN;}
-"ENDIF" {if(debug){puts("An ENDIF!");}
+"ENDIF" {if(debug_bm & 1){puts("An ENDIF!");}
   return ENDIF;}
-"GOTOB"|"GOTOF"|"GOTOC"|"GOTO"  {if(debug){puts("A GOTO!");}
+"GOTOB"|"GOTOF"|"GOTOC"|"GOTO"  {if(debug_bm & 1){puts("A GOTO!");}
   return GOTO;}
-"REPEAT" {if(debug){puts("A REPEAT!");}
+"REPEAT" {if(debug_bm & 1){puts("A REPEAT!");}
   return REPEAT;}
-"ROT" {if(debug){puts("A ROT!");}
+"ROT" {if(debug_bm & 1){puts("A ROT!");}
   return ROT;}
-"AROT" {if(debug){puts("An AROT!");}
+"AROT" {if(debug_bm & 1){puts("An AROT!");}
   return AROT;}
-"TRANS" {if(debug){puts("A TRANS!");}
+"TRANS" {if(debug_bm & 1){puts("A TRANS!");}
   return TRANS;}
-"SUPA" {if(debug){printf("A SUPA:'%s'\n",yytext);}
+"SUPA" {if(debug_bm & 1){printf("A SUPA:'%s'\n",yytext);}
   return SUPA;}
-"MSG" {if(debug){printf("A MSG:'%s'\n",yytext);}
+"MSG" {if(debug_bm & 1){printf("A MSG:'%s'\n",yytext);}
   return MSG;}
 
 "B_OR"   {return B_OR;}
@@ -90,26 +89,26 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 "<>"      {return NEQ;}
 "<="      {return LTEQ;}
 ">="      {return GTEQ;}
-[=]       {if(debug){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
-[+\-*/]   {if(debug){ printf("An arithmetic operator: %s\n",yytext);} return yytext[0];}
-[><]   {if(debug){ printf("An boolean operator: %s\n",yytext);} return yytext[0];}
+[=]       {if(debug_bm & 1){ printf("An equal sign: %s\n",yytext);} return yytext[0];}
+[+\-*/]   {if(debug_bm & 1){ printf("An arithmetic operator: %s\n",yytext);} return yytext[0];}
+[><]   {if(debug_bm & 1){ printf("An boolean operator: %s\n",yytext);} return yytext[0];}
 
 [()]      {return yytext[0];}
 [,]       {return yytext[0];}
-";"[^\n]* {if(debug){printf("A comment:'%s'\n",yytext);}}
+";"[^\n]* {if(debug_bm & 4){printf("A comment:'%s'\n",yytext);}}
 
 
-{id} {if(debug){printf("An ID:'%s'\n",yytext);}
+{id} {if(debug_bm & 1){printf("An ID:'%s'\n",yytext);}
   yylval.ID = strdup(yytext);
   return ID;}
 
-"_"{id} {if(debug){printf("An hidden ID:'%s'\n",yytext);}
+"_"{id} {if(debug_bm & 1){printf("An hidden ID:'%s'\n",yytext);}
   yylval.ID = strdup(yytext);
   return ID;}
 
 
 "\""[^\"]*"\"" {
-  if (print_strs) {
+  if (debug_bm & 2) {
     printf("A string: %s\n", yytext);
     puts("...");
   }
@@ -129,14 +128,14 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 [XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
 [ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
 {cap_letter} {yylval.CMD = yytext[0];
-  if(debug){ printf("A command: %c\n", yytext[0]); }
+  if(debug_bm & 1){ printf("A command: %c\n", yytext[0]); }
   return CMD;
 }
 
-[ \t]      		 { if(debug){ printf("\t");}}
-"\r\n"         {if(debug){ puts("\n");}
+[ \t]      		 { if(debug_bm & 1){ printf("\t");}}
+"\r\n"         {if(debug_bm & 1){ puts("\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
-"\n"           {if(debug){ puts("\n");}
+"\n"           {if(debug_bm & 1){ puts("\n");}
                 set_var("line", get_var_val("line") + 1); return NEWLINE;}
 
 

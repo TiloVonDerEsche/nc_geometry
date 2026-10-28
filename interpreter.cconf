@@ -1,4 +1,4 @@
-mpf_file = "./test.nc"
+//mpf_file = "./test.nc"
 
 //mpf_file = "./data/nc_code/Niere/Layer10_2.spf";
 //mpf_file = "./data/nc_code/Niere/round_channel/main.mpf";
@@ -13,10 +13,19 @@ mpf_file = "./test.nc"
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/color/g.mpf";
-//mpf_file = "./data/nc_code/test/abc/CoordSys3D.nc";
+mpf_file = "./data/nc_code/test/abc/CoordSys3D.nc";
 
-debug_prints = 0;
-print_strs = 1;
+/*debug_bitmap:
+ 1 Token printing
+ 2 Print strings
+ 4 Comment printing
+ 8 jump -> GOTO, REPEAT, Labels
+ 16 if clauses
+ 32
+ 64
+ 128  hashmap after executing file
+*/
+debug_bitmap = 1;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
 

@@ -2,8 +2,7 @@
 #include "helper.h"
 
 extern Config config;
-extern int debug;
-extern int print_strs;
+extern ubyte debug_bm;
 extern strfloat_t* h;
 
 extern FILE* hmhis;
@@ -28,11 +27,8 @@ int main(int argc, char *argv[])
   printf("track_list_csv=%s\n", config.track_list_csv);
   printf("ncc_points_csv=%s\n", config.ncc_points_csv);
 
-  debug = config.debug_prints;
-  print_strs = config.print_strs;
-
   h = init_hashmap();
-
+  debug_bm = config.debug_bitmap;
 
   /*if(config.hmhis_to_file) {
     hmhis = init_file(config.hmhis_json,"[");

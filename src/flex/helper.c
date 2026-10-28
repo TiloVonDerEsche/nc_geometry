@@ -2,11 +2,10 @@
 
  //---helper.c is the owner of the shared global vars--//
 Config config = {0};
-int debug = 0;
-int print_strs = 0;
+ubyte debug_bm = 0;
+strfloat_t* h = NULL;
 
 vec3D origin_offset = {0,0,0};
-strfloat_t* h = NULL;
 
 FILE* hmhis = NULL;
 FILE* tl = NULL;
@@ -246,12 +245,19 @@ int read_config(const char* fpath, Config* config) {
         return 1;
     }
 
+    ubyte inside_comment = 0;
     char line[512];
     while (fgets(line, sizeof(line), file)) {
         char* trimmed = trim(line);
 
         //ignore comments and empty lines
-        if (strlen(trimmed) == 0 || trimmed[0] == '/' || trimmed[0] == '#') {
+        if (trimmed[0] == '/' && trimmed[1] == '*') {
+		inside_comment = 1;
+	}
+        if (trimmed[0] == '*' && trimmed[1] == '/') {
+		inside_comment = 0;
+	}
+	if (strlen(trimmed) == 0 || trimmed[0] == '/' || inside_comment) {
             continue;
         }
 
@@ -261,18 +267,12 @@ int read_config(const char* fpath, Config* config) {
         parse_line(trimmed, &key, &value);
         if (!key || !value) {
             fprintf(stderr,
-              "Error: Invalid line format: %s!\
-              \r\nLine should contain <key>'='<value>;",line);
+              "Error: Invalid line format: %s!"
+              "\r\nLine should contain <key>'='<value>;",line);
             continue;
         }
 
-        if (strcmp(key, "debug_prints") == 0) {
-            config->debug_prints = atoi(value);
-        }
-        else if (strcmp(key, "print_strs") == 0) {
-            config->print_strs = atoi(value);
-        }
-        else if (strcmp(key, "hmhis_to_stdout") == 0) {
+        if (strcmp(key, "hmhis_to_stdout") == 0) {
             config->hmhis_to_stdout = atoi(value);
         }
         else if (strcmp(key, "hmhis_to_file") == 0) {
@@ -286,6 +286,9 @@ int read_config(const char* fpath, Config* config) {
         }
         else if (strcmp(key, "attrs_bitmap") == 0) {
            config->attrs_bitmap = (unsigned char) atoi(value);
+        }
+	else if (strcmp(key, "debug_bitmap") == 0) {
+           config->debug_bitmap = (unsigned char) atoi(value);
         }
         else if (strcmp(key, "mpf_file") == 0) {
             strncpy(config->mpf_file, value, sizeof(config->mpf_file) - 1);

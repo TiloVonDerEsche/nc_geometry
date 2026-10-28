@@ -167,7 +167,7 @@ void read_track_list(const char* filename) {
         exit(1);
     }
 
-    const char* fname = "color.cconf";
+    const char* fname = "color.cmap";
     FILE* colorf = fopen(fname, "r");
     if(compile_color_config(colorf) == SUCCESS) {
       printf("Compiled %s successfully!\n",fname);

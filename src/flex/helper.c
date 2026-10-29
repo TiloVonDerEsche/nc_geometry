@@ -256,6 +256,7 @@ int read_config(const char* fpath, Config* config) {
 	}
         if (trimmed[0] == '*' && trimmed[1] == '/') {
 		inside_comment = 0;
+  continue;
 	}
 	if (strlen(trimmed) == 0 || trimmed[0] == '/' || inside_comment) {
             continue;

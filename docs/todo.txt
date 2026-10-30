@@ -13,8 +13,6 @@ debug_bitmap:
 
 
  Hashmap printing, already set by hmhis_to_stdout
-What about hm printing after sucessfully read file
-
 //===============Advanced error printing==============//
 Remember Line count in stack -> line count, per file executed
 -> line count restored from stack, when finished with Include CALL
@@ -22,6 +20,16 @@ Remember Line count in stack -> line count, per file executed
 Error: Syntax in <File>:<Line>:<Char>
 Expected: <Token> instead of <Token>
 Trace:
+.
+
+//Include CALL'S//
+Better syntax error msgs through seperate line var counting per nc_file
+F.e.:
+test/call/X.mpf and Y.spf
+
+->Save line on stack, and set it to 0, for newly exec'd file.
+->file CALL finished -> restore line from stack
+
 //================cconf_Reader===================//
 -> Multiline c-comments, throgh flex comment state
 
@@ -46,26 +54,7 @@ which span across an AST.
 Then a code section between labels, are a basic block,
 which can be REPEAT'ed.
 Also the span between an IF and ENDIF is a conditional basic block.
-The shorthand form of IF, converts only that single line into a cond bb.
-
-//=================Finish Include CALL'S ==========================//
-Better syntax error msgs through seperate line var counting per nc_file
-F.e.:
-test/call/X.mpf and Y.spf
-
-Both 25 lines
-When finished with Y.spf
-The line_num seems to be 25 larger
-
--> Syntax Error
-Error: syntax error, unexpected end of file, expecting NEWLINE, in line: 50
--> Error: syntax error, unexpected end of file, expecting NEWLINE, in line: X.mpf:25
-
-So new format of err in line reporting: <nc_file>:<line_in_that_nc_file>
-Does FILE* yyin contain file_path information?
-Probably extra str* active_file global required.
-->Save line on stack, and set it to 0, for newly exec'd file.
-	->file CALL finished -> restore line from stack
+The shorthand form of IF, converts only that single line into a cond bb
 //=======================================================//
 Fix line off by one error
 -> Stop with ball search non-sense

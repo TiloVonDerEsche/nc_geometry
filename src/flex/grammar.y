@@ -3,7 +3,6 @@
   #include <math.h>
 
   #include "helper.h"
-  #include "stack/frames.h"
 
   extern Config config;
   extern ubyte debug_bm;
@@ -72,7 +71,7 @@
   Stack call_stack;
   Stack jmp_stack;
 
-  char* active_file = "NONE";
+  char* active_fname = "NONE";
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -140,11 +139,8 @@
 
 %initial-action {
     //h = init_hashmap(); //h is global in helper.c for now
-
-    // In initial setup:
-    //stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
+    stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
     stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
-    //debug_bm = config.debug_bitmap;
 }
 
 %%
@@ -442,14 +438,18 @@ arith_expr:
 %%
 int exec(char* fpath) {
   FILE* fp = fopen(fpath, "rb");
-  if (fp == NULL) {
+if (fp == NULL) {  //set yyin, only when file is correctly opened
     fprintf(stderr, "Error: Could not open %s (in read mode)!\
     \n\rDoes that file exist?\n",fpath);
     return NOT_FOUND;
   }
-  
-  active_file = strdup(fpath);
-  yyin = fp; //set yyin, only when file is correctly opened
+  //Save current active_fname and line
+  push_call_frame(&call_stack, active_fname, (size_t)get_var_val("line"));
+
+  //Switching to called file
+  active_fname = strdup(fpath);
+  yyin = fp;
+  set_var("line",1); //Reset line var, for new file
 
   //--------Preprocessor for Labels
   label_finder(yyin);
@@ -645,6 +645,6 @@ void set_var_incr(char* varname, float fnum) {
 }
 
 int yyerror(const char* err_msg) {
-	printf("Error: %s, in: <%s>:<%d>\n", err_msg, active_file, (int)get_var_val("line"));
+	printf("Error: %s, in: <%s>:<%d>\n", err_msg, active_fname, (int)get_var_val("line"));
 	return 0;
 }

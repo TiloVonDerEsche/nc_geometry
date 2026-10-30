@@ -5,9 +5,12 @@
 
 void stack_init(Stack *stack, size_t elem_size, int capacity) {
     stack->elem_size = elem_size;
-    stack->capacity = capacity > 0 ? capacity : STACK_SIZE;
+    stack->capacity = capacity > 0 ? capacity : STACK_SIZE; //NOTE why shouldn't capacity be also size_t?
     stack->top = -1;
-    stack->data = malloc(stack->elem_size * stack->capacity);
+    stack->data = malloc(stack->elem_size * stack->capacity); //TODO Check if the product, can overflow
+
+    printf("Initialized stack with: Elem_size: %lu, Capacity: %d, Top: %d\n",
+           stack->elem_size, stack->capacity, stack->top); //TODO add debug & 32
 }
 
 void stack_free(Stack *stack) {

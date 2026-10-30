@@ -4,8 +4,11 @@
 
   void set_var(char*, float);
   float get_var_val(char*);
+  void yypop_buffer_state(void);
 
   extern ubyte debug_bm;
+  extern Stack call_stack;
+  extern char* active_fname;
 %}
 
 /* scanner for a simplified numeric control (NC from CNC machining) language */
@@ -144,6 +147,18 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
 <<EOF>> {yypop_buffer_state();
   if(!YY_CURRENT_BUFFER){
       yyterminate();}
+  if (is_empty(&call_stack)) {
+    yyterminate();
+  } else {
+    char* prev_fname;
+    size_t prev_line;
+    if(!pop_call_frame(&call_stack, &prev_fname, &prev_line)) {
+	fprintf(stderr,"Failed to pop call_frame, while processing EOF!\n");//TODO perhaps terminate
+    }
+
+    active_fname = prev_fname;
+    set_var("line", prev_line); 
+  }
 }
 
 .       {fprintf(stderr,"An unknown Token: %s\n", yytext); return OTHER;}

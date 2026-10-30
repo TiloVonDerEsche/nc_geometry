@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "khashl.h"
+#include "stack/frames.h"
 
 //===========Structs Typedefs===========//
 typedef struct {

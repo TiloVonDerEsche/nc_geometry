@@ -10,7 +10,7 @@ extern FILE* tl;
 
 extern void label_finder(FILE* fp);
 
-extern FILE* yyin;
+//exec()
 extern int yyparse();
 
 //Read params from config

@@ -25,15 +25,9 @@ Trace:
 //================cconf_Reader===================//
 -> Multiline c-comments, throgh flex comment state
 
-Interpreter-, Plot Confifg as Global singletons
+Interpreter-, Plot Config as Global singletons
 
-Color.cconf
-Is another language than cconf:
-bool_expr -> {R,G,B};
-Perhaps cmap -> color_map
-or bcmap boolean_color_map
-bcfilt boolean_color_filtering
-selecfilt selective filtering
+Perhaps option to reload cconf / cmap of 3D_vis, while running.
 //=================IF clauses=====================//
 Seem to work.
 Test multiline IF clauses:
@@ -42,6 +36,17 @@ IF bool_expr expr
  expr
  expr ;ENDIF
  ENDIF
+
+Implement shorthand form of IF clauses:
+IF bool_expr if_body ;no ENDIF, since single lined
+-> Should only be possible with preparser
+
+Perhaps we should compile the nc file into basic blocks,
+which span across an AST.
+Then a code section between labels, are a basic block,
+which can be REPEAT'ed.
+Also the span between an IF and ENDIF is a conditional basic block.
+The shorthand form of IF, converts only that single line into a cond bb.
 
 //=================Finish Include CALL'S ==========================//
 Better syntax error msgs through seperate line var counting per nc_file

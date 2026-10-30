@@ -58,7 +58,6 @@
 
   int jump_requested = 0;
   int skip = 0;
-  int if_skip_depth = 0; //NOTE IDK if we need it
   int incr_mode = 0;
   int rot_mode = 0;
 
@@ -72,6 +71,8 @@
 
   Stack call_stack;
   Stack jmp_stack;
+
+  char* active_file = "NONE";
 %}
 
 %define api.value.type union /* Generate YYSTYPE from these types: */
@@ -446,6 +447,8 @@ int exec(char* fpath) {
     \n\rDoes that file exist?\n",fpath);
     return NOT_FOUND;
   }
+  
+  active_file = strdup(fpath);
   yyin = fp; //set yyin, only when file is correctly opened
 
   //--------Preprocessor for Labels
@@ -641,7 +644,7 @@ void set_var_incr(char* varname, float fnum) {
     }
 }
 
-int yyerror(const char* s) {
-	printf("Error: %s, in line: %d\n", s, (int)get_var_val("line"));
+int yyerror(const char* err_msg) {
+	printf("Error: %s, in: <%s>:<%d>\n", err_msg, active_file, (int)get_var_val("line"));
 	return 0;
 }

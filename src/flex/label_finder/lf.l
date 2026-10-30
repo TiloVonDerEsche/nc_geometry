@@ -53,7 +53,7 @@ id       [A-Za-z][_A-Za-z0-9]*
 {letter}{id}":" {
   char* s = lftext;
   s[strlen(s) - 1] = '\0';
-  if(debug_bm & 8){ printf("A label: %s, len=%lu \n", s,strlen(s)); }
+  if(debug_bm & 8 && debug_bm & 64){ printf("Label_finder found: A label: %s, len=%lu \n", s,strlen(s)); }
 
   strncpy(active_label, s, strlen(s));
   active_label[strlen(s)] = '\0';
@@ -65,8 +65,8 @@ id       [A-Za-z][_A-Za-z0-9]*
   set_var(line_label, (float)line);
 }
 
-"\""[^\"]*"\"" { if(debug_bm & 2){ printf("A string: %s\n",lftext); }}
-";"[^\n]*      {if(debug_bm & 4){ printf("A comment: %s\n", lftext); }}
+"\""[^\"]*"\"" { if(debug_bm & 2 && debug_bm & 64){ printf("Label_finder found: A string: %s\n",lftext); }}
+";"[^\n]*      {if(debug_bm & 4 && debug_bm & 64){ printf("Label_finder found: A comment: %s\n", lftext); }}
 
 [ \t]          {}
 "\r\n"         {line++;}

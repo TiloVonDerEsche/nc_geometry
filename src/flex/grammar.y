@@ -23,10 +23,10 @@
   vec3D net_point();
 
   strfloat_t* init_hashmap();
-  float get_var_val(char*);
-  void set_var_rot(char, float);
-  void set_var_incr(char*, float);
-  void set_var(char*, float);
+  float get_var_val(const char*);
+  void set_var_rot(const char, float);
+  void set_var_incr(const char*, float);
+  void set_var(const char*, float);
 
   void write_track_line();
   void write_ncc_line(vec3D);
@@ -336,11 +336,11 @@ expr:
                         {if(!skip){
                             char start_end_l[32+11];
                             snprintf(start_end_l, sizeof(start_end_l), "%s_END_LABEL", $2);
-                            handle_repeat($2,start_end_l,(size_t)get_var_val("line"));}
+                            handle_repeat(strdup($2),start_end_l,(size_t)get_var_val("line"));}
                         }
   | REPEAT ID ID %prec HIGH
-                        {if(!skip){
-                            handle_repeat($2,$3,(size_t)get_var_val("line"));}
+                        {if(!skip){//TODO Better solution than strdup without free
+                            handle_repeat(strdup($2),strdup($3),(size_t)get_var_val("line"));}
                         }
   | SPECIAL_CMD          {
                           if(strcmp($1,"LASER_ON") == 0) {
@@ -472,23 +472,34 @@ void request_jump(char* target) {
   jump_requested = 1;
   skip = 1;
 
+
+  if(debug_bm & 8) {
+    printf("Looking up target: %s -> offset: %ld\n",
+           target, (long)get_var_val(target));}
+
+
   char line_label[32+6];
   snprintf(line_label, sizeof(line_label), "%s_line", target);
   target_line = (size_t)get_var_val(line_label);
   target_byte_offset = get_var_val(target);
+
+  if(debug_bm & 8) {
+    printf("Retrieved: %s=%lu, offset=%ld\n",
+           line_label,target_line,target_byte_offset);}
+  print_hashmap(h, stdout);
 }
 
-void jump(size_t target_line,long target_byte_offset) {
-  if (target_byte_offset >= 0) {
-      set_var("line", target_line);
+void jump(size_t t_line,long t_byte_offset) {
+  if (t_byte_offset >= 0) {
+      set_var("line", t_line);
       skip = 0;
       jump_requested = 0;
 
       if(debug_bm & 8){
         printf("Jumping to line=%lu, offset=%ld\n\n",
-        target_line,target_byte_offset);}
+        t_line,t_byte_offset);}
 
-      fseek(yyin, target_byte_offset, SEEK_SET);
+      fseek(yyin, t_byte_offset, SEEK_SET);
       yyrestart(yyin);
   }
 }
@@ -511,7 +522,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     if(debug_bm & 8){
       printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
         labelp,labeln,linep,linen,(size_t)get_var_val("line"));}
-    
+
     if (byte_offsetp <= 0 && byte_offsetn <= 0) {
         fprintf(stderr,"Error: REPEAT return byte_offset=%ld\n",byte_offset);
     }
@@ -524,6 +535,11 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
        byte_offset=byte_offsetn;
        line=linen;
      }
+     //TODO jump to next line of where REPEAT is located
+     //or at the start of the line where REPEAT is located and
+     //keep an iteration counter P: REPEAT START END P=3,
+     //which is defaulted to 1, i.e. one iteration.
+
      break; //TODO Find End label: REPEAT Start End, and exit after REPEAT
     }	    //TODO So jump to REPEAT_line, when End label has been found
     linen--;linep++;
@@ -572,11 +588,11 @@ void handle_tracks_def_attrs() {
   }
 }
 
-int has_track_attr_changed(char* varname) {
+int has_track_attr_changed(const char* varname) {
   //NOTE doesn't check if attr has changed numerically
   //NOTE only that set_var has been called for that attr
-  char* key = varname;
-  char c = key[0];
+  const char* key = varname;
+  const char c = key[0];
   unsigned char bm = config.attrs_bitmap;
   if (bm & XYZ && (c=='X' || c=='Y' || c=='Z')) {save_track=TRUE;return TRUE;}
   if (bm & B && c=='B') {save_track=TRUE;return TRUE;}
@@ -608,7 +624,7 @@ void write_ncc_line(vec3D p) {
 }
 
 //-----hashmap fns
-float get_var_val(char* varname) {
+float get_var_val(const char* varname) {
   if (!varname) return 0;
 
   khint_t k;
@@ -621,10 +637,12 @@ float get_var_val(char* varname) {
   return 0;
 }
 
-void set_var(char* varname, float fnum) {
+void set_var(const char* varname, float fnum) {
   khint_t k;
   int absent;
 
+  if(debug_bm & 128) {
+    printf("Setting var: %s to %f\n",varname,fnum);}
   k = strfloat_put(h, varname, &absent);
   if (absent) {
     kh_key(h, k) = strdup(varname);}
@@ -634,7 +652,7 @@ void set_var(char* varname, float fnum) {
   has_track_attr_changed(varname);
 }
 
-void set_var_incr(char* varname, float fnum) {
+void set_var_incr(const char* varname, float fnum) {
     //incr_mode only applies to (X,Y,Z) & (A,B,C), which we call coords
     if (incr_mode) {
       set_var(varname, get_var_val(varname)+fnum);

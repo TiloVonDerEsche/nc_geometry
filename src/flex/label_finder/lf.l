@@ -1,8 +1,8 @@
 %option prefix="lf"
 %{
   #include "./../helper.h"
-  void set_var(char*, float);
-  float get_var_val(char*);
+  void set_var(const char*, float);
+  float get_var_val(const char*);
 
   long byte_counter = 0;
   #define YY_USER_ACTION byte_counter += yyleng;

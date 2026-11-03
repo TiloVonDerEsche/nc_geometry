@@ -1,4 +1,5 @@
-//mpf_file = "./test.nc"
+//mpf_file = "./test.nc";
+//mpf_file = "./LOOP_REPEAT.nc";
 
 //mpf_file = "./data/nc_code/Niere/Layer10_2.spf";
 //mpf_file = "./data/nc_code/Niere/round_channel/main.mpf";
@@ -11,9 +12,9 @@
 //mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
 //mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
 
-mpf_file = "./data/nc_code/test/call/XYZ.mpf";
+//mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/color/g.mpf";
-//mpf_file = "./data/nc_code/test/abc/CoordSys3D.nc";
+mpf_file = "./data/nc_code/test/repeat/2.mpf";
 
 /*debug_bitmap:
  1 Token printing
@@ -23,9 +24,9 @@ mpf_file = "./data/nc_code/test/call/XYZ.mpf";
  16 if clauses //TODO switch with 8
  32   stack debug
  64   activate label_finder msgs
- 128  hashmap after executing file
+ 128  hashmap after executing file & modifications
 */
-debug_bitmap = 2;
+debug_bitmap = 255;
 hmhis_to_stdout = 0;
 hmhis_to_file = 0;
 

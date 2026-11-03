@@ -3,6 +3,7 @@ SRC = ./t_vis_color.c
 ROOT_DIR = ./../../../
 MXE_PATH = /home/tilo/res/mxe
 SUFFIX = _x86_64
+EXE = bin
 # --- Default Target Logic ---
 # Usage:
 #   make              (Builds Linux)
@@ -14,7 +15,7 @@ ifeq ($(TARGET), WIN64)
     ARCH = x86_64-w64-mingw32.static
     CC = $(MXE_PATH)/usr/bin/$(ARCH)-g++
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
-    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
+    EXE = exe
     # Windows-specific flags
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`
     LIBS = `$(PKG_CONFIG) --libs --static glut glew` -lopengl32 -lglu32 -lm
@@ -26,20 +27,31 @@ else ifeq ($(TARGET), XP)
     ARCH = i686-w64-mingw32.static
     CC = $(MXE_PATH)/usr/bin/$(ARCH)-g++
     PKG_CONFIG = $(MXE_PATH)/usr/bin/$(ARCH)-pkg-config
-    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).exe
+    EXE = exe
     CFLAGS = `$(PKG_CONFIG) --cflags glut glew`
     LIBS = `$(PKG_CONFIG) --libs --static glut glew` -lopengl32 -lglu32 -lm
     LDFLAGS = -static -Wl,--subsystem,windows
-
+else ifeq ($(TARGET), ARM64)
+    #TODO get arm64 versions of freeglut/glew
+    SUFFIX = _arm_64
+    CC = aarch64-linux-gnu-g++
+    # If you have ARM64 cross-compiled versions of freeglut/glew, adjust paths here:
+    # (If compiling natively on the phone in Termux, you wouldn't use TARGET=ARM64, just default g++)
+    CFLAGS = -I/usr/aarch64-linux-gnu/include -I/home/tilo/res/freeglut_arm64/include -I/home/tilo/res/glew_arm64/include
+    LIBS = -L/home/tilo/res/freeglut_arm64/build/lib -L/home/tilo/res/glew_arm64/lib \
+           -lglut -lGLEW -lGL -lGLU -lm
+    LDFLAGS =
 else
     # Default: Linux (Mint)
     CC = g++
-    OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).bin
     CFLAGS = -I/home/tilo/res/freeglut/include -I/home/tilo/res/glew/include
     LIBS = -L/home/tilo/res/freeglut/build/lib -L/home/tilo/res/glew/lib \
            -lglut -lGLEW -lGL -lGLU -lm
     LDFLAGS =
 endif
+
+OUT = $(ROOT_DIR)3d_track_visualizer$(SUFFIX).$(EXE)
+
 
 # --- Rules ---
 

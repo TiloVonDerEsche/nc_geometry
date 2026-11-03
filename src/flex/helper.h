@@ -91,8 +91,8 @@ void modify_tl();
 strfloat_t* init_hashmap();
 void print_hashmap(strfloat_t* h, FILE* destination);
 //void set_var_incr(char* varname, float fnum);
-void set_var(char* varname, float fnum);
-float get_var_val(char* varname);
+void set_var(const char* varname, float fnum);
+float get_var_val(const char* varname);
 
 //------Math Functions------//
 vec3D vec3D_add(vec3D p1, vec3D p2);

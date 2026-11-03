@@ -7,3 +7,4 @@ $DIR/rm_binaries.sh
 $DIR/linux.sh
 $DIR/win64.sh
 $DIR/xp-win-32.sh
+#$DIR/ARM64.sh

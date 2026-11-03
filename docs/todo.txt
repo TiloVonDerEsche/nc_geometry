@@ -1,18 +1,23 @@
-//================Debug Bitmap===============//
-Advantage over enum: I can select multiple debug options, at once. Mapping:
-debug_bitmap:
-  1 Token printing
-  2 Print strings
-  4 Comment printing
-  8 jump -> GOTO, REPEAT, Labels
- 16 if clauses
- 32
- 64
- 128  hashmap after executing file
+//==================Fixing REPEAT=================//
+test/repeat/2.mpf:
+First REPEAT jump, seems to work fine.
+Jumping to CON1 with line=6 and offset=74
+
+Return Jump: Jumping to line=19 with offset=154.
+Which is right after REPEAT, but before labels:
+      v
+REPEAT CON1 CON2
+
+Second REPEAT jump has correct line=6, to CON1 label,
+but byteoffset=141 of CON2 label
 
 
+//================3D_Visualizer Bugs===============//
+Ctrl + c
+Only works when pressing C first
+-> CTRL + C already mapped key-combination
 
- Hashmap printing, already set by hmhis_to_stdout
+When tabbing out, cam keeps moving when movement key was held
 //===============Advanced error printing==============//
 Remember Line count in stack -> line count, per file executed
 -> line count restored from stack, when finished with Include CALL

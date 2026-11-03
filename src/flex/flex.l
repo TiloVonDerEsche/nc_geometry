@@ -2,8 +2,8 @@
   #include "grammar.tab.h"
   #include "helper.h"
 
-  void set_var(char*, float);
-  float get_var_val(char*);
+  void set_var(const char*, float);
+  float get_var_val(const char*);
   void yypop_buffer_state(void);
 
   extern ubyte debug_bm;
@@ -25,7 +25,7 @@ fnum    ({digit}+"."{digit}*)|({digit}*"."{digit}+)
 
 /*At least two Letters before digits or underscore*/
 /*So G00,X12,A_ can't be an id*/
-/*Don't end on an underscore -> forbids: ABC_*/
+/*Don't end on an underscore -> forbids: TEST_*/
 id       {letter}{letter}+([_]*{alnum}+)*
 
 %%
@@ -42,8 +42,10 @@ id       {letter}{letter}+([_]*{alnum}+)*
         return FLOAT;
         }
 
-R{inum} {yylval.VAR = strdup(yytext); return VAR;}
-H{inum} {yylval.VAR = strdup(yytext); return VAR;}
+R{inum} {if(debug_bm & 1){printf("An R VAR: %s!\n",yytext);}
+	yylval.VAR = strdup(yytext); return VAR;}
+H{inum} {if(debug_bm & 1){printf("An H VAR: %s!\n",yytext);}
+	yylval.VAR = strdup(yytext); return VAR;}
 
 {id}":" {
   char* s = yytext;
@@ -127,19 +129,21 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
   return STRING;
 }
 
-[G]      {yylval.G_CMD = yytext[0]; return G_CMD;}
-[XYZ]    {yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
-[ABC]    {yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
-{cap_letter} {yylval.CMD = yytext[0];
-  if(debug_bm & 1){ printf("A command: %c\n", yytext[0]); }
-  return CMD;
-}
+[G]          {if(debug_bm & 1){printf("A G_CMD:'%c'\n",yytext[0]);}
+		yylval.G_CMD = yytext[0]; return G_CMD;}
+[XYZ] 	     {if(debug_bm & 1){printf("A XYZ_CMD:'%c'\n",yytext[0]);}
+		yylval.XYZ_CMD = yytext[0]; return XYZ_CMD;}
+[ABC] 	     {if(debug_bm & 1){printf("An ABC_CMD:'%c'\n",yytext[0]);}
+		yylval.ABC_CMD = yytext[0]; return ABC_CMD;}
+{cap_letter} {if(debug_bm & 1){printf("A CMD:'%c'\n",yytext[0]);}
+		yylval.CMD = yytext[0];
+ 		 return CMD;}
 
-[ \t]      		 { if(debug_bm & 1){ printf("\t");}}
+[ \t]          {if(debug_bm & 1){ printf("\t");}}
 "\r\n"         {if(debug_bm & 1){ puts("\n");}
-                set_var("line", get_var_val("line") + 1); return NEWLINE;}
+                  set_var("line", get_var_val("line") + 1); return NEWLINE;}
 "\n"           {if(debug_bm & 1){ puts("\n");}
-                set_var("line", get_var_val("line") + 1); return NEWLINE;}
+                  set_var("line", get_var_val("line") + 1); return NEWLINE;}
 
 
 
@@ -157,7 +161,7 @@ H{inum} {yylval.VAR = strdup(yytext); return VAR;}
     }
 
     active_fname = prev_fname;
-    set_var("line", prev_line); 
+    set_var("line", prev_line);
   }
 }
 

@@ -2,6 +2,7 @@
 CC = gcc
 EXE = .bin
 SUFFIX = _x86_64
+CFLAGS =
 # Change this for different targets (e.g., make TARGET=XP)
 ifeq ($(TARGET), XP)
     CC = i686-w64-mingw32-gcc
@@ -13,23 +14,29 @@ else ifeq ($(TARGET), WIN64)
     EXE = .exe
     LDFLAGS = -static
     SUFFIX = _x86_64
+else ifeq ($(TARGET), ARM64)
+    CC = aarch64-linux-gnu-gcc
+    EXE = .bin
+    CFLAGS = -fPIE
+    LDFLAGS = -pie
+    SUFFIX = _arm_64
 endif
 
 OBJS = main.o lex.yy.o lf.yy.o label_finder.o grammar.tab.o helper.o stack.o frames.o
 OUT = ./../../generate_track_list$(SUFFIX)$(EXE)
 
 $(OUT): $(OBJS)
-	$(CC) $(OBJS) -o $(OUT) -lm $(LDFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(OUT) -lm $(LDFLAGS)
 
 # Generic rule for all .o files to save space
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 stack.o: ./stack/stack.c ./stack/stack.h
-	$(CC) -c ./stack/stack.c -o stack.o
+	$(CC) $(CFLAGS) -c ./stack/stack.c -o stack.o
 
 frames.o: ./stack/frames.c ./stack/frames.h
-	$(CC) -c ./stack/frames.c -o frames.o
+	$(CC) $(CFLAGS) -c ./stack/frames.c -o frames.o
 
 # Keep your Flex/Bison rules as they are (using Linux natives)
 lex.yy.c: flex.l grammar.tab.h
@@ -40,13 +47,13 @@ grammar.tab.c grammar.tab.h: grammar.y
 
 # Special path for label_finder objects
 lf.yy.o: ./label_finder/lf.yy.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 ./label_finder/lf.yy.c: ./label_finder/lf.l
 	flex -o $@ $<
 
 label_finder.o: ./label_finder/label_finder.c
-	$(CC) -c ./label_finder/label_finder.c -o label_finder.o
+	$(CC) $(CFLAGS) -c ./label_finder/label_finder.c -o label_finder.o
 
 clean:
 	rm -f *.o *.yy.c *.tab.c *.tab.h *.output ./label_finder/*.yy.c ./stack/*.o

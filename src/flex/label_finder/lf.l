@@ -31,15 +31,29 @@ letter      [A-Z]
 id       [A-Za-z][_A-Za-z0-9]*
 
 %%
-
 "REPEAT" {
   //gets exceeded when 32 < 8 + line_digits <=> 24 < line_digits (decimal)
   //Meaning: line > 10^24
   //64-Bit: 2^64 - 1 =^ max 20 decimal digits
   char line_label[MAX_LABEL_LEN];
   snprintf(line_label, sizeof(line_label), "REPEAT_%lu", line);
-  set_var(line_label, (float)byte_counter);
+  set_var(line_label, (float)byte_counter-6); //return jump before "REPEAT"
+
+  char iter_label[MAX_LABEL_LEN*2];
+  snprintf(iter_label, sizeof(iter_label), "%s_iter_num", line_label);
+  set_var(iter_label, 1); //Default to P=1, otherwise overwrite
 }
+
+
+
+"P"[ \t]*"="{inum} {
+    char iter_label[MAX_LABEL_LEN*2]; //line can be up to 15+32 decimal digits longs
+    snprintf(iter_label, sizeof(iter_label), "REPEAT_%lu_iter_num", line);
+    
+    char* val_ptr = strchr(yytext, '=') + 1; //read yytext after '='
+    set_var(iter_label, atoi(val_ptr));
+}
+
 
 
 "END_LABEL:" {

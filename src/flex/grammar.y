@@ -486,7 +486,7 @@ void request_jump(char* target) {
   if(debug_bm & 8) {
     printf("Retrieved: %s=%lu, offset=%ld\n",
            line_label,target_line,target_byte_offset);}
-  print_hashmap(h, stdout);
+  //print_hashmap(h, stdout);
 }
 
 void jump(size_t t_line,long t_byte_offset) {
@@ -545,20 +545,30 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     linen--;linep++;
   }
   if(debug_bm & 8){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
+  
+  char iter_label[64];
+  snprintf(iter_label, sizeof(iter_label), "REPEAT_%lu_iter_num", line);
+  
+  int iter_num = get_var_val(iter_label);
+  if(debug_bm & 8) {printf("iter_num=%d, of %s\n",iter_num,iter_label);}
+  
+  if (iter_num > 0) { //Jump only if REPEAT LB1 LB2 P>=1
+    set_var(iter_label,iter_num-1); //decrement iter_num of REPEAT
 
-  push_jmp_frame(&jmp_stack,
-    strdup(end_label), //return label NOTE when reading this label
-    line,       //return line         NOTE reset line
-    byte_offset //return byte_offset  NOTE jmp to byte_offset
-  );
+    push_jmp_frame(&jmp_stack,
+      strdup(end_label), //return label NOTE when reading this label
+      line,       //return line         NOTE reset line
+      byte_offset //return byte_offset  NOTE jmp to byte_offset
+    );
 
-  request_jump(start_label);
+    request_jump(start_label);
 
-  if (debug_bm & 8) {
-    JmpFrame temp;
-    if (peek(&jmp_stack, &temp)) {
-        printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
-                temp.label, temp.line, temp.byte_offset);
+    if (debug_bm & 8) {
+      JmpFrame temp;
+      if (peek(&jmp_stack, &temp)) {
+            printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
+                  temp.label, temp.line, temp.byte_offset);
+      }
     }
   }
 }

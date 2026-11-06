@@ -9,12 +9,12 @@
 
 //mpf_file = "./data/nc_code/Vase/05_Vase_130mm_CuAl10.mpf";
 
-//mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
+mpf_file = "./data/nc_code/LOOP/LOOP_CUBE_10VX_FGM_FH33.mpf";
 //mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
 
 //mpf_file = "./data/nc_code/test/call/XYZ.mpf";
 //mpf_file = "./data/nc_code/test/color/g.mpf";
-mpf_file = "./data/nc_code/test/repeat/3.mpf";
+//mpf_file = "./data/nc_code/test/repeat/3.mpf";
 
 /*debug_bitmap:
  1 Token printing

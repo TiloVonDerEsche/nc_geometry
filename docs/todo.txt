@@ -1,44 +1,9 @@
-//==================Fixing REPEAT=================//
-test/repeat/2.mpf:
-First REPEAT jump, seems to work fine.
-Jumping to CON1 with line=6 and offset=74
-
-Return Jump: Jumping to line=19 with offset=154.
-Which is right after REPEAT, but before labels:
-      v
-REPEAT CON1 CON2
-
-Second REPEAT jump has correct line=6, to CON1 label,
-but byteoffset=141 of CON2 label
-
-
 //================3D_Visualizer Bugs===============//
 Ctrl + c
 Only works when pressing C first
 -> CTRL + C already mapped key-combination
 
 When tabbing out, cam keeps moving when movement key was held
-//===============Advanced error printing==============//
-Remember Line count in stack -> line count, per file executed
--> line count restored from stack, when finished with Include CALL
-
-Error: Syntax in <File>:<Line>:<Char>
-Expected: <Token> instead of <Token>
-Trace:
-.
-
-//Include CALL'S//
-Better syntax error msgs through seperate line var counting per nc_file
-F.e.:
-test/call/X.mpf and Y.spf
-
-->Save line on stack, and set it to 0, for newly exec'd file.
-->file CALL finished -> restore line from stack
-
-//================cconf_Reader===================//
--> Multiline c-comments, throgh flex comment state
-
-Interpreter-, Plot Config as Global singletons
 
 Perhaps option to reload cconf / cmap of 3D_vis, while running.
 //=================IF clauses=====================//
@@ -64,6 +29,8 @@ The shorthand form of IF, converts only that single line into a cond bb
 Fix line off by one error
 -> Stop with ball search non-sense
 !Our runtime line should not be wrong!
+NOTE Is the line still of by one? When?
+
 
 Exprs before ENDIF don't seem to execute
      (^ ,in new lines,)

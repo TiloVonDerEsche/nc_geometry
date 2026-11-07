@@ -24,6 +24,8 @@ typedef struct {
   char ncc_points_csv[256];
   char hmhis_json[256];
 } Config;
+
+//NOTE Why isn't the Track typedef defined here?
 //==========Typedefs==========//
 typedef unsigned char ubyte;
 
@@ -38,13 +40,29 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define XYZ 1
 #define B 2
 #define C 4
-#define MACHINE_SPEED 8
-#define LASER_POWER 16
-#define LASER_STATUS 32
-#define G_CODE 64
+#define G_CODE 8
+#define LASER_STATUS 16
+#define LASER_POWER 32
+#define MACHINE_SPEED 64
+#define POWDER_FEED_RATE 128
+
+
+
 
 //Debug Bitmap:
 //TODO
+/*debug_bitmap:
+ 1 Token printing
+ 2 Print strings
+ 4 Comment printing
+ 8 if clauses
+ 16  jump -> GOTO, REPEAT, Labels
+ 32   stack debug
+ 64   activate label_finder msgs
+ 128  hashmap after executing file & modifications
+*/
+
+
 
 //tracks_def_by
 #define TDB_COORD_LINES 0

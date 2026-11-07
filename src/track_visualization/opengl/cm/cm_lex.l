@@ -38,19 +38,21 @@ id       [A-Za-z][_A-Za-z]*
         return FNUM;
         }
 
-"t_id" {return T_ID;}
-"t_start_x" {return T_START_X;}
-"t_start_y" {return T_START_Y;}
-"t_start_z" {return T_START_Z;}
-"t_end_x" {return T_END_X;}
-"t_end_y" {return T_END_Y;}
-"t_end_z" {return T_END_Z;}
-[bB] {return B_CMD;}
-[cC] {return C_CMD;}
-"machine_speed" {return MACHINE_SPEED;}
-"laser_power" {return LASER_POWER;}
-"laser_status" {return LASER_STATUS;}
-[gG] {return G_CODE;}
+"t_id"             {return T_ID;}
+"t_start_x"        {return T_START_X;}
+"t_start_y"        {return T_START_Y;}
+"t_start_z"        {return T_START_Z;}
+"t_end_x"          {return T_END_X;}
+"t_end_y"          {return T_END_Y;}
+"t_end_z"          {return T_END_Z;}
+[bB]               {return B_CMD;}
+[cC]               {return C_CMD;}
+[gG]               {return G_CODE;}
+"laser_status"     {return LASER_STATUS;}
+"laser_power"      {return LASER_POWER;}
+"machine_speed"    {return MACHINE_SPEED;}
+"powder_feed_rate" {return POWDER_FEED_RATE;}
+
 "hradius" {return HRAD;}
 "vradius" {return VRAD;}
 

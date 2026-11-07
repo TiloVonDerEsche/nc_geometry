@@ -42,21 +42,23 @@ public:
 
     double evaluate(Track* t) const override {
       const char* key = track_attr_name;
-      if (strcmp(key, "t_id") == 0) {return t->id;}
-      else if (strcmp(key, "t_start_x") == 0) {return t->start_x;}
-      else if (strcmp(key, "t_start_y") == 0) {return t->start_y;}
-      else if (strcmp(key, "t_start_z") == 0) {return t->start_z;}
-      else if (strcmp(key, "t_end_x") == 0) {return t->end_x;}
-      else if (strcmp(key, "t_end_y") == 0) {return t->end_y;}
-      else if (strcmp(key, "t_end_z") == 0) {return t->end_z;}
-      else if (strcmp(key, "B") == 0) {return t->b;}
-      else if (strcmp(key, "C") == 0) {return t->c;}
-      else if (strcmp(key, "machine_speed") == 0) {return t->machine_speed;}
-      else if (strcmp(key, "laser_power") == 0) {return t->laser_power;}
-      else if (strcmp(key, "laser_status") == 0) {return t->laser_status;}
-      else if (strcmp(key, "G") == 0) {return t->g_code;}
-      else if (strcmp(key, "hradius") == 0) {return t->hradius;}
-      else if (strcmp(key, "vradius") == 0) {return t->vradius;}
+      if      (strcmp(key, "t_id") == 0)             {return t->id;}
+      else if (strcmp(key, "t_start_x") == 0)        {return t->start_x;}
+      else if (strcmp(key, "t_start_y") == 0)        {return t->start_y;}
+      else if (strcmp(key, "t_start_z") == 0)        {return t->start_z;}
+      else if (strcmp(key, "t_end_x") == 0)          {return t->end_x;}
+      else if (strcmp(key, "t_end_y") == 0)          {return t->end_y;}
+      else if (strcmp(key, "t_end_z") == 0)          {return t->end_z;}
+      else if (strcmp(key, "B") == 0)                {return t->b;}
+      else if (strcmp(key, "C") == 0)                {return t->c;}
+      else if (strcmp(key, "G") == 0)                {return t->g_code;}
+      else if (strcmp(key, "laser_status") == 0)     {return t->laser_status;}
+      else if (strcmp(key, "laser_power") == 0)      {return t->laser_power;}
+      else if (strcmp(key, "machine_speed") == 0)    {return t->machine_speed;}
+      else if (strcmp(key, "powder_feed_rate") == 0) {return t->powder_feed_rate;}
+
+      else if (strcmp(key, "hradius") == 0)          {return t->hradius;}
+      else if (strcmp(key, "vradius") == 0)          {return t->vradius;}
       fprintf(stderr,"Invalid track_attr_name: %s,"
         "given to VariableNode eval fn!\n",key);
       return -1; //Invalid track_attr_name!
@@ -111,7 +113,6 @@ public:
     void print(int depth) const override {
         std::cout << std::string(depth, ' ') << "└─ Operator: [" << op << "]\n";
         if (val_node)  val_node->print(depth + 4);
-        //TODO What is depth? Is +4 correct for Unary?
     }
 
     double evaluate(Track* t) const override {
@@ -156,7 +157,6 @@ public:
     double evaluate(Track* t) const override {
         int r_eval = bool_expr_node ? bool_expr_node->evaluate(t) : 0;
         if(r_eval) {t->color=color;} //mutating track color, if bool_expr true
-        //TODO finish after successfully mapping the first color
         return r_eval;
     }
 };

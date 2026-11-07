@@ -181,7 +181,7 @@ line:
           jump_requested = 0;
           skip = 0;
           jump(target_line,target_byte_offset);
-          if(debug_bm & 8){printf("Jumped to line=%lu, byte=%ld\n\n",
+          if(debug_bm & 16){printf("Jumped to line=%lu, byte=%ld\n\n",
             target_line, target_byte_offset);}
      }
     }
@@ -202,14 +202,14 @@ expr:
    IF bool_expr {
       if (!skip && !$2) {
           skip++; //ignore code lines, if condition is false
-          if(debug_bm & 16) {printf("IF cond false:\nSkip=%d\n",skip);}
+          if(debug_bm & 8) {printf("IF cond false:\nSkip=%d\n",skip);}
           //NOTE seperate debug bitmapping for if-clauses
       }
   }
   | ENDIF {
       if (skip > 0) {
         skip--; //NOTE Are nested false IF blocks possible? i.e. skip > 1
-        if(debug_bm & 16) {printf("ENDIF reached:\nSkip=%d\n",skip);}
+        if(debug_bm & 8) {printf("ENDIF reached:\nSkip=%d\n",skip);}
       }
     }
   | ID %prec LOW //NOTE Giving this LOW prec or removing it causes infinite REPEAT jmps
@@ -270,12 +270,12 @@ expr:
                           JmpFrame top;
                           //Get stack top, without removing it from the stack
                           peek(&jmp_stack, &top);
-                          if(debug_bm & 8){
+                          if(debug_bm & 16){
                             printf("$1_LABEL=%s, jmp_stack_top.label=%s\n",
                             $1,top.label);}
 
                           //if the currently read LABEL="END_LABEL"
-                          if(debug_bm & 8){
+                          if(debug_bm & 16){
                             printf("strcmp($1,'END_LABEL')=%d\n",
                             strcmp($1,"END_LABEL"));}
                           if((strcmp($1,"END_LABEL") == 0)) {
@@ -283,7 +283,7 @@ expr:
                             //current runtime line and
                             //noted line of "<start_label>_END_LABEL" construct
                             int d = get_var_val("line")-get_var_val(top.label);
-                            if(debug_bm & 8){printf("d=%d\n...\n",d);}
+                            if(debug_bm & 16){printf("d=%d\n...\n",d);}
 
                             //lf -> label_finder
                             //tolerate off by one error, btw runtime- and lf-line
@@ -291,7 +291,7 @@ expr:
                                //if the lines of "<start_label>_END_LABEL" construct,
                                //and the runtime line match, then we found the END_LABEL,
                                //to the currently active REPEAT block
-                               if(debug_bm & 8){
+                               if(debug_bm & 16){
                                  printf("'END_LABEL' found! top.label=%s\n",top.label);}
 
                                jump_requested = 1;
@@ -300,7 +300,7 @@ expr:
                                target_line = top.line;
                                target_byte_offset = top.byte_offset;
 
-                               if(debug_bm & 8){printf("Jump Requested!\
+                               if(debug_bm & 16){printf("Jump Requested!\
                                  \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                                  target_line, target_byte_offset);}
 
@@ -314,7 +314,7 @@ expr:
                             target_line = top.line;
                             target_byte_offset = top.byte_offset;
 
-                            if(debug_bm & 8){printf("Jump Requested!\
+                            if(debug_bm & 16){printf("Jump Requested!\
                               \r\ntarget_line=%lu\ntarget_byte_offset=%ld\n",
                               target_line, target_byte_offset);}
 
@@ -455,7 +455,7 @@ if (fp == NULL) {  //set yyin, only when file is correctly opened
   label_finder(yyin);
   rewind(yyin);
 
-  if(debug_bm & 8){
+  if(debug_bm & 16){
     printf("Labels of '%s':\n",fpath);
     print_hashmap(h,stdout);}
 
@@ -473,7 +473,7 @@ void request_jump(char* target) {
   skip = 1;
 
 
-  if(debug_bm & 8) {
+  if(debug_bm & 16) {
     printf("Looking up target: %s -> offset: %ld\n",
            target, (long)get_var_val(target));}
 
@@ -483,7 +483,7 @@ void request_jump(char* target) {
   target_line = (size_t)get_var_val(line_label);
   target_byte_offset = get_var_val(target);
 
-  if(debug_bm & 8) {
+  if(debug_bm & 16) {
     printf("Retrieved: %s=%lu, offset=%ld\n",
            line_label,target_line,target_byte_offset);}
   //print_hashmap(h, stdout);
@@ -495,7 +495,7 @@ void jump(size_t t_line,long t_byte_offset) {
       skip = 0;
       jump_requested = 0;
 
-      if(debug_bm & 8){
+      if(debug_bm & 16){
         printf("Jumping to line=%lu, offset=%ld\n\n",
         t_line,t_byte_offset);}
 
@@ -519,7 +519,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     long byte_offsetp = (long)get_var_val(labelp);
     long byte_offsetn = (long)get_var_val(labeln);
 
-    if(debug_bm & 8){
+    if(debug_bm & 16){
       printf("labelp=%s, labeln=%s, linep=%lu, linen=%lu, line var_val=%lu\n",
         labelp,labeln,linep,linen,(size_t)get_var_val("line"));}
 
@@ -544,14 +544,14 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
     }	    //TODO So jump to REPEAT_line, when End label has been found
     linen--;linep++;
   }
-  if(debug_bm & 8){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
-  
+  if(debug_bm & 16){printf("REPEAT found in line=%lu, byte_offset=%ld\n",line,byte_offset);}
+
   char iter_label[64];
   snprintf(iter_label, sizeof(iter_label), "REPEAT_%lu_iter_num", line);
-  
+
   int iter_num = get_var_val(iter_label);
-  if(debug_bm & 8) {printf("iter_num=%d, of %s\n",iter_num,iter_label);}
-  
+  if(debug_bm & 16) {printf("iter_num=%d, of %s\n",iter_num,iter_label);}
+
   if (iter_num > 0) { //Jump only if REPEAT LB1 LB2 P>=1
     set_var(iter_label,iter_num-1); //decrement iter_num of REPEAT
 
@@ -563,7 +563,7 @@ void handle_repeat(char* start_label, char* end_label, size_t linep) {
 
     request_jump(start_label);
 
-    if (debug_bm & 8) {
+    if (debug_bm & 16) {
       JmpFrame temp;
       if (peek(&jmp_stack, &temp)) {
             printf("Return: Label %s, Line: %zu, Offset: %ld)\n\n",
@@ -607,30 +607,42 @@ int has_track_attr_changed(const char* varname) {
   if (bm & XYZ && (c=='X' || c=='Y' || c=='Z')) {save_track=TRUE;return TRUE;}
   if (bm & B && c=='B') {save_track=TRUE;return TRUE;}
   if (bm & C && c=='C') {save_track=TRUE;return TRUE;}
-  if (bm & MACHINE_SPEED && strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
-  if (bm & LASER_POWER && strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
-  if (bm & LASER_STATUS && strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
   if (bm & G_CODE && c=='G') {save_track=TRUE;return TRUE;}
+  if (bm & LASER_STATUS && strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & LASER_POWER && strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & MACHINE_SPEED && strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
+  if (bm & POWDER_FEED_RATE && strcmp(key, "powder_feed_rate") == 0) {save_track=TRUE;return TRUE;}
+
   return FALSE;
 }
 
 
 void write_track_line() {
-  fprintf(tl,"%lu,  %f, %f, %f,   %f, %f, %f,   %f, %f,   %f, %f, %d, %d\n",
+  fprintf(tl,"%lu,%f,%f,%f, %f,%f,%f, %f,%f, %u, %u,%f, %f,%f\n",
   tid++,
   t_start.x, t_start.y, t_start.z,
   t_end.x, t_end.y, t_end.z,
   get_var_val("B"), get_var_val("C"),
+  (unsigned int)get_var_val("G"),
+  (unsigned int)get_var_val("laser_status"),
+  get_var_val("PUIS_LASER"),
   get_var_val("VIT_TIR"),
-  get_var_val("PUIS_LASER"), (int)get_var_val("laser_status"),
-  (int)get_var_val("G")
+  get_var_val("powder_feed_rate")
   );
 }
 
+//nc-coord-line -> a line modifying XYZ or BC
 void write_ncc_line(vec3D p) {
-  fprintf(ncc_points,"%lu, %lu, %f, %f, %f, %f, %f\n",
-  tid, pid++, p.x, p.y, p.z,
-  get_var_val("PUIS_LASER"), get_var_val("VIT_TIR"));
+  fprintf(ncc_points,"%lu, %lu, %f,%f,%f, %f,%f, %u, %u,%f, %f,%f\n",
+  tid, pid++,
+  p.x, p.y, p.z,
+  get_var_val("B"), get_var_val("C"),
+  (unsigned int)get_var_val("G"),
+  (unsigned int)get_var_val("laser_status"),
+  get_var_val("PUIS_LASER"),
+  get_var_val("VIT_TIR"),
+  get_var_val("powder_feed_rate")
+  );
 }
 
 //-----hashmap fns

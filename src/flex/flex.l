@@ -157,7 +157,7 @@ H{inum} {if(debug_bm & 1){printf("An H VAR: %s!\n",yytext);}
     char* prev_fname;
     size_t prev_line;
     if(!pop_call_frame(&call_stack, &prev_fname, &prev_line)) {
-	fprintf(stderr,"Failed to pop call_frame, while processing EOF!\n");//TODO perhaps terminate
+	     fprintf(stderr,"Failed to pop call_frame, while processing EOF!\n");//TODO perhaps terminate
     }
 
     active_fname = prev_fname;

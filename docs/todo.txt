@@ -1,3 +1,9 @@
+The integration with Schmelz-Ki.
+Meaning Schmelz-Ki Transmits a current_TID, which our 3D_Track_Vis receives,
+and uses to show the current printing process of the 3D_Model.
+Then perhaps the second 3D_Vis Mode, which orbits the 3D_Models,
+center of mass, meaning we rotate around the center of mass, instead of the camera.
+
 //================3D_Visualizer Bugs===============//
 Ctrl + c
 Only works when pressing C first

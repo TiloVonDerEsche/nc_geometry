@@ -29,9 +29,11 @@ int debug = 0;
 %token T_START_X T_START_Y T_START_Z
 %token T_END_X T_END_Y T_END_Z
 %token B_CMD C_CMD
-%token MACHINE_SPEED
-%token LASER_POWER LASER_STATUS
 %token G_CODE
+%token LASER_STATUS LASER_POWER
+%token MACHINE_SPEED
+%token POWDER_FEED_RATE
+
 %token HRAD VRAD
 
 
@@ -91,24 +93,23 @@ val:
   INUM   { $$ = new NumberNode($1); }
   | FNUM { $$ = new NumberNode($1); /*TODO resolve INT / FLOAT problem*/}
   //Track Attributes:
-  //NOTE arbitrary 0 to 14, mapping for switch case VariableNode,
-  //NOTE to avoid string compare if/else chain
-  | T_ID          {$$ = new VariableNode("t_id"); }
-  | T_START_X     {$$ = new VariableNode("t_start_x"); }
-  | T_START_Y     {$$ = new VariableNode("t_start_y"); }
-  | T_START_Z     {$$ = new VariableNode("t_start_z"); }
-  | T_END_X       {$$ = new VariableNode("t_end_x"); }
-  | T_END_Y       {$$ = new VariableNode("t_end_y"); }
-  | T_END_Z       {$$ = new VariableNode("t_end_z"); }
-  | B_CMD         {$$ = new VariableNode("B"); }
-  | C_CMD         {$$ = new VariableNode("C"); }
-  | MACHINE_SPEED {$$ = new VariableNode("machine_speed"); }
-  | LASER_POWER   {$$ = new VariableNode("laser_power");}
-  | LASER_STATUS  {$$ = new VariableNode("laser_status");}
-  | G_CODE        {$$ = new VariableNode("G");}
+  | T_ID             {$$ = new VariableNode("t_id"); }
+  | T_START_X        {$$ = new VariableNode("t_start_x"); }
+  | T_START_Y        {$$ = new VariableNode("t_start_y"); }
+  | T_START_Z        {$$ = new VariableNode("t_start_z"); }
+  | T_END_X          {$$ = new VariableNode("t_end_x"); }
+  | T_END_Y          {$$ = new VariableNode("t_end_y"); }
+  | T_END_Z          {$$ = new VariableNode("t_end_z"); }
+  | B_CMD            {$$ = new VariableNode("B"); }
+  | C_CMD            {$$ = new VariableNode("C"); }
+  | G_CODE           {$$ = new VariableNode("G");}
+  | LASER_STATUS     {$$ = new VariableNode("laser_status");}
+  | LASER_POWER      {$$ = new VariableNode("laser_power");}
+  | MACHINE_SPEED    {$$ = new VariableNode("machine_speed"); }
+  | POWDER_FEED_RATE {$$ = new VariableNode("powder_feed_rate");}
+
   | HRAD          {$$ = new VariableNode("hradius");}
   | VRAD          {$$ = new VariableNode("vradius");}
-
 ;
 
 bool_expr:
@@ -132,7 +133,7 @@ bool_expr:
 
 
 %%
-void yyerror(const char *s) { std::cerr << "Fehler: " << s << "\n"; }
+void yyerror(const char *s) { std::cerr << "Error: " << s << "\n"; }
 
 uint8_t is_valid_uint8(int ui) {
   return (0<=ui && ui<=255);

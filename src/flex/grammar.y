@@ -611,14 +611,13 @@ int has_track_attr_changed(const char* varname) {
   if (bm & LASER_STATUS && strcmp(key, "laser_status") == 0) {save_track=TRUE;return TRUE;}
   if (bm & LASER_POWER && strcmp(key, "PUIS_LASER") == 0) {save_track=TRUE;return TRUE;}
   if (bm & MACHINE_SPEED && strcmp(key, "VIT_TIR") == 0) {save_track=TRUE;return TRUE;}
-  if (bm & POWDER_FEED_RATE && strcmp(key, "powder_feed_rate") == 0) {save_track=TRUE;return TRUE;}
 
   return FALSE;
 }
 
 
 void write_track_line() {
-  fprintf(tl,"%lu,%f,%f,%f, %f,%f,%f, %f,%f, %u, %u,%f, %f,%f\n",
+  fprintf(tl,"%lu,%f,%f,%f, %f,%f,%f, %f,%f, %u, %u,%f, %f\n",
   tid++,
   t_start.x, t_start.y, t_start.z,
   t_end.x, t_end.y, t_end.z,
@@ -626,22 +625,20 @@ void write_track_line() {
   (unsigned int)get_var_val("G"),
   (unsigned int)get_var_val("laser_status"),
   get_var_val("PUIS_LASER"),
-  get_var_val("VIT_TIR"),
-  get_var_val("powder_feed_rate")
+  get_var_val("VIT_TIR")
   );
 }
 
 //nc-coord-line -> a line modifying XYZ or BC
 void write_ncc_line(vec3D p) {
-  fprintf(ncc_points,"%lu, %lu, %f,%f,%f, %f,%f, %u, %u,%f, %f,%f\n",
+  fprintf(ncc_points,"%lu, %lu, %f,%f,%f, %f,%f, %u, %u,%f, %f\n",
   tid, pid++,
   p.x, p.y, p.z,
   get_var_val("B"), get_var_val("C"),
   (unsigned int)get_var_val("G"),
   (unsigned int)get_var_val("laser_status"),
   get_var_val("PUIS_LASER"),
-  get_var_val("VIT_TIR"),
-  get_var_val("powder_feed_rate")
+  get_var_val("VIT_TIR")
   );
 }
 

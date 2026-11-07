@@ -55,7 +55,6 @@ public:
       else if (strcmp(key, "laser_status") == 0)     {return t->laser_status;}
       else if (strcmp(key, "laser_power") == 0)      {return t->laser_power;}
       else if (strcmp(key, "machine_speed") == 0)    {return t->machine_speed;}
-      else if (strcmp(key, "powder_feed_rate") == 0) {return t->powder_feed_rate;}
 
       else if (strcmp(key, "hradius") == 0)          {return t->hradius;}
       else if (strcmp(key, "vradius") == 0)          {return t->vradius;}

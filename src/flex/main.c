@@ -39,11 +39,17 @@ int main(int argc, char *argv[])
     T_start_x,T_start_y,T_start_z,\
     T_end_x,T_end_y,T_end_z,\
     B,C,\
-    machine_speed,\
-    laser_power, laser_status,\
-    G_code");
-  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,x,y,z,\
-    laser_power,machine_speed");
+    G_code,\
+    laser_status, laser_power,\
+    machine_speed\
+    ");
+  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,\
+    x,y,z,\
+    B,C,\
+    G_code,\
+    laser_status, laser_power,\
+    machine_speed\
+    ");
 
   exec(config.mpf_file); //set entry point -> Main_Program_File
   yyparse();

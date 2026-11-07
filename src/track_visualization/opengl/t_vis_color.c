@@ -190,14 +190,14 @@ void read_track_list(const char* filename) {
 
     int i = 0;
     while (fgets(line, sizeof(line), file) && i < numTracks) {
-        sscanf(line, "%u,%f,%f,%f, %f,%f,%f, %f,%f, %u, %u,%f, %f,%f",
+        sscanf(line, "%u,%f,%f,%f, %f,%f,%f, %f,%f, %u, %u,%f, %f",
                &tracks[i].id,
                &tracks[i].start_x, &tracks[i].start_y, &tracks[i].start_z,
                &tracks[i].end_x, &tracks[i].end_y, &tracks[i].end_z,
                &tracks[i].b, &tracks[i].c,
                &tracks[i].g_code,
                &tracks[i].laser_status,  &tracks[i].laser_power,
-               &tracks[i].machine_speed, &tracks[i].powder_feed_rate);
+               &tracks[i].machine_speed);
         tracks[i].hradius = config.horizontal_radius;
         tracks[i].vradius = config.vertical_radius;
         tracks[i].color = (Color){0,0,0};

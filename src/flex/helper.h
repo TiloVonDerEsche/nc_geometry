@@ -44,10 +44,6 @@ KHASHL_MAP_INIT(KH_LOCAL,
 #define LASER_STATUS 16
 #define LASER_POWER 32
 #define MACHINE_SPEED 64
-#define POWDER_FEED_RATE 128
-
-
-
 
 //Debug Bitmap:
 //TODO

@@ -29,7 +29,6 @@ typedef struct {
     unsigned int laser_status; //on/off?
     float laser_power;
     float machine_speed;
-    float powder_feed_rate;
 
     //Defined by us, i.e. constant:
     Color color;

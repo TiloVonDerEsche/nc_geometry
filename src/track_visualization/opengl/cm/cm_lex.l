@@ -51,7 +51,6 @@ id       [A-Za-z][_A-Za-z]*
 "laser_status"     {return LASER_STATUS;}
 "laser_power"      {return LASER_POWER;}
 "machine_speed"    {return MACHINE_SPEED;}
-"powder_feed_rate" {return POWDER_FEED_RATE;}
 
 "hradius" {return HRAD;}
 "vradius" {return VRAD;}

@@ -440,7 +440,12 @@ int exec(char* fpath) {
   FILE* fp = fopen(fpath, "rb");
 if (fp == NULL) {  //set yyin, only when file is correctly opened
     fprintf(stderr, "Error: Could not open %s (in read mode)!\
-    \n\rDoes that file exist?\n",fpath);
+    \n\rDoes that file exist? yyin=%p\n",fpath,yyin);
+
+    if(yyin == NULL) {
+      fprintf(stderr, "Error: yyin is NULL! Exiting...\n");
+      exit(NOT_FOUND);
+    }
     return NOT_FOUND;
   }
   //Save current active_fname and line

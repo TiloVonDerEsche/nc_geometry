@@ -25,9 +25,9 @@ mpf_file = "./data/nc_code/LOOP/LOOP_CODE_CUBE_10VX_MM_FH33_50.mpf";
  64   activate label_finder msgs
  128  hashmap after executing file & modifications
 */
-debug_bitmap = 0;
+debug_bitmap = 255;
 hmhis_to_stdout = 0;
-hmhis_to_file = 0;
+hmhis_to_file = 1;
 
 /*Order:
 1->XYZ

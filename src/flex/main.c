@@ -30,10 +30,10 @@ int main(int argc, char *argv[])
   h = init_hashmap();
   debug_bm = config.debug_bitmap;
 
-  /*if(config.hmhis_to_file) {
+  if(config.hmhis_to_file) {
     hmhis = init_file(config.hmhis_json,"[");
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
-  }*/
+  }
 
   tl = init_file(config.track_list_csv,"Track_id,\
     T_start_x,T_start_y,T_start_z,\

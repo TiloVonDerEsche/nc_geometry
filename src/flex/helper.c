@@ -100,7 +100,7 @@ void print_hashmap(strfloat_t* h, FILE* destination) {
   }
   //only works if destination is seekable, a pipe f.e. is not
   fseek(destination, -1, SEEK_CUR); //move to pos of last redundant comma
-  fprintf(destination,"},\n"); //replace last comma
+  fprintf(destination,"},\n\n"); //replace last comma
 }
 
 //set_var_incr in grammar.y

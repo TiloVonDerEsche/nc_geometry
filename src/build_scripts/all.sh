@@ -1,4 +1,4 @@
-make -C ./src/flex clean
+make -C ./src/interpreter clean
 
 DIR=./src/build_scripts
 $DIR/rm_binaries.sh

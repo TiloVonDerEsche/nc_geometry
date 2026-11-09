@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "Compiling generate_track_list_arm_64.bin..."
-make -C ./src/flex TARGET=arm64
-make -C ./src/flex clean
+make -C ./src/interpreter TARGET=arm64
+make -C ./src/interpreter clean
 
 # Check for errors
 if [ $? -eq 0 ]; then
@@ -11,5 +11,5 @@ else
 fi
 echo ""
 
-make -C ./src/track_visualization/opengl TARGET=arm64
-make -C ./src/track_visualization/opengl clean
+make -C ./src/3d_vis/opengl TARGET=arm64
+make -C ./src/3d_vis/opengl clean

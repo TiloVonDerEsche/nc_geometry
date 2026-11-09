@@ -101,7 +101,8 @@ FILE* init_file(char* f_path, char* f_header);
 void close_hmhis();
 //void write_track_line(); //in grammar.y
 void modify_tl();
-
+//stack functions
+void init_stacks();
 //hashmap functions
 strfloat_t* init_hashmap();
 void print_hashmap(strfloat_t* h, FILE* destination);

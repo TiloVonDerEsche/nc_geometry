@@ -139,8 +139,8 @@
 
 %initial-action {
     //h = init_hashmap(); //h is global in helper.c for now
-    stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
-    stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
+    //stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
+    //stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
 }
 
 %%
@@ -436,6 +436,11 @@ arith_expr:
 ;
 
 %%
+void init_stacks() {
+  stack_init(&call_stack, sizeof(CallFrame), 10);  // Max 10 include levels
+  stack_init(&jmp_stack, sizeof(JmpFrame), 100);   // Max 100 jump labels
+}
+
 int exec(char* fpath) {
   FILE* fp = fopen(fpath, "rb");
 if (fp == NULL) {  //set yyin, only when file is correctly opened

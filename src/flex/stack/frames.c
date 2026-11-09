@@ -7,11 +7,11 @@ int push_call_frame(Stack *stack, char* old_fname, size_t old_line) {
         fprintf(stderr, "Include depth exceeded!\n");
         return 0;
     }
-	
+
     //save CALLER filename and line, for their restoration, when CALLEE is finished
     CallFrame frame = {
         .fname = old_fname,
-	.line = old_line
+	      .line = old_line
     };
 
     if (!push(stack, &frame)) {
@@ -28,8 +28,8 @@ int pop_call_frame(Stack *stack, char** prev_fname, size_t* prev_line) {
 
     //Mutate CallFrame
     if (!pop(stack, &frame)) {
-	fprintf(stderr, "Popping call frame failed!\n Perhaps at root main file?\n");
-        return 0; // Root file reached
+	     fprintf(stderr, "Popping call frame failed!\n Perhaps at root main file?\n");
+       return 0; // Root file reached
     }
 
     // Restore previous state

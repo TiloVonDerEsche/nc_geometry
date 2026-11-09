@@ -9,8 +9,6 @@ extern FILE* hmhis;
 extern FILE* tl;
 
 extern void label_finder(FILE* fp);
-
-//exec()
 extern int yyparse();
 
 //Read params from config
@@ -28,6 +26,7 @@ int main(int argc, char *argv[])
   printf("ncc_points_csv=%s\n", config.ncc_points_csv);
 
   h = init_hashmap();
+  init_stacks();
   debug_bm = config.debug_bitmap;
 
   if(config.hmhis_to_file) {

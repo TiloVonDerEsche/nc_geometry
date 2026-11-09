@@ -26,7 +26,7 @@ int is_empty(const Stack *stack) {
 }
 
 int is_full(const Stack *stack) {
-    return stack->top >= stack->capacity - 1;
+    return stack->top >= stack->capacity - 1; //NOTE if capacity were to be unsigned, this would be buggy
 }
 
 int push(Stack *stack, const void *elem) {

@@ -106,7 +106,6 @@ val:
   | LASER_STATUS     {$$ = new VariableNode("laser_status");}
   | LASER_POWER      {$$ = new VariableNode("laser_power");}
   | MACHINE_SPEED    {$$ = new VariableNode("machine_speed"); }
-  | POWDER_FEED_RATE {$$ = new VariableNode("powder_feed_rate");}
 
   | HRAD          {$$ = new VariableNode("hradius");}
   | VRAD          {$$ = new VariableNode("vradius");}

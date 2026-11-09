@@ -4,8 +4,6 @@ and uses to show the current printing process of the 3D_Model.
 Then perhaps the second 3D_Vis Mode, which orbits the 3D_Models,
 center of mass, meaning we rotate around the center of mass, instead of the camera.
 
-Segmentation fault, when trying to write to hmhis.json
-
 //================3D_Visualizer Bugs===============//
 Ctrl + c
 Only works when pressing C first
@@ -139,3 +137,38 @@ Geometry merging into Isosurface
 
 //===============Old ideas==============//
 overlap_vec (overlap / intersect direction of previously drawn track -> Work in Progress)
+
+
+
+
+//===============Track List Format=================//
+A singular place to adjust the track typedef, and track_list format
+Use the typedef as a seed:
+typedef struct {
+    unsigned int id; //defined by appearance order in nc_code
+    float start_x, start_y, start_z; // Start point t_start_x, t_start_y, t_start_z
+    float end_x, end_y, end_z; // End point  t_end_x, ...
+    float b, c;
+    unsigned int g_code;
+    unsigned int laser_status; //on/off?
+    float laser_power;
+    float machine_speed;
+
+    //Defined by us, i.e. constant:
+    Color color;
+    float hradius, vradius; // Radii
+} Track;
+
+"laser_status" -> ? "LASER_ON" : "LASER_OFF"
+"laser_power" -> "PUIS_LASER"
+"machine_speed" -> "VIT_TIR"
+
+-> Extract the attribute order, types and names
+-> generate format string for track_list writing and reading
+-> Color_mapper: somehow add new bison tokens and flex reading rule
+-> Copy the attr ordered names as CSV header for init_file in main.c
+-> NC_Interpreter: Somehow define what corresponding string to save in var-hashmap
+   -> mapping
+->adjust attrs_bitmap mapping automatically
+//-----NC Machine Dialect Abstraction
+-> track_def_by_attrs is the universal mode

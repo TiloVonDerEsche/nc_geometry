@@ -34,7 +34,14 @@ int main(int argc, char *argv[])
     hmhis = init_file(config.hmhis_json,"[");
     setvbuf(hmhis, NULL, _IONBF, 0);  // disable buffering
   }
-
+  if(config.save_ncc_points) {
+    ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,\
+      x,y,z,\
+      B,C,\
+      G_code,\
+      laser_status, laser_power,\
+      machine_speed\
+      ");}
   tl = init_file(config.track_list_csv,"Track_id,\
     T_start_x,T_start_y,T_start_z,\
     T_end_x,T_end_y,T_end_z,\
@@ -43,20 +50,14 @@ int main(int argc, char *argv[])
     laser_status, laser_power,\
     machine_speed\
     ");
-  ncc_points = init_file(config.ncc_points_csv, "Track_id,Point_id,\
-    x,y,z,\
-    B,C,\
-    G_code,\
-    laser_status, laser_power,\
-    machine_speed\
-    ");
+
 
   exec(config.mpf_file); //set entry point -> Main_Program_File
   yyparse();
 
   //printf("%lu tracks written to %s!\n",tid,config.track_list_csv);
   if(config.hmhis_to_file) {close_hmhis();}
+  if(config.save_ncc_points) {fclose(ncc_points);}
   fclose(tl);
-  fclose(ncc_points);
   return 0;
 }

@@ -636,6 +636,7 @@ void write_track_line() {
 
 //nc-coord-line -> a line modifying XYZ or BC
 void write_ncc_line(vec3D p) {
+  if(!config.save_ncc_points) {return;}
   fprintf(ncc_points,"%lu, %lu, %f,%f,%f, %f,%f, %u, %u,%f, %f\n",
   tid, pid++,
   p.x, p.y, p.z,

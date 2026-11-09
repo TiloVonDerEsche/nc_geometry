@@ -14,6 +14,7 @@ typedef struct {
 typedef struct {
   int hmhis_to_stdout;
   int hmhis_to_file;
+  int save_ncc_points;
   int tracks_def_by;
   int track_mid_len;
   unsigned char attrs_bitmap; //8-Bitmap

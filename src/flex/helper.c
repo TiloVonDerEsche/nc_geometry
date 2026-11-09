@@ -252,15 +252,12 @@ int read_config(const char* fpath, Config* config) {
 
         //ignore comments and empty lines
         if (trimmed[0] == '/' && trimmed[1] == '*') {
-		inside_comment = 1;
-	}
+      		inside_comment = 1;}
         if (trimmed[0] == '*' && trimmed[1] == '/') {
-		inside_comment = 0;
-  continue;
-	}
-	if (strlen(trimmed) == 0 || trimmed[0] == '/' || inside_comment) {
-            continue;
-        }
+      		inside_comment = 0;
+          continue;}
+      	if (strlen(trimmed) == 0 || trimmed[0] == '/' || inside_comment) {
+          continue;}
 
         char* key;
         char* value;
@@ -279,6 +276,9 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "hmhis_to_file") == 0) {
             config->hmhis_to_file = atoi(value);
         }
+        else if (strcmp(key, "save_ncc_points") == 0) {
+            config->save_ncc_points = atoi(value);
+        }
         else if (strcmp(key, "tracks_def_by") == 0) {
             config->tracks_def_by = atoi(value);
         }
@@ -288,7 +288,7 @@ int read_config(const char* fpath, Config* config) {
         else if (strcmp(key, "attrs_bitmap") == 0) {
            config->attrs_bitmap = (unsigned char) atoi(value);
         }
-	else if (strcmp(key, "debug_bitmap") == 0) {
+	      else if (strcmp(key, "debug_bitmap") == 0) {
            config->debug_bitmap = (unsigned char) atoi(value);
         }
         else if (strcmp(key, "mpf_file") == 0) {

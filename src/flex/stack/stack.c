@@ -9,8 +9,8 @@ void stack_init(Stack *stack, size_t elem_size, int capacity) {
     stack->top = -1;
     stack->data = malloc(stack->elem_size * stack->capacity); //TODO Check if the product, can overflow
 
-    printf("Initialized stack with: Elem_size: %lu, Capacity: %d, Top: %d\n",
-           stack->elem_size, stack->capacity, stack->top); //TODO add debug & 32
+    //printf("Initialized stack with: Elem_size: %lu, Capacity: %d, Top: %d\n",
+    //       stack->elem_size, stack->capacity, stack->top); //TODO add debug_bm & 32, perhaps extern debug_bm
 }
 
 void stack_free(Stack *stack) {

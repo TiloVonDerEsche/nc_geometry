@@ -1,6 +1,6 @@
 ## Syntax highlighting for C and C++ files.
 
-syntax c "\.ctxt$"
+syntax c "\.cmap$"
 header "-\*-.*\<C(\+\+)?((;|[[:blank:]]).*)?-\*-"
 magic "^(C|C\+\+) (source|program)"
 comment "//"
@@ -15,16 +15,8 @@ color normal ":[[:blank:]]*$"
 color brightred "[[:alpha:]_][[:alnum:]_]*[[:blank:]]*="
 
 # Valid Parameters (Overlays bright yellow for correct parameter names)
-# Add or remove parameter names inside the list using the '|' separator
-#config.ctxt && plot_config.ctxt
-color green "print_strs|debug_prints"
-color green "mpf_file|ncc_points_csv|track_list_csv|tracks_to_plot"
-color green "hmhis_json|hmhis_to_file|hmhis_to_stdout"
-color green "track_mid_len|tracks_def_by|attrs_bitmap"
-color green "camera_orient"
-color green "vertical_radius|horizontal_radius"
-
-#color_config.ctxt
+# Add or remove parameter names inside the list using the '|' separators
+#color.cmap
 color green "B|C|G"
 color green "t_id"
 color green "t_start_x|t_start_y|t_start_z"
@@ -57,7 +49,7 @@ color brightblue "//.*"
 color brightblue start="/\*" end="\*/"
 
 # Reminders.
-color brightwhite,yellow "\<(FIXME|TODO|REMOVE|XXX)\>"
+color brightwhite,yellow "\<(NOTE|TODO|DEL|HELP)\>"
 
 # Trailing whitespace.
 color ,green "[[:space:]]+$"

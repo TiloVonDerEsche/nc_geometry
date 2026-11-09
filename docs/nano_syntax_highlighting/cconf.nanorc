@@ -1,0 +1,54 @@
+## Syntax highlighting for C and C++ files.
+
+syntax c "\.cconf$"
+header "-\*-.*\<C(\+\+)?((;|[[:blank:]]).*)?-\*-"
+magic "^(C|C\+\+) (source|program)"
+comment "//"
+
+# Constants.
+color brightred "\<[A-Z_][0-9A-Z_]*\>"
+
+# Labels.
+color brightmagenta "^[[:blank:]]*[A-Z_a-z][0-9A-Z_a-z]*:[[:blank:]]*$"
+color normal ":[[:blank:]]*$"
+
+color brightred "[[:alpha:]_][[:alnum:]_]*[[:blank:]]*="
+
+# Valid Parameters (Overlays bright yellow for correct parameter names)
+# Add or remove parameter names inside the list using the '|' separator
+#interpreter.cconf && color.cconf
+color green "debug_bitmap|debug_prints"
+color green "mpf_file|ncc_points_csv|track_list_csv|tracks_to_plot"
+color green "save_ncc_points"
+color green "hmhis_json|hmhis_to_file|hmhis_to_stdout"
+color green "track_mid_len|tracks_def_by|attrs_bitmap"
+color green "camera_orient"
+color green "vertical_radius|horizontal_radius"
+
+# Single-quoted stuff (characters, backslash escapes, hex and octal byte codes).
+color brightmagenta "'([^'\]|\\(["'\abfnrtv]|x[[:xdigit:]]{1,2}|[0-3]?[0-7]{1,2}))'"
+
+# Strings
+color brightyellow ""([^"]|\\")*""
+
+# Integers (e.g., 1, 10, 255)
+color yellow "\<[0-9]+\>"
+
+# Floats (e.g., 0.30, 0.02)
+color yellow "\<[0-9]+\.[0-9]+\>"
+
+# Equal Sign
+color white "(=|==|!=|<=|<|>=|>|\+|-|\*|\^)"
+
+# Brackets & Delimiters
+color white "[\{\};,]"
+
+# Comments.
+color brightblue "//.*"
+color brightblue start="/\*" end="\*/"
+
+# Reminders.
+color brightwhite,yellow "\<(NOTE|TODO|DEL|HELP)\>"
+
+# Trailing whitespace.
+color ,green "[[:space:]]+$"

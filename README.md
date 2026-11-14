@@ -103,3 +103,6 @@ Download the binaries from Releases, or click here: [![GitHub release (latest by
 
 # Used by:
 https://github.com/CIMTT-Kiel/schmelz-ki
+
+# Credits:
+Variable Hashmap from standalone khashl.h: https://github.com/attractivechaos/khashl

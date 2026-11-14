@@ -1,3 +1,17 @@
+//====================Shipping==============//
+Make Download.md download the latest version,
+for the specified OS.
+Only the executables need to be handpicked.
+
+
+Seperate repo for nano syntax highlighting
+->cconf
+->cmap
+->c
+->bison, flex
+->py
+//==============Schmelz-Ki Integration============//
+
 The integration with Schmelz-Ki.
 Meaning Schmelz-Ki Transmits a current_TID, which our 3D_Track_Vis receives,
 and uses to show the current printing process of the 3D_Model.
